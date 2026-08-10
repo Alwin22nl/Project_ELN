@@ -1,0 +1,189 @@
+{% extends "base.html" %}
+
+{% block title %}
+Zettex ELN
+{% endblock %}
+
+{% block content %}
+
+<div class="page-navigation">
+    <a href="{{ url_for('adhesion') }}" class="back-button">
+        Back to Adhesion Overview
+    </a>
+</div>
+
+<div class="container">
+    <div class="left-panel">
+        <h1>Adhesion Test</h1>
+        <form method="POST">
+            <h3>Select Product</h3>
+            <select id="product_select" name="product_id">
+
+                <option value="">
+                    Select product...
+                </option>
+
+                {% for product in products %}
+                <option value="{{ product.product_id }}">
+                    {{ product.product_name }}
+                </option>
+                {% endfor %}
+
+            </select>
+            <br><br>
+            <h3>Select Sample</h3>
+            <select id="sample_select" name="sample_id">
+                <option>
+                    Select product first...
+                </option>
+            </select>
+
+            <hr>
+            <h2>Adhesion Results</h2>
+
+            <label>Rubber</label><br>
+            <input type="number" step="0.01" name="rubber" min="0" max="100" required>
+
+            <br><br>
+
+            <label>Copper</label><br>
+            <input type="number" step="0.01" name="copper" min="0" max="100" required>
+
+            <br><br>
+
+            <label>Wood</label><br>
+            <input type="number" step="0.01" name="wood" min="0" max="100" required>
+
+            <br><br>
+
+            <label>Aluminium</label><br>
+            <input type="number" step="0.01" name="aluminium" min="0" max="100" required>
+
+            <br><br>
+
+            <label>Aluminium Anod.</label><br>
+            <input type="number" step="0.1" name="aluminium_anod" min="0" max="100" required>
+
+            <br><br>
+
+            <label>Lead</label><br>
+            <input type="number" step="0.01" name="lead" min="0" max="100" required>
+
+            <br><br>
+
+            <label>RVS</label><br>
+            <input type="number" step="0.01" name="rvs" min="0" max="100" required>
+
+            <br><br>
+
+            <label>Concrete</label><br>
+            <input type="number" step="0.01" name="concrete" min="0" max="100" required>
+
+            <br><br>
+
+            <label>Glass</label><br>
+            <input type="number" step="0.01" name="glass" min="0" max="100" required>
+
+            <br><br>
+
+            <label>PVC</label><br>
+            <input type="number" step="0.1" name="pvc" min="0" max="100" required>
+
+            <br><br>
+
+            <label>PMMA</label><br>
+            <input type="number" step="0.1" name="pmma" min="0" max="100" required>
+
+            <br><br>
+
+            <label>PC</label><br>
+            <input type="number" step="0.1" name="pc" min="0" max="100" required>
+
+            <br><br>
+
+            <label>Remark</label><br>
+            <textarea name="remark"></textarea>
+
+            <br><br>
+
+            <button type="submit">
+                Save Adhesion
+            </button>
+        </form>
+    </div>
+
+    <div class="right-panel">
+        <h2>Latest Results</h2>
+        <table class="compact-table">
+            <tr>
+                <th>Batch number</th>
+                <th>Rubber</th>
+                <th>Copper</th>
+                <th>Wood</th>
+                <th>Aluminium</th>
+                <th>Aluminium Anod.</th>
+                <th>Lead</th>
+                <th>RVS</th>
+                <th>Concrete</th>
+                <th>Glass</th>
+                <th>PVC</th>
+                <th>PMMA</th>
+                <th>PC</th>
+            </tr>
+
+            {% for result in results %}
+
+            <tr>
+                <td>{{ result.batch_nr }}</td>
+                <td>{{ result.rubber }}</td>
+                <td>{{ result.copper }}</td>
+                <td>{{ result.wood }}</td>
+                <td>{{ result.aluminium }}</td>
+                <td>{{ result.aluminium_anod }}</td>
+                <td>{{ result.lead }}</td>
+                <td>{{ result.rvs }}</td>
+                <td>{{ result.concrete }}</td>
+                <td>{{ result.glass }}</td>
+                <td>{{ result.pvc }}</td>
+                <td>{{ result.pmma }}</td>
+                <td>{{ result.pc }}</td>
+            </tr>
+
+            {% endfor %}
+        </table>
+    </div>
+</div>
+
+<script>
+
+document
+.getElementById("product_select")
+.addEventListener("change", function() {
+
+    let product_id = this.value;
+    let sample_dropdown = document.getElementById("sample_select");
+
+    if (!product_id) {
+        sample_dropdown.innerHTML =
+            "<option>Select product first...</option>";
+        return;
+    }
+
+    sample_dropdown.innerHTML =
+        "<option>Loading...</option>";
+    fetch("/get_adhesion_samples/" + product_id)
+    .then(response => response.json())
+    .then(data => {
+        sample_dropdown.innerHTML =
+            "<option>Select sample...</option>";
+
+        data.samples.forEach(function(sample) {
+            let option = document.createElement("option");
+            option.value = sample.id;
+            option.text = sample.batch_nr;
+            sample_dropdown.appendChild(option);
+        });
+    });
+});
+</script>
+{% endblock %}

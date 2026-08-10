@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block title %}
+Zettex ELN
+{% endblock %}
+
+{% block content %}
+
+<h1>Product Management</h1>
+{% if session.role == "admin" %}
+<div class="container">
+    <!-- LEFT PANEL -->
+    <div class="left-panel">
+        <h2>Create Product</h2>
+        <form method="POST">
+            <label>Product Code</label>
+            <input 
+                type="text"
+                name="product_code"
+                required>
+            <label>Product Name</label>
+            <input 
+                type="text"
+                name="product_name"
+                required>
+            <hr>
+            <h3>Required Tests</h3>
+            {% for test in tests %}
+            <div class="test-option">
+                <input 
+                    type="checkbox"
+                    name="required_tests"
+                    value="{{ test.test_type_id }}"
+                    id="test_{{ test.test_type_id }}">
+                <label for="test_{{ test.test_type_id }}">
+                    {{ test.test_name }}
+                </label>
+                <input
+                    type="number"
+                    name="frequency_{{ test.test_type_id }}"
+                    value="1"
+                    min="1"
+                    style="width:80px;">
+                <span>
+                    batches
+                </span>
+            </div>
+            {% endfor %}
+            <br>
+            <button type="submit">
+                Save Product
+            </button>
+        </form>
+    </div>
+{% endif %}
+    <!-- RIGHT PANEL -->
+    <div class="right-panel">
+        <h2>Existing Products</h2>
+        <table>
+            <tr>
+                <th>Code</th>
+                <th>Product</th>
+            </tr>
+            {% for product in products %}
+            <tr>
+                <td>
+                    {{ product.product_code }}
+                </td>
+                <td>
+                    {{ product.product_name }}
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+</div>
+
+{% endblock %}

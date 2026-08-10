@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+
+{% block title %}
+Zettex ELN
+{% endblock %}
+
+{% block content %}
+
+<div class="page-navigation">
+    <a href="{{ url_for('shore_a') }}" class="back-button">
+        Back to Shore A Overview
+    </a>
+</div>
+
+<div class="container">
+    <div class="left-panel">
+        <h1>Shore A Test</h1>
+        <form method="POST">
+            <h3>Select Product</h3>
+            <select id="product_select" name="product_id">
+
+                <option value="">
+                    Select product...
+                </option>
+
+                {% for product in products %}
+                <option value="{{ product.product_id }}">
+                    {{ product.product_name }}
+                </option>
+                {% endfor %}
+
+            </select>
+            <br><br>
+            <h3>Select Sample</h3>
+            <select id="sample_select" name="sample_id">
+                <option>
+                    Select product first...
+                </option>
+            </select>
+
+            <hr>
+            <h2>Shore A Results</h2>
+
+            <label>Shore A 1</label><br>
+            <input type="number" step="0.01" name="shore_a_1" min="1" max="100" required>
+
+            <br><br>
+
+            <label>Shore A 2</label><br>
+            <input type="number" step="0.01" name="shore_a_2" min="1" max="100" required>
+
+            <br><br>
+
+            <label>Shore A 3</label><br>
+            <input type="number" step="0.01" name="shore_a_3" min="1" max="100" required>
+
+            <br><br>
+
+            <label>Temperature</label><br>
+            <input type="number" step="0.01" name="temperature" min="15" max="50" required>
+
+            <br><br>
+
+            <label>Humidity</label><br>
+            <input type="number" step="0.1" name="humidity" min="0" max="100" required>
+
+            <br><br>
+
+            <label>Remark</label><br>
+            <textarea name="remark"></textarea>
+
+            <br><br>
+
+            <button type="submit">
+                Save Shore A
+            </button>
+        </form>
+    </div>
+
+    <div class="right-panel">
+        <h2>Latest Results</h2>
+        <table>
+            <tr>
+                <th>Batch number</th>
+                <th>Shore A</th>
+                <th>Temprerature</th>
+                <th>Humidity</th>
+            </tr>
+
+            {% for result in results %}
+
+            <tr>
+                <td>{{ result.batch_nr }}</td>
+                <td>{{ result.shore_a_avg }}</td>
+                <td>{{ result.temperature }}</td>
+                <td>{{ result.humidity }}</td>
+            </tr>
+
+            {% endfor %}
+        </table>
+    </div>
+</div>
+
+<script>
+
+document
+.getElementById("product_select")
+.addEventListener("change", function() {
+
+    let product_id = this.value;
+    let sample_dropdown = document.getElementById("sample_select");
+
+    if (!product_id) {
+        sample_dropdown.innerHTML =
+            "<option>Select product first...</option>";
+        return;
+    }
+
+    sample_dropdown.innerHTML =
+        "<option>Loading...</option>";
+    fetch("/get_shore_a_samples/" + product_id)
+    .then(response => response.json())
+    .then(data => {
+        sample_dropdown.innerHTML =
+            "<option>Select sample...</option>";
+
+        data.samples.forEach(function(sample) {
+            let option = document.createElement("option");
+            option.value = sample.id;
+            option.text = sample.batch_nr;
+            sample_dropdown.appendChild(option);
+        });
+    });
+});
+</script>
+{% endblock %}

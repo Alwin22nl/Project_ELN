@@ -1,0 +1,142 @@
+{% extends "base.html" %}
+
+{% block title %}
+Zettex ELN
+{% endblock %}
+
+{% block content %}
+
+<div class="page-navigation">
+    <a href="{{ url_for('tensile') }}" class="back-button">
+        ← Back to Tensile Strength
+    </a>
+</div>
+
+<h1>Measure Tensile Dumbells</h1>
+
+<form method="POST">
+    <label>Batch</label>
+    <select name="sample_id" required>
+
+        <option value="">
+            Select batch...
+        </option>
+
+        {% for sample in samples %}
+
+        <option value="{{ sample.sample_id }}">
+            {{ sample.batch_nr }} - {{ sample.product_name }}
+        </option>
+
+        {% endfor %}
+    </select>
+    <br><br>
+    <table>
+        <tr>
+            <th>Dumbell</th>
+            <th>Width 1</th>
+            <th>Width 2</th>
+            <th>Width 3</th>
+            <th>Avg Width</th>
+            <th>Thickness 1</th>
+            <th>Thickness 2</th>
+            <th>Thickness 3</th>
+            <th>Avg Thickness</th>
+
+        </tr>
+
+        {% for i in range(1,5) %}
+
+        <tr>
+            <td>
+                {{ i }}
+                <input
+                    type="hidden"
+                    name="specimen_no[]"
+                    value="{{ i }}">
+            </td>
+            <td>
+                <input
+                    type="number"
+                    step="0.001"
+                    name="width_1[]"
+                    min="5.500"
+                    max="6.500"
+                    required>
+            </td>
+            <td>
+                <input
+                    type="number"
+                    step="0.001"
+                    name="width_2[]"
+                    min="5.500"
+                    max="6.500"
+                    required>
+            </td>
+            <td>
+                <input
+                    type="number"
+                    step="0.001"
+                    name="width_3[]"
+                    min="5.500"
+                    max="6.500"
+                    required>
+            </td>
+            <td>
+                <input
+                    type="number"
+                    step="0.001"
+                    name="width_avg[]"
+                    class="width-avg"
+                    readonly>
+            </td>
+            <td>
+                <input
+                    type="number"
+                    step="0.001"
+                    name="thickness_1[]"
+                    min="1.500"
+                    max="2.500"
+                    required>
+            </td>
+            <td>
+                <input
+                    type="number"
+                    step="0.001"
+                    name="thickness_2[]"
+                    min="1.500"
+                    max="2.500"
+                    required>
+            </td>
+            <td>
+                <input
+                    type="number"
+                    step="0.001"
+                    name="thickness_3[]"
+                    min="1.500"
+                    max="2.500"
+                    required>
+            </td>
+            <td>
+                <input
+                    type="number"
+                    step="0.001"
+                    name="thickness_avg[]"
+                    class="thickness-avg"
+                    readonly>
+            </td>
+
+        </tr>
+
+        {% endfor %}
+
+    </table>
+    <br>
+    <button type="submit">
+        Save Measurements
+    </button>
+</form>
+
+<script src="{{ url_for('static', filename='js/tensile_measure.js') }}"></script>
+
+{% endblock %}

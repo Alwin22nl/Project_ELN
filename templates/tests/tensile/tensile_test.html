@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+
+{% block title %}
+Zettex ELN
+{% endblock %}
+
+{% block content %}
+
+<div class="page-navigation">
+
+    <a href="{{ url_for('tensile') }}"
+    class="back-button">
+
+        ← Back to Tensile Strength
+
+    </a>
+</div>
+
+<h1>Tensile Strength Test</h1>
+
+<form method="POST">
+    <label>Select Batch</label>
+        <select id="batch_select"
+        name="sample_id">
+            <option value="">
+                Select batch...
+            </option>
+    {% for batch in batches %}
+
+        <option value="{{ batch.sample_id }}">
+            {{ batch.batch_nr }} -
+            {{ batch.product_name }}
+        </option>
+
+    {% endfor %}
+
+    </select>
+    <br><br>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Dumbell</th>
+                <th>Width avg</th>
+                <th>Thickness avg</th>
+                <th>T 50</th>
+                <th>T 100</th>
+                <th>T max</th>
+                <th>E max</th>
+                <th>Remark</th>
+            </tr>
+        </thead>
+        <tbody id="specimen_body">
+        </tbody>
+    </table>
+
+    <br>
+    <button type="submit">
+    Save Tensile Results
+    </button>
+</form>
+
+<hr>
+
+<h2>Latest Results</h2>
+    <table>
+        <tr>
+            <th>Batch</th>
+            <th>Tmax</th>
+            <th>Emax</th>
+            <th>T50</th>
+            <th>T100</th>
+        </tr>
+        {% for result in results %}
+        <tr>
+            <td>
+                {{ result.batch_nr }}
+            </td>
+            <td>
+                {{ result.t_max }}
+            </td>
+            <td>
+                {{ result.e_max }}
+            </td>
+            <td>
+                {{ result.t_50 }}
+            </td>
+            <td>
+                {{ result.t_100 }}
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+
+<script src="{{ url_for(
+'static',
+filename='js/tensile_test.js'
+) }}"></script>
+
+{% endblock %}

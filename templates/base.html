@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+
+    <head>
+
+        <title>
+            {% block title %}
+            Zettex ELN
+            {% endblock %}
+        </title>
+
+        <link rel="stylesheet" 
+            href="{{ url_for('static', filename='style.css') }}">
+
+    </head>
+
+    <body>
+        <div class="layout">
+            <!-- Navigation -->
+            <nav class="sidebar">
+
+                <h2>Zettex ELN</h2>
+
+                {% if session.get("user_id") %}
+                <a href="/">🏠 Dashboard</a>
+
+                <a href="/sample">🧪 Samples</a>
+
+                <a href="/tests">🔬 Tests</a>
+
+                <a href="/products">📦 Products</a>
+
+                <a href="{{ url_for('overview_page') }}">📋 Results</a>
+
+                <a href="{{ url_for('batch_search') }}">🔎 Batch Search</a>
+                {% endif %}
+                {% if session.role == "admin" %}
+
+                <a href="{{ url_for('audit_logs_admin') }}">
+                Correction Logs
+                </a>
+
+                <a href="{{ url_for('admin_page') }}">
+                    Administration
+                </a>
+                {% endif %}
+
+                <div class="sidebar-bottom">
+                {% if session.get("user_id") %}
+                    <p>
+                        Logged in as<br>
+                        <br>
+                        <strong>{{ session["name"] }}</strong>
+                    </p>
+                    <a href="{{ url_for('logout') }}">
+                        Logout
+                    </a>
+                    {% endif %}
+                </div>
+            </nav>
+
+            <!-- Page content -->
+            <main class="content">
+                {% block content %}
+                {% endblock %}
+            </main>
+        </div>
+
+    </body>
+
+</html>

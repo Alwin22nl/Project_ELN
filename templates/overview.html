@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block title %}
+Zettex ELN
+{% endblock %}
+
+{% block content %}
+
+<h1>Product Overview</h1>
+
+<form method="GET">
+    <label>Select Product</label>
+    <select name="product_id">
+        {% for product in products %}
+        <option
+            value="{{ product.product_id }}"
+            {% if selected_product == product.product_id %}
+                selected
+            {% endif %}
+        >
+            {{ product.product_name }}
+        </option>
+        {% endfor %}
+    </select>
+    <button type="submit">
+        Load
+    </button>
+</form>
+
+<br>
+<div class="overview">
+    <table>
+        <thead>
+            <tr>
+                {% for title, field in columns %}
+                    <th>{{ title }}</th>
+                {% endfor %}
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for row in results %}
+            <tr>
+
+                {% for title, field in columns %}
+                    <td>{{ row[field] if row[field] is not none else "" }}</td>
+                {% endfor %}
+
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
