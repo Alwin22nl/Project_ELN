@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block title %}
+Zettex ELN
+{% endblock %}
+
+{% block content %}
+
+<h1>Sample Management</h1>
+<h1>Create New Sample</h1>
+
+{% if error %}
+    <div class="form-error">
+        {{ error }}
+    </div>
+{% endif %}
+
+<div class="container">
+    <div class="left-panel">
+        <form action="/sample" method="POST">
+            <label>Batch Number</label><br>
+            <input type="text" name="batch_nr"><br><br>
+
+            <label>Production Date</label><br>
+            <input type="date" name="prod_date"><br><br>
+
+            <label>Product</label><br>
+            <select name="product_id">
+
+                {% for product in products %}
+                    <option value="{{ product.product_id }}">
+                        {{ product.product_name }}
+                    </option>
+                {% endfor %}
+            </select>
+            <label class="checkbox-label" >
+                After storage required
+                <input 
+                    type="checkbox" 
+                    name="after_storage_required"
+                    value="true"
+                >
+            </label>
+
+            <br><br>
+
+            <label>Remark</label><br>
+            <textarea name="remark"></textarea>
+
+            <br><br>
+
+            <button type="submit">
+                Save Sample
+            </button>
+        </form>
+    </div>
+
+    <div class="right-panel">
+        <h2>Registered Samples</h2>
+
+        <table>
+
+            <tr>
+                <th>Status</th>
+                <th>Batch</th>
+                <th>Product</th>
+                <th>Production Date</th>
+            </tr>
+
+            {% for sample in samples %}
+            <tr>
+                <td>{{ sample.status }}</td>
+                <td>{{ sample.batch_nr }}</td>
+                <td>{{ sample.product }}</td>
+                <td>{{ sample.prod_date }}</td>
+             </tr>
+
+            {% endfor %}
+        </table>
+    </div>
+</div>
+
+{% endblock %}

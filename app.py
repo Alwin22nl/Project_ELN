@@ -986,6 +986,8 @@ def remove_afterstorage():
 @login_required
 def sample():
 
+    error = None
+
     if request.method == "POST":
 
         batch_nr = request.form["batch_nr"]
@@ -998,45 +1000,57 @@ def sample():
         cursor = get_dict_cursor(connection)
 
         cursor.execute(
-        """
-        SELECT
-            COALESCE(MAX(batch_sequence),0)+1 AS next_sequence
-        FROM samples
-        WHERE product_id = %s
-        """,
-        (product_id,)
-        )
-
-        next_sequence = cursor.fetchone()["next_sequence"]
-
-        cursor.execute(
             """
-            INSERT INTO samples
-            (
-                batch_nr,
-                prod_date,
-                product_id,
-                batch_sequence,
-                after_storage_required,
-                remark
-            )
-            VALUES (%s, %s, %s, %s, %s, %s)
+            SELECT COUNT(*) AS count
+            FROM samples
+            WHERE batch_nr = %s
             """,
-            (
-                batch_nr,
-                prod_date,
-                product_id,
-                next_sequence,
-                after_storage_required,
-                remark
-            )
+            (batch_nr,)
         )
 
-        connection.commit()
+        if cursor.fetchone()["count"] > 0:
+            error = f"Batch number '{batch_nr}' already exists."
+        else:
+            cursor.execute(
+            """
+            SELECT
+                COALESCE(MAX(batch_sequence),0)+1 AS next_sequence
+            FROM samples
+            WHERE product_id = %s
+            """,
+            (product_id,)
+            )
+
+            next_sequence = cursor.fetchone()["next_sequence"]
+
+            cursor.execute(
+                """
+                INSERT INTO samples
+                (
+                    batch_nr,
+                    prod_date,
+                    product_id,
+                    batch_sequence,
+                    after_storage_required,
+                    remark
+                )
+                VALUES (%s, %s, %s, %s, %s, %s)
+                """,
+                (
+                    batch_nr,
+                    prod_date,
+                    product_id,
+                    next_sequence,
+                    after_storage_required,
+                    remark
+                )
+            )
+
+            connection.commit()
+            print("Sample saved!")
+
         cursor.close()
         connection.close()
-
-        print("Sample saved!")
 
     connection = get_connection()
     cursor = get_dict_cursor(connection)
@@ -1055,7 +1069,7 @@ def sample():
             samples.batch_nr,
             products.product_name,
             samples.prod_date,
-            (samples.prod_date + 7) AS due_date
+            samples.product_id
         FROM samples
         JOIN products
         ON products.product_id = samples.product_id
@@ -1064,12 +1078,218 @@ def sample():
     """)
 
     samples = cursor.fetchall()
+    sample_ids = [sample["sample_id"] for sample in samples]
+    product_ids = list({sample["product_id"] for sample in samples})
+
+    cursor.execute(
+        """
+        SELECT
+            product_id,
+            test_type_id
+        FROM product_test_requirements
+        WHERE product_id = ANY(%s)
+        """,
+        (product_ids,)
+    )
+    requirements = cursor.fetchall()
+    required_tests = {}
+    for row in requirements:
+        required_tests.setdefault(row["product_id"], set()).add(row["test_type_id"])
+
+    cursor.execute(
+        """
+        SELECT
+            afterstorage_id,
+            sample_id
+        FROM after_storage
+        WHERE sample_id = ANY(%s)
+        """,
+        (sample_ids,)
+    )
+    after_storage_rows = cursor.fetchall()
+    afterstorage_by_sample = {}
+    afterstorage_ids = []
+    for row in after_storage_rows:
+        afterstorage_by_sample.setdefault(row["sample_id"], []).append(row["afterstorage_id"])
+        afterstorage_ids.append(row["afterstorage_id"])
+
+    cursor.execute(
+        """
+        SELECT sample_id
+        FROM initial_tack
+        WHERE sample_id = ANY(%s)
+        """,
+        (sample_ids,)
+    )
+    initial_tack_done = {row["sample_id"] for row in cursor.fetchall()}
+
+    cursor.execute(
+        """
+        SELECT sample_id
+        FROM density
+        WHERE sample_id = ANY(%s)
+        """,
+        (sample_ids,)
+    )
+    density_done = {row["sample_id"] for row in cursor.fetchall()}
+
+    cursor.execute(
+        """
+        SELECT sample_id
+        FROM shore_a
+        WHERE sample_id = ANY(%s)
+        """,
+        (sample_ids,)
+    )
+    shore_a_done = {row["sample_id"] for row in cursor.fetchall()}
+
+    cursor.execute(
+        """
+        SELECT sample_id
+        FROM adhesion
+        WHERE sample_id = ANY(%s)
+        """,
+        (sample_ids,)
+    )
+    adhesion_done = {row["sample_id"] for row in cursor.fetchall()}
+
+    cursor.execute(
+        """
+        SELECT sample_id
+        FROM epdm_adhesion
+        WHERE sample_id = ANY(%s)
+        """,
+        (sample_ids,)
+    )
+    epdm_adhesion_done = {row["sample_id"] for row in cursor.fetchall()}
+
+    cursor.execute(
+        """
+        SELECT sample_id
+        FROM tensile_strength
+        WHERE sample_id = ANY(%s)
+        """,
+        (sample_ids,)
+    )
+    tensile_done = {row["sample_id"] for row in cursor.fetchall()}
+
+    cursor.execute(
+        """
+        SELECT sample_id
+        FROM curability
+        WHERE sample_id = ANY(%s)
+        """,
+        (sample_ids,)
+    )
+    curability_sample_done = {row["sample_id"] for row in cursor.fetchall()}
+
+    curability_afterstorage_done = set()
+    if afterstorage_ids:
+        cursor.execute(
+            """
+            SELECT a.sample_id
+            FROM curability c
+            JOIN after_storage a
+            ON c.afterstorage_id = a.afterstorage_id
+            WHERE a.afterstorage_id = ANY(%s)
+            """,
+            (afterstorage_ids,)
+        )
+        curability_afterstorage_done = {row["sample_id"] for row in cursor.fetchall()}
+
+    rheology_sample_done = set()
+    rheology_afterstorage_done = set()
+    cursor.execute(
+        """
+        SELECT sample_id
+        FROM rheology
+        WHERE sample_id = ANY(%s)
+        """,
+        (sample_ids,)
+    )
+    rheology_sample_done = {row["sample_id"] for row in cursor.fetchall()}
+
+    if afterstorage_ids:
+        cursor.execute(
+            """
+            SELECT a.sample_id
+            FROM rheology r
+            JOIN after_storage a
+            ON r.afterstorage_id = a.afterstorage_id
+            WHERE a.afterstorage_id = ANY(%s)
+            """,
+            (afterstorage_ids,)
+        )
+        rheology_afterstorage_done = {row["sample_id"] for row in cursor.fetchall()}
+
+    skinformation_sample_done = set()
+    skinformation_afterstorage_done = set()
+    cursor.execute(
+        """
+        SELECT sample_id
+        FROM skinformation
+        WHERE sample_id = ANY(%s)
+        """,
+        (sample_ids,)
+    )
+    skinformation_sample_done = {row["sample_id"] for row in cursor.fetchall()}
+
+    if afterstorage_ids:
+        cursor.execute(
+            """
+            SELECT a.sample_id
+            FROM skinformation s
+            JOIN after_storage a
+            ON s.afterstorage_id = a.afterstorage_id
+            WHERE a.afterstorage_id = ANY(%s)
+            """,
+            (afterstorage_ids,)
+        )
+        skinformation_afterstorage_done = {row["sample_id"] for row in cursor.fetchall()}
+
     sample_list = []
 
     for sample in samples:
         due_date = sample["prod_date"] + timedelta(days=7)
+        product_id = sample["product_id"]
+        requirement_set = required_tests.get(product_id, set())
 
-        if today < due_date:
+        def test_done(sample_id, test_type):
+            if test_type == 1:
+                return (
+                    sample_id in rheology_sample_done
+                    or sample_id in rheology_afterstorage_done
+                )
+            if test_type == 2:
+                return (
+                    sample_id in curability_sample_done
+                    or sample_id in curability_afterstorage_done
+                )
+            if test_type == 3:
+                return sample_id in shore_a_done
+            if test_type == 4:
+                return sample_id in density_done
+            if test_type == 5:
+                return sample_id in tensile_done
+            if test_type == 6:
+                return sample_id in adhesion_done
+            if test_type == 7:
+                return sample_id in epdm_adhesion_done
+            if test_type == 8:
+                return sample_id in initial_tack_done
+            if test_type == 9:
+                return (
+                    sample_id in skinformation_sample_done
+                    or sample_id in skinformation_afterstorage_done
+                )
+            return False
+
+        completed = all(test_done(sample["sample_id"], test_type)
+                        for test_type in requirement_set)
+
+        if completed:
+            status = "🟢 Completed"
+        elif today < due_date:
             status = "🔴 Wait with Testing"
         else:
             status = "🟠 Available for Testing / in progress"
@@ -1087,7 +1307,8 @@ def sample():
     return render_template(
         "sample.html",
         products=products,
-        samples=sample_list
+        samples=sample_list,
+        error=error
     )
 
 @app.route("/tests")
