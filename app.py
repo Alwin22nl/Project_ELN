@@ -836,11 +836,13 @@ def dashboard():
             ON curability_preparation.sample_id = samples.sample_id
             LEFT JOIN curability
             ON curability.sample_id = samples.sample_id
-            WHERE EXISTS (
-                SELECT 1
-                FROM product_test_requirements ptr
-                WHERE ptr.product_id = samples.product_id
-                AND ptr.test_type_id = 2
+            WHERE
+                samples.prod_date <= CURRENT_DATE - INTERVAL '7 days'
+                AND EXISTS (
+                    SELECT 1
+                    FROM product_test_requirements ptr
+                    WHERE ptr.product_id = samples.product_id
+                    AND ptr.test_type_id = 2
                 )
         ) curability_measure_tasks
         WHERE action IS NOT NULL
