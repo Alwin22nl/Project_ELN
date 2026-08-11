@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block title %}
+Zettex ELN
+{% endblock %}
+
+
+{% block content %}
+<div class="page-navigation">
+    <a href="{{ url_for('shore_a') }}" class="back-button">
+        Back to Shore A Overview
+    </a>
+</div>
+
+<h1>Shore A - Specimen Preparation</h1>
+<div class="container">
+    <!-- LEFT PANEL -->
+    <div class="left-panel">
+        <h2>Prepare New Specimen</h2>
+        <form method="POST">
+            <label>Select Sample</label>
+            <select name="sample_id" required>
+                <option value="">
+                    Select sample...
+                </option>
+                {% for sample in samples %}
+                <option value="{{ sample.sample_id }}">
+                    {{ sample.batch_nr }} - {{ sample.product_name }}
+                 </option>
+                {% endfor %}
+            </select>
+            <br><br>
+            <label>Remark</label>
+            <textarea name="remark"></textarea>
+            <br><br>
+            <button type="submit">
+                Register Preparation
+            </button>
+        </form>
+    </div>
+    <!-- RIGHT PANEL -->
+    <div class="right-panel">
+        <h2>Prepared Specimens</h2>
+        <p>
+            These samples are curing and will become available
+            for Shore A testing after 7 days.
+        </p>
+        <table>
+            <tr>
+                <th>Batch</th>
+                <th>Product</th>
+                <th>Prepared Date</th>
+                <th>Status</th>
+            </tr>
+            {% for sample in prepared %}
+            <tr>
+                <td>
+                    {{ sample.batch_nr }}
+                </td>
+                <td>
+                    {{ sample.product_name }}
+                </td>
+                <td>
+                    {{ sample.prepared_date.strftime('%d-%m-%Y') }}
+                </td>
+                <td>
+                    {% set days = (today - sample.prepared_date.date()).days %}
+                    {% if days >= 7 %}
+                        Ready for Testing
+                    {% else %}
+                        {{ days }} / 7 days curing
+                    {% endif %}
+            </td>
+
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block title %}
+Zettex ELN
+{% endblock %}
+
+{% block content %}
+
+<h1>Laboratory Tests</h1>
+<p>Select the test you want to perform.</p>
+<div class="test-grid">
+
+{% for test in tests %}
+
+    <a class="test-card"
+       href="{{ url_for(test.endpoint) }}">
+
+        <div class="test-name">
+            {{ test.name }}
+        </div>
+    </a>
+{% endfor %}
+</div>
+{% endblock %}

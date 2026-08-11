@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block title %}
+Zettex ELN
+{% endblock %}
+
+{% block content %}
+
+<h1>Batch Search</h1>
+
+<form method="POST">
+
+    <input 
+    type="text"
+    name="batch_nr"
+    placeholder="Enter batch number">
+
+    <button type="submit">
+        Search
+    </button>
+
+</form>
+
+
+{% if batch %}
+
+<hr>
+
+<h2>
+Batch: {{ batch.batch_nr }}
+</h2>
+
+<p>
+Product:
+{{ batch.product_name }}
+</p>
+
+<p>
+Production date:
+{{ batch.prod_date }}
+</p>
+
+<h2>Test Results</h2>
+
+<table>
+    <thead>
+        <tr>
+            <th>Test</th>
+            <th>Operator</th>
+            <th>Date</th>
+            <th>Results</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for test in results %}
+        <tr>
+            <td>
+                {{ test.test_name }}
+            </td>
+            <td>
+                {{ test.operator }}
+            </td>
+            <td>
+                {{ test.test_date }}
+            </td>
+            <td>
+                {% for name, value in test["values"].items() %}
+                {{ name }}:
+                {{ value }}<br>
+                {% endfor %}
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+
+</table>
+
+{% endif %}
+
+{% endblock %}

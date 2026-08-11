@@ -1,0 +1,179 @@
+{% extends "base.html" %}
+
+
+{% block title %}
+Zettex ELN
+{% endblock %}
+
+
+
+{% block content %}
+
+
+<div class="page-navigation">
+
+    <a href="{{ url_for('curability') }}" class="back-button">
+        Back to Curability Overview
+    </a>
+
+</div>
+
+
+<h1>Curability - Specimen Preparation</h1>
+<div class="container">
+<!-- LEFT PANEL -->
+    <div class="left-panel">
+        <h2>Prepare New Specimen</h2>
+        <form method="POST">
+            <label>Select Sample</label>
+            <select 
+                name="sample_id"
+                id="sample_select"
+                required>
+                <option value="">
+                    Select sample...
+                </option>
+
+            {% for sample in samples %}
+
+                <option 
+                    value="{{ sample.sample_id }}"
+                    data-afterstorage="{{ sample.afterstorage_id or '' }}">
+                    {{ sample.display_name }}
+                </option>
+
+            {% endfor %}
+            </select>
+            <input 
+                type="hidden"
+                name="afterstorage_id"
+                id="afterstorage_id">
+
+            <br><br>
+            <label>Remark</label>
+            <textarea name="remark"></textarea>
+            <br><br>
+            <button type="submit">
+            Register Preparation
+            </button>
+        </form>
+    </div>
+
+<!-- RIGHT PANEL -->
+    <div class="right-panel">
+        <h2>Prepared Specimens</h2>
+        <table>
+            <tr>
+                <th>Batch</th>
+                <th>Product</th>
+                <th>Prepared</th>
+                <th>Status</th>
+            </tr>
+            {% for sample in prepared %}
+            <tr>
+
+                <td>
+                    {{ sample.display_name }}
+                </td>
+                <td>
+                    {{ sample.product_name }}
+                </td>
+                <td>
+                {{ sample.prepared_date.strftime('%d-%m-%Y') }}
+                </td>
+<td>
+
+{% set hours_passed = ((now - sample.prepared_date).total_seconds() / 3600) %}
+
+
+{% if sample.removed_24h_at is none %}
+
+
+    {% if hours_passed < 24 %}
+
+        <button disabled>
+            Remove 24h specimen
+        </button>
+        <br>
+        Available in
+        {{ ((24 - hours_passed) // 1)|int }}h
+    {% else %}
+        <form method="POST"
+        action="{{ url_for(
+            'curability_remove_24h',
+            curability_preparation_id=sample.curability_preparation_id
+        ) }}">
+            <button type="submit">
+                Remove 24h specimen
+            </button>
+        </form>
+    {% endif %}
+
+{% elif sample.removed_7d_at is none %}
+
+    {% if hours_passed < 168 %}
+        <button disabled>
+            Remove 7d specimen
+        </button>
+        <br>
+        Available in
+        {{ ((168 - hours_passed) // 24)|int }}d
+    {% else %}
+        <form method="POST"
+        action="{{ url_for(
+            'curability_remove_7d',
+            curability_preparation_id=sample.curability_preparation_id
+        ) }}">
+            <button type="submit">
+                Remove 7d specimen
+            </button>
+        </form>
+    {% endif %}
+{% else %}
+    Ready for Testing
+{% endif %}
+</td>
+            </tr>
+        {% endfor %}
+        </table>
+    </div>
+</div>
+
+
+<script>
+
+function updateTimers(){
+    document.querySelectorAll(".countdown").forEach(function(timer){
+        let target = new Date(timer.dataset.time);
+        let now = new Date();
+        let diff = target - now;
+        if(diff <= 0){
+            timer.innerHTML = "Available now";
+            return;
+        }
+        let hours = Math.floor(diff / 1000 / 60 / 60);
+        let minutes = Math.floor(
+            (diff / 1000 / 60) % 60
+        );
+        timer.innerHTML =
+            hours + "h " + minutes + "m";
+    });
+}
+setInterval(updateTimers, 60000);
+updateTimers();
+
+document
+.getElementById("sample_select")
+.addEventListener("change", function(){
+
+    let selected =
+        this.options[this.selectedIndex];
+
+    document.getElementById("afterstorage_id").value =
+        selected.dataset.afterstorage || "";
+
+});
+
+</script>
+
+{% endblock %}

@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block title %}
+Zettex ELN
+{% endblock %}
+
+{% block content %}
+
+<h1>EPDM Adhesion</h1>
+
+<div class="test-grid">
+    <a class="test-card"
+       href="{{ url_for('epdm_adhesion_prep') }}">
+        Prepare Specimens
+    </a>
+    <a class="test-card"
+       href="{{ url_for('epdm_adhesion_test') }}">
+        Perform Test
+    </a>
+</div>
+
+{% endblock %}

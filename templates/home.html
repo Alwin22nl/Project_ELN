@@ -1,0 +1,418 @@
+{% extends "base.html" %}
+
+{% block title %}
+Zettex ELN
+{% endblock %}
+
+{% block content %}
+
+<h1>ELN Dashboard</h1>
+
+<h3>Welkom {{ session["name"] }}!</h3> 
+<p>Hieronder alle openstaande taken</p>
+
+<div class="dashboard-card full-width">
+    <a href="{{ url_for('curability_prep') }}"><h2>Curability Schedule</h2></a>
+
+    <table class="task-table">
+        <thead>
+            <tr>
+                <th>Batch</th>
+                <th>Production date</th>
+                <th>Due time</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+
+        <tbody>
+
+        {% for row in curability_schedule %}
+
+            <tr>
+                <td>
+                    {{ row.batch_nr }}
+                </td>d>
+                <td>
+                    {{ row.prod_date.strftime('%d-%m-%Y') if row.prod_date else "" }}
+                </td>
+                <td>
+                    {{ row.due_time.strftime('%H:%M') if row.due_time else "" }}
+                </td>
+                <td>
+                    {{ row.action }}
+                </td>
+            </tr>
+
+        {% else %}
+
+            <tr>
+                <td colspan="5">
+                    No curability removals scheduled
+                </td>
+            </tr>
+
+        {% endfor %}
+
+        </tbody>
+
+    </table>
+
+</div>
+<br>
+<div class="dashboard-card full-width">
+    <h2>After Storage Schedule</h2>
+    <table class="task-table">
+        <thead>
+            <tr>
+                <th>Batch</th>
+                <th>Product</th>
+                <th>Due</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for row in after_storage_schedule %}
+            <tr>
+                <td>
+                    {{ row.batch_nr }} AS
+                </td>
+                <td>
+                    {{ row.product_name }}
+                </td>
+                <td>
+                    {{ row.due_date.strftime('%d-%m-%Y') }}
+                </td>
+                <td>
+                    {% if row.action == "Place in oven" %}
+                        <form method="POST"
+                              action="{{ url_for('place_afterstorage') }}">
+                            <input type="hidden"
+                                   name="sample_id"
+                                   value="{{ row.sample_id }}">
+                            <label>
+                                Oven:
+                            </label>
+                            <input type="text"
+                                   name="oven_location">
+                            <button type="submit">
+                                Place in oven
+                            </button>
+                        </form>
+                    {% elif row.action == "Remove from oven" %}
+                        <form method="POST"
+                              action="{{ url_for('remove_afterstorage') }}">
+                            <input type="hidden"
+                                   name="afterstorage_id"
+                                   value="{{ row.afterstorage_id }}">
+                            <button type="submit">
+                                Remove from oven
+                            </button>
+                        </form>
+                    {% endif %}
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="4">
+                    No after storage actions waiting
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+<br>
+<div class="dashboard-grid">
+
+    <!-- Rheology -->
+    <div class="dashboard-card">
+        <a href="{{ url_for('rheology') }}"><h2>Rheology</h2></a>
+
+        <table>
+            <tr>
+                <th>Batch</th>
+                <th>Production Date</th>
+            </tr>
+
+            {% for row in rheology %}
+            <tr>
+                <td>{{ row.batch_nr }}</td>
+                <td>{{ row.prod_date.strftime("%d-%m-%Y") }}</td>
+            </tr>
+            {% endfor %}
+
+            {% if rheology|length == 0 %}
+            <tr>
+                <td colspan="3">No rheology tests waiting.</td>
+            </tr>
+            {% endif %}
+        </table>
+    </div>
+
+    <!-- Skinformation -->
+    <div class="dashboard-card">
+        <a href="{{ url_for('skinformation') }}"><h2>Skinformation</h2></a>
+
+        <table>
+            <tr>
+                <th>Batch</th>
+                <th>Production Date</th>
+            </tr>
+
+            {% for row in skinformation %}
+            <tr>
+                <td>{{ row.batch_nr }}</td>
+                <td>{{ row.prod_date.strftime("%d-%m-%Y") }}</td>
+            </tr>
+            {% endfor %}
+
+            {% if skinformation|length == 0 %}
+            <tr>
+                <td colspan="3">No Skinformation tests waiting.</td>
+            </tr>
+            {% endif %}
+        </table>
+    </div>
+
+    <!-- Tensile Strentgh-->
+    <div class="dashboard-card">
+        <a href="{{ url_for('tensile') }}"><h2>Tensile Strength</h2></a>
+
+        <table class="task-table">
+            <thead>
+                <tr>
+                    <th>Batch</th>
+                    <th>Production date</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for row in tensile %}
+                <tr>
+                    <td>
+                        {{ row.batch_nr }}
+                    </td>
+
+                    <td>
+                        {{ row.prod_date }}
+                    </td>
+
+                    <td>
+                        {{ row.action }}
+                    </td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="4">
+                        No tensile actions waiting
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Shore A -->
+    <div class="dashboard-card">
+        <a href="{{ url_for('shore_a') }}"><h2>Shore A</h2></a>
+
+        <table class="task-table">
+            <thead>
+                <tr>
+                    <th>Batch</th>
+                    <th>Production date</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for row in shore_a %}
+                <tr>
+                    <td>
+                        {{ row.batch_nr }}
+                    </td>
+
+                    <td>
+                        {{ row.prod_date }}
+                    </td>
+
+                    <td>
+                        {{ row.action }}
+                    </td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="4">
+                        No Shore A actions waiting
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Curability -->
+    <div class="dashboard-card">
+        <a href="{{ url_for('curability') }}"><h2>Curability</h2></a>
+
+        <table class="task-table">
+            <thead>
+                <tr>
+                    <th>Batch</th>
+                    <th>Production date</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for row in curability %}
+                <tr>
+                    <td>
+                        {{ row.batch_nr }}
+                    </td>
+
+                    <td>
+                        {{ row.prod_date }}
+                    </td>
+
+                    <td>
+                        {{ row.action }}
+                    </td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="4">
+                        No Curability actions waiting
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Initial Tack -->
+    <div class="dashboard-card">
+        <a href="{{ url_for('initial_tack') }}"><h2>Initial Tack</h2></a>
+
+        <table>
+            <tr>
+                <th>Batch</th>
+                <th>Production Date</th>
+            </tr>
+
+            {% for row in initial_tack %}
+            <tr>
+                <td>{{ row.batch_nr }}</td>
+                <td>{{ row.prod_date.strftime("%d-%m-%Y") }}</td>
+            </tr>
+            {% endfor %}
+
+            {% if initial_tack|length == 0 %}
+            <tr>
+                <td colspan="3">No Initial Tack tests waiting.</td>
+            </tr>
+            {% endif %}
+        </table>
+    </div>
+
+    <!-- Density -->
+    <div class="dashboard-card">
+       <a href="{{ url_for('density') }}"><h2>Density</h2></a>
+
+        <table>
+            <tr>
+                <th>Batch</th>
+                <th>Production Date</th>
+            </tr>
+
+            {% for row in density %}
+            <tr>
+                <td>{{ row.batch_nr }}</td>
+                <td>{{ row.prod_date.strftime("%d-%m-%Y") }}</td>
+            </tr>
+            {% endfor %}
+
+            {% if density|length == 0 %}
+            <tr>
+                <td colspan="3">No rheology tests waiting.</td>
+            </tr>
+            {% endif %}
+        </table>
+    </div>
+    
+    <!-- Adhesion -->
+    <div class="dashboard-card">
+        <a href="{{ url_for('adhesion') }}"><h2>Adhesion</h2></a>
+
+        <table class="task-table">
+            <thead>
+                <tr>
+                    <th>Batch</th>
+                    <th>Production date</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for row in adhesion %}
+                <tr>
+                    <td>
+                        {{ row.batch_nr }}
+                    </td>
+
+                    <td>
+                        {{ row.prod_date }}
+                    </td>
+
+                    <td>
+                        {{ row.action }}
+                    </td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="4">
+                        No Adhesion actions waiting
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- EPDM Adhesion -->
+    <div class="dashboard-card">
+        <a href="{{ url_for('epdm_adhesion') }}"><h2>EPDM adhesion</h2></a>
+
+        <table class="task-table">
+            <thead>
+                <tr>
+                    <th>Batch</th>
+                    <th>Production date</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for row in epdm_adhesion %}
+                <tr>
+                    <td>
+                        {{ row.batch_nr }}
+                    </td>
+
+                    <td>
+                        {{ row.prod_date }}
+                    </td>
+
+                    <td>
+                        {{ row.action }}
+                    </td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="4">
+                        No EDPM Adhesion actions waiting
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+ 
+{% endblock %}
