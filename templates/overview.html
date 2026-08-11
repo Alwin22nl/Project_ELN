@@ -22,8 +22,21 @@ Zettex ELN
         </option>
         {% endfor %}
     </select>
+    <label>Batch</label>
+    <input
+        type="text"
+        name="batch_nr"
+        value="{{ batch_nr|default('') }}"
+        placeholder="Batch number"
+    >
+    <label>Production Date</label>
+    <input
+        type="date"
+        name="prod_date"
+        value="{{ prod_date or '' }}"
+    >
     <button type="submit">
-        Load
+        Filter
     </button>
 </form>
 
@@ -39,11 +52,34 @@ Zettex ELN
         </thead>
 
         <tbody>
+            {% if results %}
+            <tr class="average-row">
+                {% for title, field in columns %}
+                    {% if loop.index0 == 0 %}
+                        <td>Average</td>
+                    {% elif loop.index0 == 1 %}
+                        <td></td>
+                    {% elif averages[field] is not none %}
+                        <td>{{ averages[field] }}</td>
+                    {% else %}
+                        <td></td>
+                    {% endif %}
+                {% endfor %}
+            </tr>
+            {% endif %}
             {% for row in results %}
             <tr>
 
                 {% for title, field in columns %}
-                    <td>{{ row[field] if row[field] is not none else "" }}</td>
+                    <td>
+                        {% if row[field] is not none %}
+                            {% if field == "prod_date" %}
+                                {{ row[field].strftime('%d-%m-%Y') }}
+                            {% else %}
+                                {{ row[field] }}
+                            {% endif %}
+                        {% endif %}
+                    </td>
                 {% endfor %}
 
             </tr>
