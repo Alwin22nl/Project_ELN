@@ -3555,13 +3555,13 @@ def overview_page():
             samples.sample_id,
             samples.batch_nr,
             samples.prod_date,
-            rheology.yield_stress,
-            rheology.vis_at_10,
+            COALESCE(rheology.yield_stress, rheology_as.yield_stress) AS yield_stress,
+            COALESCE(rheology.vis_at_10, rheology_as.vis_at_10) AS vis_at_10,
             ROUND(initial_tack.initial_tack, 2) AS initial_tack,
-            skinformation.tack_free_time,
-            skinformation.skinformation_time,
-            curability.day_1,
-            curability.day_7,
+            COALESCE(skinformation.tack_free_time, skinformation_as.tack_free_time) AS tack_free_time,
+            COALESCE(skinformation.skinformation_time, skinformation_as.skinformation_time) AS skinformation_time,
+            COALESCE(curability.day_1, curability_as.day_1) AS day_1,
+            COALESCE(curability.day_7, curability_as.day_7) AS day_7,
             shore_a.shore_a_avg,
             ROUND(density.density_product, 2) AS density_product,
             ROUND(AVG(tensile_specimen.t_max),2) AS t_max,
@@ -3577,14 +3577,22 @@ def overview_page():
                 ELSE '✓'
             END AS epdm_adhesion
         FROM samples
+        LEFT JOIN after_storage
+            ON after_storage.sample_id = samples.sample_id
         LEFT JOIN rheology
             ON rheology.sample_id = samples.sample_id
+        LEFT JOIN rheology AS rheology_as
+            ON rheology_as.afterstorage_id = after_storage.afterstorage_id
         LEFT JOIN initial_tack
             ON initial_tack.sample_id = samples.sample_id
         LEFT JOIN skinformation
             ON skinformation.sample_id = samples.sample_id
+        LEFT JOIN skinformation AS skinformation_as
+            ON skinformation_as.afterstorage_id = after_storage.afterstorage_id
         LEFT JOIN curability
           ON curability.sample_id = samples.sample_id
+        LEFT JOIN curability AS curability_as
+          ON curability_as.afterstorage_id = after_storage.afterstorage_id
         LEFT JOIN shore_a
             ON shore_a.sample_id = samples.sample_id
         LEFT JOIN density
@@ -3615,11 +3623,17 @@ def overview_page():
             samples.prod_date,
             rheology.yield_stress,
             rheology.vis_at_10,
+            rheology_as.yield_stress,
+            rheology_as.vis_at_10,
             initial_tack.initial_tack,
             skinformation.tack_free_time,
             skinformation.skinformation_time,
+            skinformation_as.tack_free_time,
+            skinformation_as.skinformation_time,
             curability.day_1,
             curability.day_7,
+            curability_as.day_1,
+            curability_as.day_7,
             shore_a.shore_a_avg,
             density.density_product,
             adhesion.sample_id,
@@ -3700,6 +3714,8 @@ def batch_search():
                 cursor.execute("""
                     SELECT
                         rheology.yield_stress,
+                        rheology.vis_at_1,
+                        rheology.vis_at_5,
                         rheology.vis_at_10,
                         rheology.humidity,
                         rheology.test_date, 
@@ -3722,11 +3738,46 @@ def batch_search():
 
                         "values": {
                             "Yield stress": rheology["yield_stress"],
+                            "Viscosity @1": rheology["vis_at_1"],
+                            "Viscosity @5": rheology["vis_at_5"],
                             "Viscosity @10": rheology["vis_at_10"],
                             "Humidity": rheology["humidity"]
                         }
                     })
                 else:
+                    cursor.execute("""
+                        SELECT
+                            rheology.yield_stress,
+                            rheology.vis_at_1,
+                            rheology.vis_at_5,
+                            rheology.vis_at_10,
+                            rheology.humidity,
+                            rheology.test_date,
+                            users.name AS operator
+                        FROM rheology
+                        JOIN after_storage
+                            ON rheology.afterstorage_id = after_storage.afterstorage_id
+                        JOIN users
+                            ON users.user_id = rheology.operator_id
+                        WHERE after_storage.sample_id = %s
+                    """,
+                    (sample_id,)
+                    )
+                    rheology_as = cursor.fetchone()
+                    if rheology_as:
+                        results.append({
+                            "test_name": "Rheology (after storage)",
+                            "operator": rheology_as["operator"],
+                            "test_date": format_datetime(rheology_as["test_date"]),
+                            "values": {
+                                "Yield stress": rheology_as["yield_stress"],
+                                "Viscosity @1": rheology_as["vis_at_1"],
+                                "Viscosity @5": rheology_as["vis_at_5"],
+                                "Viscosity @10": rheology_as["vis_at_10"],
+                                "Humidity": rheology_as["humidity"]
+                            }
+                        })
+                    else:
                         results.append({
                             "test_name": "Rheology",
                             "operator": "",
@@ -3803,6 +3854,33 @@ def batch_search():
                         }
                     })
                 else:
+                    cursor.execute("""
+                        SELECT
+                            skinformation.tack_free_time,
+                            skinformation.skinformation_time,
+                            skinformation.test_date,
+                            users.name AS operator
+                        FROM skinformation
+                        JOIN after_storage
+                            ON skinformation.afterstorage_id = after_storage.afterstorage_id
+                        JOIN users
+                            ON users.user_id = skinformation.operator_id
+                        WHERE after_storage.sample_id = %s
+                    """,
+                    (sample_id,)
+                    )
+                    skinformation_as = cursor.fetchone()
+                    if skinformation_as:
+                        results.append({
+                            "test_name": "Skinformation (after storage)",
+                            "operator": skinformation_as["operator"],
+                            "test_date": format_datetime(skinformation_as["test_date"]),
+                            "values": {
+                                "Tack free": skinformation_as["tack_free_time"],
+                                "Skinformation": skinformation_as["skinformation_time"]
+                            }
+                        })
+                    else:
                         results.append({
                             "test_name": "Skinformation",
                             "operator": "",
@@ -3921,14 +3999,41 @@ def batch_search():
                         }
                     })
                 else:
-                    results.append({
-                        "test_name": "Curability",
-                        "operator": "",
-                        "test_date": "",
-                        "values": {
-                            "Status": "No result recorded"
-                        }
-                    })
+                    cursor.execute("""
+                        SELECT
+                            curability.day_1,
+                            curability.day_7,
+                            curability.test_date,
+                            users.name AS operator
+                        FROM curability
+                        JOIN after_storage
+                            ON curability.afterstorage_id = after_storage.afterstorage_id
+                        JOIN users
+                            ON users.user_id = curability.operator_id
+                        WHERE after_storage.sample_id = %s
+                    """,
+                    (sample_id,)
+                    )
+                    curability_as = cursor.fetchone()
+                    if curability_as:
+                        results.append({
+                            "test_name": "Curability (after storage)",
+                            "operator": curability_as["operator"],
+                            "test_date": format_datetime(curability_as["test_date"]),
+                            "values": {
+                                "24h": curability_as["day_1"],
+                                "7d": curability_as["day_7"]
+                            }
+                        })
+                    else:
+                        results.append({
+                            "test_name": "Curability",
+                            "operator": "",
+                            "test_date": "",
+                            "values": {
+                                "Status": "No result recorded"
+                            }
+                        })
 
             # Tensile
             if 5 in required_tests:
