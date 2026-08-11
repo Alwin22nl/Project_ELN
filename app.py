@@ -4,6 +4,7 @@ from flask import session, Flask, render_template, request, redirect, url_for, j
 from database import get_connection, get_dict_cursor
 from helper import log_change
 from datetime import date, timedelta, datetime
+from numbers import Real
 from werkzeug.security import generate_password_hash, check_password_hash
 from functools import wraps
 import secrets
@@ -3467,6 +3468,11 @@ def overview_page():
 
     products = cursor.fetchall()
     product_id = request.args.get("product_id", type=int)
+    batch_nr = request.args.get("batch_nr", "").strip()
+    prod_date = request.args.get("prod_date")
+    if prod_date == "":
+        prod_date = None
+
     if not product_id:
 
         cursor.close()
@@ -3477,7 +3483,9 @@ def overview_page():
             products=products,
             selected_product=None,
             columns=[],
-            results=[]
+            results=[],
+            batch_nr="",
+            prod_date=""
         )
 
     # Required tests for this product
@@ -3542,7 +3550,7 @@ def overview_page():
             ("EPDM Adhesion", "epdm_adhesion")
         )
 
-    cursor.execute("""
+    query = """
         SELECT
             samples.sample_id,
             samples.batch_nr,
@@ -3588,6 +3596,18 @@ def overview_page():
         LEFT JOIN epdm_adhesion
             ON epdm_adhesion.sample_id = samples.sample_id
         WHERE samples.product_id = %s
+    """
+    query_args = [product_id]
+
+    if batch_nr:
+        query += "\n            AND samples.batch_nr ILIKE %s"
+        query_args.append(f"%{batch_nr}%")
+
+    if prod_date is not None:
+        query += "\n            AND samples.prod_date = %s"
+        query_args.append(prod_date)
+
+    query += """
 
         GROUP BY
             samples.sample_id,
@@ -3604,10 +3624,20 @@ def overview_page():
             density.density_product,
             adhesion.sample_id,
             epdm_adhesion.sample_id
-        ORDER BY samples.sample_id 
-    """, (product_id,))
+        ORDER BY samples.sample_id
+    """
+
+    cursor.execute(query, tuple(query_args))
 
     results = cursor.fetchall()
+
+    averages = {}
+    for title, field in columns:
+        values = [
+            row[field] for row in results
+            if row[field] is not None and isinstance(row[field], Real)
+        ]
+        averages[field] = round(sum(values) / len(values), 2) if values else None
 
     cursor.close()
     connection.close()
@@ -3617,7 +3647,10 @@ def overview_page():
         products=products,
         selected_product=product_id,
         columns=columns,
-        results=results
+        results=results,
+        batch_nr=batch_nr,
+        prod_date=prod_date or "",
+        averages=averages
     )
 
 @app.route("/batch_search", methods=["GET", "POST"])
