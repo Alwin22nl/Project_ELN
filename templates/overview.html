@@ -33,7 +33,7 @@ Zettex ELN
     <input
         type="date"
         name="prod_date"
-        value="{{ prod_date|default('') }}"
+        value="{{ prod_date or '' }}"
     >
     <button type="submit">
         Filter
@@ -71,7 +71,15 @@ Zettex ELN
             <tr>
 
                 {% for title, field in columns %}
-                    <td>{{ row[field] if row[field] is not none else "" }}</td>
+                    <td>
+                        {% if row[field] is not none %}
+                            {% if field == "prod_date" %}
+                                {{ row[field].strftime('%d-%m-%Y') }}
+                            {% else %}
+                                {{ row[field] }}
+                            {% endif %}
+                        {% endif %}
+                    </td>
                 {% endfor %}
 
             </tr>
