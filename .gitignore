@@ -6,3 +6,4 @@ Database_backup/
 # Files to ignore
 test_connection.py
 Project LIMSELN.txt
+.env

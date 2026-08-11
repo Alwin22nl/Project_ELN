@@ -1,3 +1,5 @@
+import os
+from dotenv import load_dotenv
 from flask import session, Flask, render_template, request, redirect, url_for, jsonify
 from database import get_connection, get_dict_cursor
 from helper import log_change
@@ -7,10 +9,11 @@ from functools import wraps
 import secrets
 import string
 
+load_dotenv()
 today = date.today()
 
 app = Flask(__name__)
-app.secret_key = "ELN-Project made by Alwin for Zettex Lab"
+app.secret_key = os.getenv("SECRET_KEY")
 app.permanent_session_lifetime = timedelta(hours=1)
 app.config["SESSION_REFRESH_EACH_REQUEST"] = True
 
