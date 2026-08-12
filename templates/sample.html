@@ -72,7 +72,7 @@ Zettex ELN
                 <td>{{ sample.status }}</td>
                 <td>{{ sample.batch_nr }}</td>
                 <td>{{ sample.product }}</td>
-                <td>{{ sample.prod_date }}</td>
+                <td>{{ sample.prod_date.strftime("%d-%m-%Y") }}</td>
              </tr>
 
             {% endfor %}

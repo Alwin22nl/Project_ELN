@@ -1254,6 +1254,7 @@ def sample():
         skinformation_afterstorage_done = {row["sample_id"] for row in cursor.fetchall()}
 
     sample_list = []
+    current_date = date.today()
 
     for sample in samples:
         due_date = sample["prod_date"] + timedelta(days=7)
@@ -1295,7 +1296,7 @@ def sample():
 
         if completed:
             status = "🟢 Completed"
-        elif today < due_date:
+        elif current_date < due_date:
             status = "🔴 Wait with Testing"
         else:
             status = "🟠 Available for Testing / in progress"
