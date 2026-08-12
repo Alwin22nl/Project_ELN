@@ -60,8 +60,7 @@ document
             step="0.001"
             name="t_50[]"
             min="0.100"
-            max="10.000"
-            required>
+            max="10.000">
             </td>
 
 
@@ -71,8 +70,7 @@ document
             step="0.001"
             name="t_100[]"
             min="0.100"
-            max="10.000" 
-            required>
+            max="10.000" >
             </td>
 
 
