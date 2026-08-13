@@ -522,7 +522,9 @@ def dashboard():
         WHERE
         after_storage.removed_from_oven IS NOT NULL
         AND rheology.afterstorage_id IS NULL
-        ORDER BY prod_date;
+        ORDER BY 
+            prod_date,
+            sample_id;
     """)
 
     rheology = cursor.fetchall()
@@ -569,7 +571,9 @@ def dashboard():
         WHERE
         after_storage.removed_from_oven IS NOT NULL
         AND skinformation.afterstorage_id IS NULL
-        ORDER BY prod_date;
+        ORDER BY 
+            prod_date,
+            sample_id;
     """)
     
     skinformation = cursor.fetchall()
@@ -598,7 +602,7 @@ def dashboard():
             )
         )=0
         AND initial_tack.sample_id IS NULL
-        ORDER BY samples.prod_date
+        ORDER BY samples.prod_date, samples.sample_id;
     """)
     
     initial_tack = cursor.fetchall()
@@ -651,7 +655,7 @@ def dashboard():
                 )
         ) tensile_tasks
         WHERE action IS NOT NULL        
-        ORDER BY prod_date
+        ORDER BY prod_date, sample_id;
     """)
 
     tensile = cursor.fetchall()
@@ -695,7 +699,7 @@ def dashboard():
                 ) = 0
         ) shore_a_tasks
         WHERE action IS NOT NULL
-        ORDER BY prod_date
+        ORDER BY prod_date, sample_id;
     """)
 
     shore_a = cursor.fetchall()
@@ -749,7 +753,7 @@ def dashboard():
                 )             
         ) adhesion_tasks
         WHERE action IS NOT NULL
-        ORDER BY prod_date
+        ORDER BY prod_date, sample_id;
     """)
 
     adhesion = cursor.fetchall()
@@ -803,7 +807,7 @@ def dashboard():
                 )             
         ) epdm_adhesion_tasks
         WHERE action IS NOT NULL
-        ORDER BY prod_date
+        ORDER BY prod_date, sample_id;
     """)
     epdm_adhesion = cursor.fetchall()
 
@@ -882,7 +886,7 @@ def dashboard():
             after_storage.removed_from_oven IS NOT NULL
             ) curability_as_tasks 
             WHERE action IS NOT NULL
-        ORDER BY prod_date;
+        ORDER BY prod_date, sample_id;
         """)
     curability = cursor.fetchall()
 
@@ -919,7 +923,7 @@ def dashboard():
                     ) = 0  
                 )
         AND density.sample_id IS NULL
-        ORDER BY samples.prod_date
+        ORDER BY samples.prod_date, samples.sample_id;
         """)
 
     density = cursor.fetchall()
