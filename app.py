@@ -1346,7 +1346,7 @@ def rheology():
             INSERT INTO rheology
             (
                 sample_id,
-                afterstorage_id
+                afterstorage_id,
                 operator_id,
                 remark,
                 yield_stress,
@@ -1356,7 +1356,7 @@ def rheology():
                 humidity
             )
             VALUES
-            (%s,%s,%s,%s,%s,%s,%s,%s)
+            (%s,%s,%s,%s,%s,%s,%s,%s,%s)
             """,
             (
                 request.form["sample_id"],
@@ -1494,11 +1494,17 @@ def skinformation():
         skin_rhs = request.form.getlist("rh_skinformation_time[]")
         remarks = request.form.getlist("remark[]")
         operator_id = session["user_id"]
-        afterstorage_id = request.form.get("afterstorage_id[]") or None
+        afterstorage_ids = request.form.getlist("afterstorage_id[]")
 
         for i in range(len(sample_ids)):
             if sample_ids[i] == "":
                 continue
+
+            # normalize afterstorage id for this row
+            as_id = None
+            if i < len(afterstorage_ids):
+                val = afterstorage_ids[i]
+                as_id = val if val != "" else None
 
             cursor.execute(
                 """
@@ -1521,7 +1527,7 @@ def skinformation():
                 (
                     sample_ids[i],
                     operator_id,
-                    afterstorage_id[i],
+                    as_id,
                     remarks[i],
                     tack_times[i],
                     tack_temps[i],
@@ -2837,6 +2843,12 @@ def curability_test():
             if sample_ids[i] == "":
                 continue
 
+            # normalize afterstorage id for this row (may be missing)
+            as_id = None
+            if i < len(afterstorage_ids):
+                val = afterstorage_ids[i]
+                as_id = val if val != "" else None
+
             cursor.execute(
                 """
                 INSERT INTO curability
@@ -2857,7 +2869,7 @@ def curability_test():
                 """,
                 (
                     sample_ids[i],
-                    afterstorage_ids[i],
+                    as_id,
                     operator_id,
                     remarks[i],
                     day_1[i],
