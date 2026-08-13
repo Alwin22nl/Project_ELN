@@ -1743,101 +1743,43 @@ def density():
     connection = get_connection()
     cursor = get_dict_cursor(connection)
     if request.method == "POST":
-        action = request.form.get("action")
-        if action == "correct":
-            density_id = request.form["density_id"]
-            new_value = float(
-                request.form["density_product"]
-            )
-            reason = request.form["reason"]
-            # Get current value
-            cursor.execute("""
-                SELECT
-                    density_product
-                FROM density
-                WHERE density_id = %s
-            """,
-            (density_id,)
-            )
+        sample_id = request.form["sample_id"]
+        operator_id = session["user_id"]
+        remark = request.form.get("remark")
+        vessel_empty = float(request.form["vessel_empty"])
+        vessel_full = float(request.form["vessel_full"])
+        vessel_volume = float(request.form["vessel_volume"])
+        density_product = (vessel_full - vessel_empty) / vessel_volume
 
-            old = cursor.fetchone()
-            old_values = {
-                "density_product": old["density_product"]
-            }
-            new_values = {
-                "density_product": new_value
-            }
-            # Update result
-            cursor.execute("""
-                UPDATE density
-                SET density_product = %s
-                WHERE density_id = %s
+        cursor.execute(
+            """
+            INSERT INTO density
+            (
+                sample_id,
+                operator_id,
+                remark,
+                vessel_empty,
+                vessel_full,
+                vessel_volume,
+                density_product
+            )
+            VALUES (%s,%s,%s,%s,%s,%s,%s)
             """,
             (
-                new_value,
-                density_id
-            ))
-            # Audit trail
-            log_change(
-                cursor,
-                "density",
-                density_id,
-                old_values,
-                new_values,
-                reason
+                sample_id,
+                operator_id,
+                remark,
+                vessel_empty,
+                vessel_full,
+                vessel_volume,
+                density_product
             )
-            connection.commit()
-            cursor.close()
-            connection.close()
-            return redirect(url_for("density"))
+        )
 
-        else:
-
-            sample_id = request.form["sample_id"]
-            operator_id = session["user_id"]
-            remark = request.form["remark"]
-            vessel_empty = float(
-                request.form["vessel_empty"]
-            )
-            vessel_full = float(
-                request.form["vessel_full"]
-            )
-            vessel_volume = float(
-                request.form["vessel_volume"]
-            )
-            density_product = (
-                vessel_full - vessel_empty
-            ) / vessel_volume
-
-            cursor.execute(
-                """
-                INSERT INTO density
-                (
-                    sample_id,
-                    operator_id,
-                    remark,
-                    vessel_empty,
-                    vessel_full,
-                    vessel_volume,
-                    density_product
-                )
-                VALUES (%s,%s,%s,%s,%s,%s,%s)
-                """,
-                (
-                    sample_id,
-                    operator_id,
-                    remark,
-                    vessel_empty,
-                    vessel_full,
-                    vessel_volume,
-                    density_product
-                )
-            )
-
-            connection.commit()
-            cursor.close()
-            connection.close()
-            return redirect(url_for("density"))
+        connection.commit()
+        cursor.close()
+        connection.close()
+        return redirect(url_for("density"))
 
 
     # Load products requiring density
@@ -1898,17 +1840,18 @@ def get_density_samples(product_id):
         ON density.sample_id = samples.sample_id
         WHERE samples.product_id = %s
         AND samples.prod_date <= CURRENT_DATE - 7
-        AND samples.batch_sequence = 1
-            OR
-            MOD(
-            samples.batch_sequence,
-            (
-                SELECT frequency
-                FROM product_test_requirements
-                WHERE product_id = samples.product_id
-                AND test_type_id = 4
-            )
-        ) = 0
+        AND (
+            samples.batch_sequence = 1
+            OR MOD(
+                samples.batch_sequence,
+                (
+                    SELECT frequency
+                    FROM product_test_requirements
+                    WHERE product_id = samples.product_id
+                    AND test_type_id = 4
+                )
+            ) = 0
+        )
         AND density.sample_id IS NULL
         ORDER BY samples.sample_id
         """,
