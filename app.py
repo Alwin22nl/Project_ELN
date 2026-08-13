@@ -1994,7 +1994,7 @@ def shore_a_prep():
                     product_test_requirements.frequency
                 ) = 0
             )
-            ORDER BY samples.batch_sequence
+            ORDER BY samples.product_id, samples.sample_id;
             """
     )   
 
@@ -2142,7 +2142,7 @@ def get_shore_a_samples(product_id):
         AND shore_a_preparation.prepared_date::date
             <= CURRENT_DATE - INTERVAL '7 days'
 
-        ORDER BY samples.sample_id
+        ORDER BY samples.product_id, samples.sample_id;
         """,
         (product_id,)
     )
@@ -2733,7 +2733,7 @@ def curability_prep():
         WHERE
             after_storage.removed_from_oven IS NOT NULL
             AND curability_preparation.afterstorage_id IS NULL
-        ORDER BY sample_id
+        ORDER BY sample_id;
         """
     )
     samples = cursor.fetchall()
@@ -3007,7 +3007,7 @@ def get_curability_samples(product_id):
             AND curability_preparation.removed_24h_at IS NOT NULL
             AND curability_preparation.removed_7d_at IS NOT NULL
             AND curability.afterstorage_id IS NULL
-        ORDER BY sample_id
+        ORDER BY product_id, sample_id;
         """,
         (product_id,)
     )
@@ -3090,7 +3090,7 @@ def tensile_prep():
                     product_test_requirements.frequency
                 ) = 0
             )
-            ORDER BY samples.batch_sequence
+            ORDER BY samples.product_id, samples.sample_id;
             """
     )   
 
@@ -3223,7 +3223,7 @@ def tensile_measure():
         WHERE tensile_specimen.sample_id IS NULL
         AND tensile_strength_preparation.prepared_date::date
         <= CURRENT_DATE - INTERVAL '7 days'
-        ORDER BY samples.sample_id
+        ORDER BY samples.product_id, samples.sample_id;
         """
     )
 
@@ -3315,7 +3315,7 @@ def tensile_test():
         ON products.product_id =
            samples.product_id
         WHERE tensile_specimen.t_max IS NULL
-        ORDER BY samples.sample_id
+        ORDER BY samples.sample_id;
         """
     )
     batches = cursor.fetchall()
@@ -4308,4 +4308,4 @@ def users():
     return "Users page"
 
 if __name__ == "__main__":
-    app.run(debug=False)
+    app.run(debug=True)
