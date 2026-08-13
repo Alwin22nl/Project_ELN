@@ -8,36 +8,37 @@ Zettex ELN
 
 <h1>Product Overview</h1>
 
-<form method="GET">
-    <label>Select Product</label>
-    <select name="product_id">
-        {% for product in products %}
-        <option
-            value="{{ product.product_id }}"
-            {% if selected_product == product.product_id %}
-                selected
-            {% endif %}
-        >
-            {{ product.product_name }}
-        </option>
-        {% endfor %}
-    </select>
-    <label>Batch</label>
-    <input
-        type="text"
-        name="batch_nr"
-        value="{{ batch_nr|default('') }}"
-        placeholder="Batch number"
-    >
-    <label>Production Date</label>
-    <input
-        type="date"
-        name="prod_date"
-        value="{{ prod_date or '' }}"
-    >
-    <button type="submit">
-        Filter
-    </button>
+<form method="GET" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+    <div style="display:flex;flex-direction:column;align-items:flex-start;">
+        <label style="font-size:0.8em;margin-bottom:2px;">Product</label>
+        <select name="product_id" style="width:140px;padding:4px;font-size:0.9em;">
+            <option value="">--</option>
+            {% for product in products %}
+            <option value="{{ product.product_id }}" {% if selected_product == product.product_id %}selected{% endif %}>{{ product.product_name }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <div style="display:flex;flex-direction:column;align-items:flex-start;">
+        <label style="font-size:0.8em;margin-bottom:2px;">Batch</label>
+        <input type="text" name="batch_nr" value="{{ batch_nr|default('') }}" placeholder="Batch" style="width:120px;padding:4px;font-size:0.9em;" />
+    </div>
+
+    <div style="display:flex;gap:8px;align-items:center;">
+        <div style="display:flex;flex-direction:column;align-items:flex-start;">
+            <label style="font-size:0.8em;margin-bottom:2px;">From</label>
+            <input type="text" name="prod_date_from" value="{{ prod_date_from|default('') }}" placeholder="DD-MM-YYYY or MM-YYYY or YYYY" style="width:140px;padding:4px;font-size:0.9em;" />
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:flex-start;">
+            <label style="font-size:0.8em;margin-bottom:2px;">To</label>
+            <input type="text" name="prod_date_to" value="{{ prod_date_to|default('') }}" placeholder="DD-MM-YYYY or MM-YYYY or YYYY" style="width:140px;padding:4px;font-size:0.9em;" />
+        </div>
+    </div>
+
+    <div style="display:flex;gap:6px;align-items:center;">
+        <button type="submit" style="display:inline-flex;align-items:center;justify-content:center;padding:4px 10px;font-size:0.85em;height:30px;line-height:normal;border:1px solid #ccc;background:#f5f5f5;color:#000;border-radius:3px;cursor:pointer;margin:0;">Filter</button>
+        <a href="{{ url_for('overview_page') }}" style="display:inline-flex;align-items:center;justify-content:center;padding:4px 10px;font-size:0.85em;height:30px;line-height:normal;border:1px solid #ccc;background:#f5f5f5;color:#000;text-decoration:none;border-radius:3px;margin:0;">Clear</a>
+    </div>
 </form>
 
 <br>

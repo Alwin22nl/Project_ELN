@@ -5,6 +5,8 @@ from database import get_connection, get_dict_cursor
 from helper import log_change
 from datetime import date, timedelta, datetime
 from numbers import Real
+import calendar
+import re
 from werkzeug.security import generate_password_hash, check_password_hash
 from functools import wraps
 import secrets
@@ -3474,9 +3476,8 @@ def overview_page():
     products = cursor.fetchall()
     product_id = request.args.get("product_id", type=int)
     batch_nr = request.args.get("batch_nr", "").strip()
-    prod_date = request.args.get("prod_date")
-    if prod_date == "":
-        prod_date = None
+    prod_date_from = request.args.get("prod_date_from", "").strip()
+    prod_date_to = request.args.get("prod_date_to", "").strip()
 
     if not product_id:
 
@@ -3490,7 +3491,8 @@ def overview_page():
             columns=[],
             results=[],
             batch_nr="",
-            prod_date=""
+            prod_date_from="",
+            prod_date_to=""
         )
 
     # Required tests for this product
@@ -3616,9 +3618,48 @@ def overview_page():
         query += "\n            AND samples.batch_nr ILIKE %s"
         query_args.append(f"%{batch_nr}%")
 
-    if prod_date is not None:
-        query += "\n            AND samples.prod_date = %s"
-        query_args.append(prod_date)
+    # Parse partial date inputs in order: DD-MM-YYYY, MM-YYYY, or YYYY
+    def parse_partial(s):
+        if not s:
+            return None, None
+        s = s.strip()
+        # DD-MM-YYYY or D-M-YYYY
+        m = re.match(r"^(\d{1,2})-(\d{1,2})-(\d{4})$", s)
+        if m:
+            d = int(m.group(1)); mon = int(m.group(2)); y = int(m.group(3))
+            try:
+                return date(y, mon, d), date(y, mon, d)
+            except Exception:
+                return None, None
+        # MM-YYYY or M-YYYY
+        m = re.match(r"^(\d{1,2})-(\d{4})$", s)
+        if m:
+            mon = int(m.group(1)); y = int(m.group(2))
+            try:
+                last = calendar.monthrange(y, mon)[1]
+                return date(y, mon, 1), date(y, mon, last)
+            except Exception:
+                return None, None
+        # YYYY
+        if re.match(r"^\d{4}$", s):
+            y = int(s)
+            return date(y, 1, 1), date(y, 12, 31)
+        return None, None
+
+    df1, dt1 = parse_partial(prod_date_from)
+    df2, dt2 = parse_partial(prod_date_to)
+    date_from = df1 or df2
+    date_to = dt2 or dt1
+
+    if date_from and date_to:
+        query += "\n            AND samples.prod_date BETWEEN %s AND %s"
+        query_args.extend([date_from, date_to])
+    elif date_from:
+        query += "\n            AND samples.prod_date >= %s"
+        query_args.append(date_from)
+    elif date_to:
+        query += "\n            AND samples.prod_date <= %s"
+        query_args.append(date_to)
 
     query += """
 
@@ -3652,10 +3693,22 @@ def overview_page():
 
     averages = {}
     for title, field in columns:
-        values = [
-            row[field] for row in results
-            if row[field] is not None and isinstance(row[field], Real)
-        ]
+        values = []
+        for row in results:
+            try:
+                val = row[field]
+            except Exception:
+                # row may be a tuple-like; skip if we can't access by key
+                continue
+            if val is None:
+                continue
+            try:
+                f = float(val)
+            except Exception:
+                # not a numeric value (e.g. strings like '✓'), skip
+                continue
+            values.append(f)
+
         averages[field] = round(sum(values) / len(values), 2) if values else None
 
     cursor.close()
@@ -3668,7 +3721,8 @@ def overview_page():
         columns=columns,
         results=results,
         batch_nr=batch_nr,
-        prod_date=prod_date or "",
+        prod_date_from=prod_date_from,
+        prod_date_to=prod_date_to,
         averages=averages
     )
 
