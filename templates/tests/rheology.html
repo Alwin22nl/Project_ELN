@@ -42,8 +42,8 @@ Zettex ELN
 
             <br><br>
 
-            <label>Viscosity @ 1</label><br>
-            <input type="number" step="0.01" name="vis_at_1" required>
+            <label>Viscosity @ 10</label><br>
+            <input type="number" step="0.01" name="vis_at_10" required>
 
             <br><br>
 
@@ -52,8 +52,8 @@ Zettex ELN
 
             <br><br>
 
-            <label>Viscosity @ 10</label><br>
-            <input type="number" step="0.01" name="vis_at_10" required>
+            <label>Viscosity @ 1</label><br>
+            <input type="number" step="0.01" name="vis_at_1" required>
 
             <br><br>
 
@@ -79,9 +79,9 @@ Zettex ELN
             <tr>
                 <th>Batch number</th>
                 <th>Yield Stress</th>
-                <th>Viscosity @ 1</th>
-                <th>Viscosity @ 5</th>
                 <th>Viscosity @ 10</th>
+                <th>Viscosity @ 5</th>
+                <th>Viscosity @ 1</th>
                 <th>Humidity</th>
             </tr>
 
@@ -90,9 +90,9 @@ Zettex ELN
             <tr>
                 <td>{{ result.batch_nr }}</td>
                 <td>{{ result.yield_stress }}</td>
-                <td>{{ result.vis_at_1 }}</td>
-                <td>{{ result.vis_at_5 }}</td>
                 <td>{{ result.vis_at_10 }}</td>
+                <td>{{ result.vis_at_5 }}</td>
+                <td>{{ result.vis_at_1 }}</td>
                 <td>{{ result.humidity }}</td>
             </tr>
 
