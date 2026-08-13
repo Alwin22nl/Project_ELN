@@ -526,7 +526,8 @@ def dashboard():
         AND rheology.afterstorage_id IS NULL
         ORDER BY 
             prod_date,
-            sample_id;
+            sample_id
+        LIMIT 25;
     """)
 
     rheology = cursor.fetchall()
@@ -575,7 +576,8 @@ def dashboard():
         AND skinformation.afterstorage_id IS NULL
         ORDER BY 
             prod_date,
-            sample_id;
+            sample_id
+        LIMIT 25;
     """)
     
     skinformation = cursor.fetchall()
@@ -657,7 +659,8 @@ def dashboard():
                 )
         ) tensile_tasks
         WHERE action IS NOT NULL        
-        ORDER BY prod_date, sample_id;
+        ORDER BY prod_date, sample_id
+        LIMIT 25;
     """)
 
     tensile = cursor.fetchall()
@@ -701,7 +704,8 @@ def dashboard():
                 ) = 0
         ) shore_a_tasks
         WHERE action IS NOT NULL
-        ORDER BY prod_date, sample_id;
+        ORDER BY prod_date, sample_id
+        LIMIT 25;
     """)
 
     shore_a = cursor.fetchall()
@@ -755,7 +759,8 @@ def dashboard():
                 )             
         ) adhesion_tasks
         WHERE action IS NOT NULL
-        ORDER BY prod_date, sample_id;
+        ORDER BY prod_date, sample_id
+        LIMIT 25;
     """)
 
     adhesion = cursor.fetchall()
@@ -809,7 +814,8 @@ def dashboard():
                 )             
         ) epdm_adhesion_tasks
         WHERE action IS NOT NULL
-        ORDER BY prod_date, sample_id;
+        ORDER BY prod_date, sample_id
+        LIMIT 25;
     """)
     epdm_adhesion = cursor.fetchall()
 
@@ -888,7 +894,8 @@ def dashboard():
             after_storage.removed_from_oven IS NOT NULL
             ) curability_as_tasks 
             WHERE action IS NOT NULL
-        ORDER BY prod_date, sample_id;
+        ORDER BY prod_date, sample_id
+        LIMIT 25;
         """)
     curability = cursor.fetchall()
 
@@ -925,7 +932,8 @@ def dashboard():
                     ) = 0  
                 )
         AND density.sample_id IS NULL
-        ORDER BY samples.prod_date, samples.sample_id;
+        ORDER BY samples.prod_date, samples.sample_id
+        LIMIT 25;
         """)
 
     density = cursor.fetchall()
