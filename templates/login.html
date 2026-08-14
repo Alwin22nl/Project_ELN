@@ -9,6 +9,10 @@ Zettex ELN
 <h1>Laboratory Login</h1>
 
 <div class="login-container">
+    {% if error %}
+    <div class="login-error">{{ error }}</div>
+    {% endif %}
+
     <form method="POST">
 
         <label>

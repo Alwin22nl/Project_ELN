@@ -162,7 +162,7 @@ def login():
             """
             SELECT *
             FROM users
-            WHERE username = %s
+            WHERE LOWER(username) = LOWER(%s)
             AND active = TRUE
             """,
             (username,)
@@ -195,10 +195,10 @@ def login():
                 url_for("dashboard")
             )
 
+        # if we reach here, authentication failed
+        return render_template("login.html", error="Invalid username or password.")
 
-    return render_template(
-        "login.html"
-    )
+    return render_template("login.html")
 
 @app.route("/logout")
 def logout():
