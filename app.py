@@ -173,7 +173,6 @@ def login():
         cursor.close()
         connection.close()
 
-
         if user and check_password_hash(
             user["password_hash"],
             password
