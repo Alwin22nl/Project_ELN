@@ -16,56 +16,64 @@
 
     <body>
         <div class="layout">
-            <!-- Navigation -->
             <nav class="sidebar">
-
                 <h2>Zettex ELN</h2>
-
                 {% if session.get("user_id") %}
-                <a href="/">🏠 Dashboard</a>
-
-                <a href="/sample">🧪 Samples</a>
-
-                <a href="/tests">🔬 Tests</a>
-
-                <a href="/products">📦 Products</a>
-
-                <a href="{{ url_for('overview_page') }}">📋 Results</a>
-
-                <a href="{{ url_for('batch_search') }}">🔎 Batch Search</a>
+                <a href="/">Dashboard</a>
+                <a href="/sample">Samples</a>
+                <a href="/tests">Tests</a>
+                <a href="/products">Products</a>
+                <a href="{{ url_for('overview_page') }}">Results</a>
+                <a href="{{ url_for('batch_search') }}">Batch Search</a>
                 {% endif %}
                 {% if session.role == "admin" %}
-
-                <a href="{{ url_for('audit_logs_admin') }}">
-                Correction Logs
-                </a>
-
-                <a href="{{ url_for('admin_page') }}">
-                    Administration
-                </a>
+                <a href="{{ url_for('audit_logs_admin') }}">Correction Logs</a>
+                <a href="{{ url_for('admin_page') }}">Administration</a>
                 {% endif %}
-
                 <div class="sidebar-bottom">
                 {% if session.get("user_id") %}
-                    <p>
-                        Logged in as<br>
-                        <br>
-                        <strong>{{ session["name"] }}</strong>
-                    </p>
-                    <a href="{{ url_for('logout') }}">
-                        Logout
-                    </a>
-                    {% endif %}
+                    <div class="sidebar-user">
+                        <div id="userAvatar" class="sidebar-avatar" title="{{ session['name'] }}">{% set _parts = session['name'].split() if session.get('name') else [] %}{% if _parts|length >= 2 %}{{ (_parts[0][0] + _parts[1][0])|upper }}{% elif _parts|length == 1 %}{{ _parts[0][0:2]|upper }}{% else %}{% endif %}</div>
+                        <div id="userMenu" class="sidebar-user-menu" aria-hidden="true">
+                            <div class="sidebar-user-name">{{ session['name'] }}</div>
+                            <a class="logout-link" href="{{ url_for('logout') }}">Logout</a>
+                        </div>
+                    </div>
+                {% endif %}
                 </div>
             </nav>
 
-            <!-- Page content -->
-            <main class="content">
-                {% block content %}
-                {% endblock %}
-            </main>
+                </header>
+
+                <main class="content">
+                    <div class="page">
+                        {% block content %}{% endblock %}
+                    </div>
+                </main>
+            </div>
         </div>
 
     </body>
 
 </html>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    var avatar = document.getElementById('userAvatar');
+    var userBlock = avatar && avatar.closest('.sidebar-user');
+    if (!avatar || !userBlock) return;
+
+    var toggleMenu = function (ev) {
+        ev.stopPropagation();
+        userBlock.classList.toggle('show-menu');
+    };
+
+    avatar.addEventListener('click', toggleMenu);
+
+    // close when clicking outside
+    document.addEventListener('click', function (ev) {
+        if (!userBlock.contains(ev.target)) {
+            userBlock.classList.remove('show-menu');
+        }
+    });
+});
+</script>
