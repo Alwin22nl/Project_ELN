@@ -7,7 +7,20 @@ Zettex ELN
 {% block content %}
 
 <h1>Sample Management</h1>
-<h1>Create New Sample</h1>
+<div class="tabs">
+    <button type="button" class="tab-btn active" data-target="#create">Create New Sample</button>
+    <button type="button" class="tab-btn" data-target="#append">Append Remark</button>
+</div>
+
+<div id="tab-contents">
+    <div id="create" class="tab-content active">
+        <h1>Create New Sample</h1>
+    </div>
+
+    <div id="append" class="tab-content">
+        <h1>Append Remark to Sample</h1>
+    </div>
+</div>
 
 {% if error %}
     <div class="form-error">
@@ -17,6 +30,7 @@ Zettex ELN
 
 <div class="container">
     <div class="left-panel">
+        <div id="create-panel">
         <form action="/sample" method="POST">
             <label>Batch Number</label><br>
             <input type="text" name="batch_nr"><br><br>
@@ -53,6 +67,32 @@ Zettex ELN
                 Save Sample
             </button>
         </form>
+        </div>
+
+        <div id="append-panel" style="display:none">
+            <form action="/sample/append_remark" method="POST" id="appendForm">
+                <label>Product</label><br>
+                <select id="append_product" name="product_id">
+                    <option value="">Select product...</option>
+                    {% for product in products %}
+                    <option value="{{ product.product_id }}">{{ product.product_name }}</option>
+                    {% endfor %}
+                </select>
+
+                <br><br>
+                <label>Sample</label><br>
+                <select id="append_sample" name="sample_id">
+                    <option value="">Select sample...</option>
+                </select>
+
+                <br><br>
+                <label>Remark to append</label><br>
+                <textarea name="remark" id="append_remark_text"></textarea>
+
+                <br><br>
+                <button type="submit">Append Remark</button>
+            </form>
+        </div>
     </div>
 
     <div class="right-panel">
@@ -79,5 +119,55 @@ Zettex ELN
         </table>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+    // tabs
+    document.querySelectorAll('.tab-btn').forEach(function(btn){
+        btn.addEventListener('click', function(){
+            document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+            btn.classList.add('active');
+            var target = btn.dataset.target;
+            document.querySelectorAll('.tab-content').forEach(function(tc){ tc.classList.remove('active'); });
+            document.querySelectorAll('.tab-content').forEach(function(tc){ tc.style.display = 'none'; });
+            var el = document.querySelector(target);
+            if (el){ el.classList.add('active'); el.style.display = 'block'; }
+
+            // show panels inside left column
+            if (target === '#create'){
+                document.getElementById('create-panel').style.display = '';
+                document.getElementById('append-panel').style.display = 'none';
+            } else {
+                document.getElementById('create-panel').style.display = 'none';
+                document.getElementById('append-panel').style.display = '';
+            }
+        });
+    });
+
+    // populate samples when product changes
+    var productSelect = document.getElementById('append_product');
+    var sampleSelect = document.getElementById('append_sample');
+    if (productSelect){
+        productSelect.addEventListener('change', function(){
+            var pid = this.value;
+            sampleSelect.innerHTML = '<option value="">Loading...</option>';
+            if (!pid){ sampleSelect.innerHTML = '<option value="">Select sample...</option>'; return; }
+            fetch('/get_samples/' + pid)
+            .then(r=>r.json())
+            .then(data=>{
+                sampleSelect.innerHTML = '<option value="">Select sample...</option>';
+                data.forEach(function(s){
+                    var opt = document.createElement('option');
+                    opt.value = s.sample_id;
+                    opt.textContent = s.display || s.sample_id;
+                    sampleSelect.appendChild(opt);
+                });
+            }).catch(function(){
+                sampleSelect.innerHTML = '<option value="">Error loading</option>';
+            });
+        });
+    }
+});
+</script>
 
 {% endblock %}
