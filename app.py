@@ -208,6 +208,73 @@ def logout():
         url_for("login")
     )
 
+
+@app.route('/get_samples/<int:product_id>')
+@login_required
+def get_samples(product_id):
+    connection = get_connection()
+    cursor = get_dict_cursor(connection)
+    cursor.execute(
+        """
+        SELECT sample_id, batch_nr, prod_date, remark
+        FROM samples
+        WHERE product_id = %s
+        ORDER BY prod_date DESC NULLS LAST, sample_id DESC
+        """,
+        (product_id,)
+    )
+    rows = cursor.fetchall()
+    cursor.close()
+    connection.close()
+
+    results = []
+    for r in rows:
+        display = r['batch_nr'] or ''
+        if r.get('prod_date'):
+            display = f"{display} - {r['prod_date'].strftime('%d-%m-%Y')}" if display else r['prod_date'].strftime('%d-%m-%Y')
+        results.append({
+            'sample_id': r['sample_id'],
+            'display': display,
+            'remark': r.get('remark')
+        })
+
+    return jsonify(results)
+
+
+@app.route('/sample/append_remark', methods=['POST'])
+@login_required
+def sample_append_remark():
+    product_id = request.form.get('product_id')
+    sample_id = request.form.get('sample_id')
+    remark = request.form.get('remark')
+
+    if not sample_id or not remark:
+        return redirect(url_for('sample'))
+
+    timestamp = datetime.now().strftime('%d-%m-%Y %H:%M')
+    user = session.get('name') or session.get('username') or 'unknown'
+    appended = f"{remark} ({timestamp} by {user})"
+
+    connection = get_connection()
+    cursor = get_dict_cursor(connection)
+    cursor.execute(
+        """
+        UPDATE samples
+        SET remark = CASE WHEN remark IS NULL OR remark = '' THEN %s ELSE remark || E'\n' || %s END
+        WHERE sample_id = %s
+        """,
+        (
+            appended,
+            appended,
+            sample_id
+        )
+    )
+    connection.commit()
+    cursor.close()
+    connection.close()
+
+    return redirect(url_for('sample'))
+
 @app.route("/change_password", methods=["GET", "POST"])
 @login_required
 def change_password():
@@ -3706,7 +3773,8 @@ def batch_search():
                 samples.batch_nr,
                 samples.prod_date,
                 samples.product_id,
-                products.product_name
+                products.product_name,
+                samples.remark
             FROM samples
             JOIN products
             ON products.product_id = samples.product_id
