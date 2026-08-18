@@ -40,6 +40,13 @@ Production date:
 {{ batch.prod_date }}
 </p>
 
+{% if batch.remark %}
+<div class="batch-remark">
+    {{ batch.remark|replace('\n','<br>')|safe }}
+</div>
+<br>
+{% endif %}
+
 <h2>Test Results</h2>
 
 <table>

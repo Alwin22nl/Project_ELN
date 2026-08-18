@@ -8,41 +8,43 @@ Zettex ELN
 
 <h1>Product Overview</h1>
 
-<form method="GET">
-    <label>Select Product</label>
-    <select name="product_id">
-        {% for product in products %}
-        <option
-            value="{{ product.product_id }}"
-            {% if selected_product == product.product_id %}
-                selected
-            {% endif %}
-        >
-            {{ product.product_name }}
-        </option>
-        {% endfor %}
-    </select>
-    <label>Batch</label>
-    <input
-        type="text"
-        name="batch_nr"
-        value="{{ batch_nr|default('') }}"
-        placeholder="Batch number"
-    >
-    <label>Production Date</label>
-    <input
-        type="date"
-        name="prod_date"
-        value="{{ prod_date or '' }}"
-    >
-    <button type="submit">
-        Filter
-    </button>
+<form method="GET" class="filters">
+    <div class="filter-group">
+        <label>Product</label>
+        <select name="product_id" class="filter-input">
+            <option value="">--</option>
+            {% for product in products %}
+            <option value="{{ product.product_id }}" {% if selected_product == product.product_id %}selected{% endif %}>{{ product.product_name }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <div class="filter-group">
+        <label>Batch</label>
+        <input type="text" name="batch_nr" value="{{ batch_nr|default('') }}" placeholder="Batch" class="filter-input" />
+    </div>
+
+    <div class="filter-group">
+        <label>From</label>
+        <input type="text" name="prod_date_from" value="{{ prod_date_from|default('') }}" placeholder="DD-MM-YYYY or MM-YYYY or YYYY" class="filter-input" />
+    </div>
+
+    <div class="filter-group">
+        <label>To</label>
+        <input type="text" name="prod_date_to" value="{{ prod_date_to|default('') }}" placeholder="DD-MM-YYYY or MM-YYYY or YYYY" class="filter-input" />
+    </div>
+
+    <div class="filter-actions">
+        <button type="submit" class="btn">Filter</button>
+        <a href="{{ url_for('overview_page') }}" class="btn btn-secondary">Clear</a>
+    </div>
 </form>
 
-<br>
+<div style="height:12px"></div>
+
 <div class="overview">
-    <table>
+    <div class="table-wrapper">
+    <table class="nice-table">
         <thead>
             <tr>
                 {% for title, field in columns %}
@@ -69,9 +71,8 @@ Zettex ELN
             {% endif %}
             {% for row in results %}
             <tr>
-
                 {% for title, field in columns %}
-                    <td>
+                    <td class="cell-{{ field }}">
                         {% if row[field] is not none %}
                             {% if field == "prod_date" %}
                                 {{ row[field].strftime('%d-%m-%Y') }}
@@ -81,10 +82,10 @@ Zettex ELN
                         {% endif %}
                     </td>
                 {% endfor %}
-
             </tr>
             {% endfor %}
         </tbody>
     </table>
+    </div>
 </div>
 {% endblock %}

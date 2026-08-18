@@ -13,7 +13,7 @@ Zettex ELN
 
 <div class="dashboard-card full-width">
     <a href="{{ url_for('curability_prep') }}"><h2>Curability Schedule</h2></a>
-
+    <br>
     <table class="task-table">
         <thead>
             <tr>
@@ -31,7 +31,7 @@ Zettex ELN
             <tr>
                 <td>
                     {{ row.batch_nr }}
-                </td>d>
+                </td>
                 <td>
                     {{ row.prod_date.strftime('%d-%m-%Y') if row.prod_date else "" }}
                 </td>
@@ -61,6 +61,7 @@ Zettex ELN
 <br>
 <div class="dashboard-card full-width">
     <h2>After Storage Schedule</h2>
+    <br>
     <table class="task-table">
         <thead>
             <tr>
@@ -127,7 +128,7 @@ Zettex ELN
     <!-- Rheology -->
     <div class="dashboard-card">
         <a href="{{ url_for('rheology') }}"><h2>Rheology</h2></a>
-
+        <br>
         <table>
             <tr>
                 <th>Batch</th>
@@ -152,7 +153,7 @@ Zettex ELN
     <!-- Skinformation -->
     <div class="dashboard-card">
         <a href="{{ url_for('skinformation') }}"><h2>Skinformation</h2></a>
-
+        <br>
         <table>
             <tr>
                 <th>Batch</th>
@@ -177,7 +178,7 @@ Zettex ELN
     <!-- Tensile Strentgh-->
     <div class="dashboard-card">
         <a href="{{ url_for('tensile') }}"><h2>Tensile Strength</h2></a>
-
+        <br>
         <table class="task-table">
             <thead>
                 <tr>
@@ -215,7 +216,7 @@ Zettex ELN
     <!-- Shore A -->
     <div class="dashboard-card">
         <a href="{{ url_for('shore_a') }}"><h2>Shore A</h2></a>
-
+        <br>
         <table class="task-table">
             <thead>
                 <tr>
@@ -253,7 +254,7 @@ Zettex ELN
     <!-- Curability -->
     <div class="dashboard-card">
         <a href="{{ url_for('curability') }}"><h2>Curability</h2></a>
-
+        <br>
         <table class="task-table">
             <thead>
                 <tr>
@@ -291,7 +292,7 @@ Zettex ELN
     <!-- Initial Tack -->
     <div class="dashboard-card">
         <a href="{{ url_for('initial_tack') }}"><h2>Initial Tack</h2></a>
-
+        <br>
         <table>
             <tr>
                 <th>Batch</th>
@@ -316,7 +317,7 @@ Zettex ELN
     <!-- Density -->
     <div class="dashboard-card">
        <a href="{{ url_for('density') }}"><h2>Density</h2></a>
-
+        <br>
         <table>
             <tr>
                 <th>Batch</th>
@@ -341,7 +342,7 @@ Zettex ELN
     <!-- Adhesion -->
     <div class="dashboard-card">
         <a href="{{ url_for('adhesion') }}"><h2>Adhesion</h2></a>
-
+        <br>
         <table class="task-table">
             <thead>
                 <tr>
@@ -379,7 +380,7 @@ Zettex ELN
     <!-- EPDM Adhesion -->
     <div class="dashboard-card">
         <a href="{{ url_for('epdm_adhesion') }}"><h2>EPDM adhesion</h2></a>
-
+        <br>
         <table class="task-table">
             <thead>
                 <tr>

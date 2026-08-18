@@ -5,6 +5,8 @@ from database import get_connection, get_dict_cursor
 from helper import log_change
 from datetime import date, timedelta, datetime
 from numbers import Real
+import calendar
+import re
 from werkzeug.security import generate_password_hash, check_password_hash
 from functools import wraps
 import secrets
@@ -160,7 +162,7 @@ def login():
             """
             SELECT *
             FROM users
-            WHERE username = %s
+            WHERE LOWER(username) = LOWER(%s)
             AND active = TRUE
             """,
             (username,)
@@ -170,7 +172,6 @@ def login():
 
         cursor.close()
         connection.close()
-
 
         if user and check_password_hash(
             user["password_hash"],
@@ -193,10 +194,10 @@ def login():
                 url_for("dashboard")
             )
 
+        # if we reach here, authentication failed
+        return render_template("login.html", error="Invalid username or password.")
 
-    return render_template(
-        "login.html"
-    )
+    return render_template("login.html")
 
 @app.route("/logout")
 def logout():
@@ -206,6 +207,73 @@ def logout():
     return redirect(
         url_for("login")
     )
+
+
+@app.route('/get_samples/<int:product_id>')
+@login_required
+def get_samples(product_id):
+    connection = get_connection()
+    cursor = get_dict_cursor(connection)
+    cursor.execute(
+        """
+        SELECT sample_id, batch_nr, prod_date, remark
+        FROM samples
+        WHERE product_id = %s
+        ORDER BY prod_date DESC NULLS LAST, sample_id DESC
+        """,
+        (product_id,)
+    )
+    rows = cursor.fetchall()
+    cursor.close()
+    connection.close()
+
+    results = []
+    for r in rows:
+        display = r['batch_nr'] or ''
+        if r.get('prod_date'):
+            display = f"{display} - {r['prod_date'].strftime('%d-%m-%Y')}" if display else r['prod_date'].strftime('%d-%m-%Y')
+        results.append({
+            'sample_id': r['sample_id'],
+            'display': display,
+            'remark': r.get('remark')
+        })
+
+    return jsonify(results)
+
+
+@app.route('/sample/append_remark', methods=['POST'])
+@login_required
+def sample_append_remark():
+    product_id = request.form.get('product_id')
+    sample_id = request.form.get('sample_id')
+    remark = request.form.get('remark')
+
+    if not sample_id or not remark:
+        return redirect(url_for('sample'))
+
+    timestamp = datetime.now().strftime('%d-%m-%Y %H:%M')
+    user = session.get('name') or session.get('username') or 'unknown'
+    appended = f"{remark} ({timestamp} by {user})"
+
+    connection = get_connection()
+    cursor = get_dict_cursor(connection)
+    cursor.execute(
+        """
+        UPDATE samples
+        SET remark = CASE WHEN remark IS NULL OR remark = '' THEN %s ELSE remark || E'\n' || %s END
+        WHERE sample_id = %s
+        """,
+        (
+            appended,
+            appended,
+            sample_id
+        )
+    )
+    connection.commit()
+    cursor.close()
+    connection.close()
+
+    return redirect(url_for('sample'))
 
 @app.route("/change_password", methods=["GET", "POST"])
 @login_required
@@ -522,7 +590,10 @@ def dashboard():
         WHERE
         after_storage.removed_from_oven IS NOT NULL
         AND rheology.afterstorage_id IS NULL
-        ORDER BY prod_date;
+        ORDER BY 
+            prod_date,
+            sample_id
+        LIMIT 25;
     """)
 
     rheology = cursor.fetchall()
@@ -569,7 +640,10 @@ def dashboard():
         WHERE
         after_storage.removed_from_oven IS NOT NULL
         AND skinformation.afterstorage_id IS NULL
-        ORDER BY prod_date;
+        ORDER BY 
+            prod_date,
+            sample_id
+        LIMIT 25;
     """)
     
     skinformation = cursor.fetchall()
@@ -598,7 +672,7 @@ def dashboard():
             )
         )=0
         AND initial_tack.sample_id IS NULL
-        ORDER BY samples.prod_date
+        ORDER BY samples.prod_date, samples.sample_id;
     """)
     
     initial_tack = cursor.fetchall()
@@ -651,7 +725,8 @@ def dashboard():
                 )
         ) tensile_tasks
         WHERE action IS NOT NULL        
-        ORDER BY prod_date
+        ORDER BY prod_date, sample_id
+        LIMIT 25;
     """)
 
     tensile = cursor.fetchall()
@@ -695,7 +770,8 @@ def dashboard():
                 ) = 0
         ) shore_a_tasks
         WHERE action IS NOT NULL
-        ORDER BY prod_date
+        ORDER BY prod_date, sample_id
+        LIMIT 25;
     """)
 
     shore_a = cursor.fetchall()
@@ -749,7 +825,8 @@ def dashboard():
                 )             
         ) adhesion_tasks
         WHERE action IS NOT NULL
-        ORDER BY prod_date
+        ORDER BY prod_date, sample_id
+        LIMIT 25;
     """)
 
     adhesion = cursor.fetchall()
@@ -803,7 +880,8 @@ def dashboard():
                 )             
         ) epdm_adhesion_tasks
         WHERE action IS NOT NULL
-        ORDER BY prod_date
+        ORDER BY prod_date, sample_id
+        LIMIT 25;
     """)
     epdm_adhesion = cursor.fetchall()
 
@@ -882,7 +960,8 @@ def dashboard():
             after_storage.removed_from_oven IS NOT NULL
             ) curability_as_tasks 
             WHERE action IS NOT NULL
-        ORDER BY prod_date;
+        ORDER BY prod_date, sample_id
+        LIMIT 25;
         """)
     curability = cursor.fetchall()
 
@@ -919,7 +998,8 @@ def dashboard():
                     ) = 0  
                 )
         AND density.sample_id IS NULL
-        ORDER BY samples.prod_date
+        ORDER BY samples.prod_date, samples.sample_id
+        LIMIT 25;
         """)
 
     density = cursor.fetchall()
@@ -1340,7 +1420,7 @@ def rheology():
             INSERT INTO rheology
             (
                 sample_id,
-                afterstorage_id
+                afterstorage_id,
                 operator_id,
                 remark,
                 yield_stress,
@@ -1350,7 +1430,7 @@ def rheology():
                 humidity
             )
             VALUES
-            (%s,%s,%s,%s,%s,%s,%s,%s)
+            (%s,%s,%s,%s,%s,%s,%s,%s,%s)
             """,
             (
                 request.form["sample_id"],
@@ -1488,11 +1568,17 @@ def skinformation():
         skin_rhs = request.form.getlist("rh_skinformation_time[]")
         remarks = request.form.getlist("remark[]")
         operator_id = session["user_id"]
-        afterstorage_id = request.form.get("afterstorage_id[]") or None
+        afterstorage_ids = request.form.getlist("afterstorage_id[]")
 
         for i in range(len(sample_ids)):
             if sample_ids[i] == "":
                 continue
+
+            # normalize afterstorage id for this row
+            as_id = None
+            if i < len(afterstorage_ids):
+                val = afterstorage_ids[i]
+                as_id = val if val != "" else None
 
             cursor.execute(
                 """
@@ -1515,7 +1601,7 @@ def skinformation():
                 (
                     sample_ids[i],
                     operator_id,
-                    afterstorage_id[i],
+                    as_id,
                     remarks[i],
                     tack_times[i],
                     tack_temps[i],
@@ -1723,101 +1809,43 @@ def density():
     connection = get_connection()
     cursor = get_dict_cursor(connection)
     if request.method == "POST":
-        action = request.form.get("action")
-        if action == "correct":
-            density_id = request.form["density_id"]
-            new_value = float(
-                request.form["density_product"]
-            )
-            reason = request.form["reason"]
-            # Get current value
-            cursor.execute("""
-                SELECT
-                    density_product
-                FROM density
-                WHERE density_id = %s
-            """,
-            (density_id,)
-            )
+        sample_id = request.form["sample_id"]
+        operator_id = session["user_id"]
+        remark = request.form.get("remark")
+        vessel_empty = float(request.form["vessel_empty"])
+        vessel_full = float(request.form["vessel_full"])
+        vessel_volume = float(request.form["vessel_volume"])
+        density_product = (vessel_full - vessel_empty) / vessel_volume
 
-            old = cursor.fetchone()
-            old_values = {
-                "density_product": old["density_product"]
-            }
-            new_values = {
-                "density_product": new_value
-            }
-            # Update result
-            cursor.execute("""
-                UPDATE density
-                SET density_product = %s
-                WHERE density_id = %s
+        cursor.execute(
+            """
+            INSERT INTO density
+            (
+                sample_id,
+                operator_id,
+                remark,
+                vessel_empty,
+                vessel_full,
+                vessel_volume,
+                density_product
+            )
+            VALUES (%s,%s,%s,%s,%s,%s,%s)
             """,
             (
-                new_value,
-                density_id
-            ))
-            # Audit trail
-            log_change(
-                cursor,
-                "density",
-                density_id,
-                old_values,
-                new_values,
-                reason
+                sample_id,
+                operator_id,
+                remark,
+                vessel_empty,
+                vessel_full,
+                vessel_volume,
+                density_product
             )
-            connection.commit()
-            cursor.close()
-            connection.close()
-            return redirect(url_for("density"))
+        )
 
-        else:
-
-            sample_id = request.form["sample_id"]
-            operator_id = session["user_id"]
-            remark = request.form["remark"]
-            vessel_empty = float(
-                request.form["vessel_empty"]
-            )
-            vessel_full = float(
-                request.form["vessel_full"]
-            )
-            vessel_volume = float(
-                request.form["vessel_volume"]
-            )
-            density_product = (
-                vessel_full - vessel_empty
-            ) / vessel_volume
-
-            cursor.execute(
-                """
-                INSERT INTO density
-                (
-                    sample_id,
-                    operator_id,
-                    remark,
-                    vessel_empty,
-                    vessel_full,
-                    vessel_volume,
-                    density_product
-                )
-                VALUES (%s,%s,%s,%s,%s,%s,%s)
-                """,
-                (
-                    sample_id,
-                    operator_id,
-                    remark,
-                    vessel_empty,
-                    vessel_full,
-                    vessel_volume,
-                    density_product
-                )
-            )
-
-            connection.commit()
-            cursor.close()
-            connection.close()
-            return redirect(url_for("density"))
+        connection.commit()
+        cursor.close()
+        connection.close()
+        return redirect(url_for("density"))
 
 
     # Load products requiring density
@@ -1878,17 +1906,18 @@ def get_density_samples(product_id):
         ON density.sample_id = samples.sample_id
         WHERE samples.product_id = %s
         AND samples.prod_date <= CURRENT_DATE - 7
-        AND samples.batch_sequence = 1
-            OR
-            MOD(
-            samples.batch_sequence,
-            (
-                SELECT frequency
-                FROM product_test_requirements
-                WHERE product_id = samples.product_id
-                AND test_type_id = 4
-            )
-        ) = 0
+        AND (
+            samples.batch_sequence = 1
+            OR MOD(
+                samples.batch_sequence,
+                (
+                    SELECT frequency
+                    FROM product_test_requirements
+                    WHERE product_id = samples.product_id
+                    AND test_type_id = 4
+                )
+            ) = 0
+        )
         AND density.sample_id IS NULL
         ORDER BY samples.sample_id
         """,
@@ -1974,7 +2003,7 @@ def shore_a_prep():
                     product_test_requirements.frequency
                 ) = 0
             )
-            ORDER BY samples.batch_sequence
+            ORDER BY samples.product_id, samples.sample_id;
             """
     )   
 
@@ -2122,7 +2151,7 @@ def get_shore_a_samples(product_id):
         AND shore_a_preparation.prepared_date::date
             <= CURRENT_DATE - INTERVAL '7 days'
 
-        ORDER BY samples.sample_id
+        ORDER BY samples.product_id, samples.sample_id;
         """,
         (product_id,)
     )
@@ -2713,7 +2742,7 @@ def curability_prep():
         WHERE
             after_storage.removed_from_oven IS NOT NULL
             AND curability_preparation.afterstorage_id IS NULL
-        ORDER BY sample_id
+        ORDER BY sample_id;
         """
     )
     samples = cursor.fetchall()
@@ -2831,6 +2860,12 @@ def curability_test():
             if sample_ids[i] == "":
                 continue
 
+            # normalize afterstorage id for this row (may be missing)
+            as_id = None
+            if i < len(afterstorage_ids):
+                val = afterstorage_ids[i]
+                as_id = val if val != "" else None
+
             cursor.execute(
                 """
                 INSERT INTO curability
@@ -2851,7 +2886,7 @@ def curability_test():
                 """,
                 (
                     sample_ids[i],
-                    afterstorage_ids[i],
+                    as_id,
                     operator_id,
                     remarks[i],
                     day_1[i],
@@ -2981,7 +3016,7 @@ def get_curability_samples(product_id):
             AND curability_preparation.removed_24h_at IS NOT NULL
             AND curability_preparation.removed_7d_at IS NOT NULL
             AND curability.afterstorage_id IS NULL
-        ORDER BY sample_id
+        ORDER BY product_id, sample_id;
         """,
         (product_id,)
     )
@@ -3064,7 +3099,7 @@ def tensile_prep():
                     product_test_requirements.frequency
                 ) = 0
             )
-            ORDER BY samples.batch_sequence
+            ORDER BY samples.product_id, samples.sample_id;
             """
     )   
 
@@ -3197,7 +3232,7 @@ def tensile_measure():
         WHERE tensile_specimen.sample_id IS NULL
         AND tensile_strength_preparation.prepared_date::date
         <= CURRENT_DATE - INTERVAL '7 days'
-        ORDER BY samples.sample_id
+        ORDER BY samples.product_id, samples.sample_id;
         """
     )
 
@@ -3289,7 +3324,7 @@ def tensile_test():
         ON products.product_id =
            samples.product_id
         WHERE tensile_specimen.t_max IS NULL
-        ORDER BY samples.sample_id
+        ORDER BY samples.sample_id;
         """
     )
     batches = cursor.fetchall()
@@ -3470,9 +3505,8 @@ def overview_page():
     products = cursor.fetchall()
     product_id = request.args.get("product_id", type=int)
     batch_nr = request.args.get("batch_nr", "").strip()
-    prod_date = request.args.get("prod_date")
-    if prod_date == "":
-        prod_date = None
+    prod_date_from = request.args.get("prod_date_from", "").strip()
+    prod_date_to = request.args.get("prod_date_to", "").strip()
 
     if not product_id:
 
@@ -3486,7 +3520,8 @@ def overview_page():
             columns=[],
             results=[],
             batch_nr="",
-            prod_date=""
+            prod_date_from="",
+            prod_date_to=""
         )
 
     # Required tests for this product
@@ -3612,9 +3647,48 @@ def overview_page():
         query += "\n            AND samples.batch_nr ILIKE %s"
         query_args.append(f"%{batch_nr}%")
 
-    if prod_date is not None:
-        query += "\n            AND samples.prod_date = %s"
-        query_args.append(prod_date)
+    # Parse partial date inputs in order: DD-MM-YYYY, MM-YYYY, or YYYY
+    def parse_partial(s):
+        if not s:
+            return None, None
+        s = s.strip()
+        # DD-MM-YYYY or D-M-YYYY
+        m = re.match(r"^(\d{1,2})-(\d{1,2})-(\d{4})$", s)
+        if m:
+            d = int(m.group(1)); mon = int(m.group(2)); y = int(m.group(3))
+            try:
+                return date(y, mon, d), date(y, mon, d)
+            except Exception:
+                return None, None
+        # MM-YYYY or M-YYYY
+        m = re.match(r"^(\d{1,2})-(\d{4})$", s)
+        if m:
+            mon = int(m.group(1)); y = int(m.group(2))
+            try:
+                last = calendar.monthrange(y, mon)[1]
+                return date(y, mon, 1), date(y, mon, last)
+            except Exception:
+                return None, None
+        # YYYY
+        if re.match(r"^\d{4}$", s):
+            y = int(s)
+            return date(y, 1, 1), date(y, 12, 31)
+        return None, None
+
+    df1, dt1 = parse_partial(prod_date_from)
+    df2, dt2 = parse_partial(prod_date_to)
+    date_from = df1 or df2
+    date_to = dt2 or dt1
+
+    if date_from and date_to:
+        query += "\n            AND samples.prod_date BETWEEN %s AND %s"
+        query_args.extend([date_from, date_to])
+    elif date_from:
+        query += "\n            AND samples.prod_date >= %s"
+        query_args.append(date_from)
+    elif date_to:
+        query += "\n            AND samples.prod_date <= %s"
+        query_args.append(date_to)
 
     query += """
 
@@ -3648,10 +3722,22 @@ def overview_page():
 
     averages = {}
     for title, field in columns:
-        values = [
-            row[field] for row in results
-            if row[field] is not None and isinstance(row[field], Real)
-        ]
+        values = []
+        for row in results:
+            try:
+                val = row[field]
+            except Exception:
+                # row may be a tuple-like; skip if we can't access by key
+                continue
+            if val is None:
+                continue
+            try:
+                f = float(val)
+            except Exception:
+                # not a numeric value (e.g. strings like '✓'), skip
+                continue
+            values.append(f)
+
         averages[field] = round(sum(values) / len(values), 2) if values else None
 
     cursor.close()
@@ -3664,7 +3750,8 @@ def overview_page():
         columns=columns,
         results=results,
         batch_nr=batch_nr,
-        prod_date=prod_date or "",
+        prod_date_from=prod_date_from,
+        prod_date_to=prod_date_to,
         averages=averages
     )
 
@@ -3686,7 +3773,8 @@ def batch_search():
                 samples.batch_nr,
                 samples.prod_date,
                 samples.product_id,
-                products.product_name
+                products.product_name,
+                samples.remark
             FROM samples
             JOIN products
             ON products.product_id = samples.product_id
@@ -4230,4 +4318,4 @@ def users():
     return "Users page"
 
 if __name__ == "__main__":
-    app.run(debug=False)
+    app.run(debug=True)
