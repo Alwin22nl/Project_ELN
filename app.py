@@ -3518,6 +3518,7 @@ def overview_page():
             products=products,
             selected_product=None,
             columns=[],
+            as_columns=[],
             results=[],
             batch_nr="",
             prod_date_from="",
@@ -3537,10 +3538,16 @@ def overview_page():
         ("Batch", "batch_nr"),
         ("Production", "prod_date")
     ]
+    as_columns = []
     if 1 in required_tests:
         columns.extend([
             ("Yield Stress", "yield_stress"),
             ("Vis @10", "vis_at_10")
+        ])
+        # after-storage columns for rheology
+        as_columns.extend([
+            ("Yield Stress (AS)", "yield_stress_as"),
+            ("Vis @10 (AS)", "vis_at_10_as")
         ])
 
     if 8 in required_tests:
@@ -3553,11 +3560,21 @@ def overview_page():
             ("Tack Free", "tack_free_time"),
             ("Skin Formation", "skinformation_time")
         ])
+        # after-storage columns for skinformation
+        as_columns.extend([
+            ("Tack Free (AS)", "tack_free_time_as"),
+            ("Skin Formation (AS)", "skinformation_time_as")
+        ])
 
     if 2 in required_tests:
         columns.extend([
             ("Day 1", "day_1"),
             ("Day 7", "day_7")
+        ])
+        # after-storage columns for curability
+        as_columns.extend([
+            ("Day 1 (AS)", "day_1_as"),
+            ("Day 7 (AS)", "day_7_as")
         ])
 
     if 3 in required_tests:
@@ -3593,11 +3610,17 @@ def overview_page():
             samples.prod_date,
             COALESCE(rheology.yield_stress, rheology_as.yield_stress) AS yield_stress,
             COALESCE(rheology.vis_at_10, rheology_as.vis_at_10) AS vis_at_10,
+            rheology_as.yield_stress AS yield_stress_as,
+            rheology_as.vis_at_10 AS vis_at_10_as,
             ROUND(initial_tack.initial_tack, 2) AS initial_tack,
             COALESCE(skinformation.tack_free_time, skinformation_as.tack_free_time) AS tack_free_time,
             COALESCE(skinformation.skinformation_time, skinformation_as.skinformation_time) AS skinformation_time,
+            skinformation_as.tack_free_time AS tack_free_time_as,
+            skinformation_as.skinformation_time AS skinformation_time_as,
             COALESCE(curability.day_1, curability_as.day_1) AS day_1,
             COALESCE(curability.day_7, curability_as.day_7) AS day_7,
+            curability_as.day_1 AS day_1_as,
+            curability_as.day_7 AS day_7_as,
             shore_a.shore_a_avg,
             ROUND(density.density_product, 2) AS density_product,
             ROUND(AVG(tensile_specimen.t_max),2) AS t_max,
@@ -3748,6 +3771,7 @@ def overview_page():
         products=products,
         selected_product=product_id,
         columns=columns,
+        as_columns=as_columns,
         results=results,
         batch_nr=batch_nr,
         prod_date_from=prod_date_from,
@@ -3833,6 +3857,38 @@ def batch_search():
                             "Humidity": rheology["humidity"]
                         }
                     })
+                    # also include any after-storage rheology results for this sample
+                    cursor.execute("""
+                        SELECT
+                            rheology.yield_stress,
+                            rheology.vis_at_1,
+                            rheology.vis_at_5,
+                            rheology.vis_at_10,
+                            rheology.humidity,
+                            rheology.test_date,
+                            users.name AS operator
+                        FROM rheology
+                        JOIN after_storage
+                            ON rheology.afterstorage_id = after_storage.afterstorage_id
+                        JOIN users
+                            ON users.user_id = rheology.operator_id
+                        WHERE after_storage.sample_id = %s
+                    """,
+                    (sample_id,)
+                    )
+                    for r_as in cursor.fetchall():
+                        results.append({
+                            "test_name": "Rheology (after storage)",
+                            "operator": r_as["operator"],
+                            "test_date": format_datetime(r_as["test_date"]),
+                            "values": {
+                                "Yield stress": r_as["yield_stress"],
+                                "Viscosity @1": r_as["vis_at_1"],
+                                "Viscosity @5": r_as["vis_at_5"],
+                                "Viscosity @10": r_as["vis_at_10"],
+                                "Humidity": r_as["humidity"]
+                            }
+                        })
                 else:
                     cursor.execute("""
                         SELECT
@@ -3942,6 +3998,32 @@ def batch_search():
                             "Skinformation": skinformation["skinformation_time"]
                         }
                     })
+                    # also include after-storage skinformation results
+                    cursor.execute("""
+                        SELECT
+                            skinformation.tack_free_time,
+                            skinformation.skinformation_time,
+                            skinformation.test_date,
+                            users.name AS operator
+                        FROM skinformation
+                        JOIN after_storage
+                            ON skinformation.afterstorage_id = after_storage.afterstorage_id
+                        JOIN users
+                            ON users.user_id = skinformation.operator_id
+                        WHERE after_storage.sample_id = %s
+                    """,
+                    (sample_id,)
+                    )
+                    for s_as in cursor.fetchall():
+                        results.append({
+                            "test_name": "Skinformation (after storage)",
+                            "operator": s_as["operator"],
+                            "test_date": format_datetime(s_as["test_date"]),
+                            "values": {
+                                "Tack free": s_as["tack_free_time"],
+                                "Skinformation": s_as["skinformation_time"]
+                            }
+                        })
                 else:
                     cursor.execute("""
                         SELECT
@@ -4087,6 +4169,32 @@ def batch_search():
                             "7d": curability["day_7"]
                         }
                     })
+                    # also include after-storage curability results
+                    cursor.execute("""
+                        SELECT
+                            curability.day_1,
+                            curability.day_7,
+                            curability.test_date,
+                            users.name AS operator
+                        FROM curability
+                        JOIN after_storage
+                            ON curability.afterstorage_id = after_storage.afterstorage_id
+                        JOIN users
+                            ON users.user_id = curability.operator_id
+                        WHERE after_storage.sample_id = %s
+                    """,
+                    (sample_id,)
+                    )
+                    for c_as in cursor.fetchall():
+                        results.append({
+                            "test_name": "Curability (after storage)",
+                            "operator": c_as["operator"],
+                            "test_date": format_datetime(c_as["test_date"]),
+                            "values": {
+                                "24h": c_as["day_1"],
+                                "7d": c_as["day_7"]
+                            }
+                        })
                 else:
                     cursor.execute("""
                         SELECT

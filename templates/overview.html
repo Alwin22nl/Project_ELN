@@ -50,6 +50,9 @@ Zettex ELN
                 {% for title, field in columns %}
                     <th>{{ title }}</th>
                 {% endfor %}
+                {% for title, field in as_columns %}
+                    <th class="as-col">{{ title }}</th>
+                {% endfor %}
             </tr>
         </thead>
 
@@ -67,6 +70,13 @@ Zettex ELN
                         <td></td>
                     {% endif %}
                 {% endfor %}
+                {% for title, field in as_columns %}
+                    {% if averages[field] is not none %}
+                        <td>{{ averages[field] }}</td>
+                    {% else %}
+                        <td></td>
+                    {% endif %}
+                {% endfor %}
             </tr>
             {% endif %}
             {% for row in results %}
@@ -79,6 +89,13 @@ Zettex ELN
                             {% else %}
                                 {{ row[field] }}
                             {% endif %}
+                        {% endif %}
+                    </td>
+                {% endfor %}
+                {% for title, field in as_columns %}
+                    <td class="cell-{{ field }} as-cell">
+                        {% if row[field] is not none %}
+                            {{ row[field] }}
                         {% endif %}
                     </td>
                 {% endfor %}
