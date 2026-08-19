@@ -6,19 +6,19 @@ Zettex ELN
 
 {% block content %}
 
-<h1>Sample Management</h1>
+<h1>Koker Management</h1>
 <div class="tabs">
-    <button type="button" class="tab-btn active" data-target="#create">Create New Sample</button>
-    <button type="button" class="tab-btn" data-target="#append">Append Remark</button>
+    <button type="button" class="tab-btn active" data-target="#create">Voeg nieuwe Batch toe</button>
+    <button type="button" class="tab-btn" data-target="#append">Voeg opmerking toe</button>
 </div>
 
 <div id="tab-contents">
     <div id="create" class="tab-content active">
-        <h1>Create New Sample</h1>
+        <h1>Registreer nieuwe Batch</h1>
     </div>
 
     <div id="append" class="tab-content">
-        <h1>Append Remark to Sample</h1>
+        <h1>Voeg opmerking toe aan Batch</h1>
     </div>
 </div>
 
@@ -32,10 +32,10 @@ Zettex ELN
     <div class="left-panel">
         <div id="create-panel">
         <form action="/sample" method="POST">
-            <label>Batch Number</label><br>
+            <label>Batch Nummer</label><br>
             <input type="text" name="batch_nr"><br><br>
 
-            <label>Production Date</label><br>
+            <label>Productie Datum</label><br>
             <input type="date" name="prod_date"><br><br>
 
             <label>Product</label><br>
@@ -48,7 +48,7 @@ Zettex ELN
                 {% endfor %}
             </select>
             <label class="checkbox-label" >
-                After storage required
+                After storage vereist
                 <input 
                     type="checkbox" 
                     name="after_storage_required"
@@ -58,13 +58,13 @@ Zettex ELN
 
             <br><br>
 
-            <label>Remark</label><br>
+            <label>Opmerking</label><br>
             <textarea name="remark" class="remark-input"></textarea>
 
             <br><br>
 
             <button type="submit">
-                Save Sample
+                Batch opslaan
             </button>
         </form>
         </div>
@@ -73,30 +73,30 @@ Zettex ELN
             <form action="/sample/append_remark" method="POST" id="appendForm">
                 <label>Product</label><br>
                 <select id="append_product" name="product_id">
-                    <option value="">Select product...</option>
+                    <option value="">Selecteer product...</option>
                     {% for product in products %}
                     <option value="{{ product.product_id }}">{{ product.product_name }}</option>
                     {% endfor %}
                 </select>
 
                 <br><br>
-                <label>Sample</label><br>
+                <label>Batch</label><br>
                 <select id="append_sample" name="sample_id">
-                    <option value="">Select sample...</option>
+                    <option value="">Selecteer product eerst...</option>
                 </select>
 
                 <br><br>
-                <label>Remark to append</label><br>
+                <label>Opmerking om toe te voegen</label><br>
                 <textarea name="remark" id="append_remark_text" class="remark-input"></textarea>
 
                 <br><br>
-                <button type="submit">Append Remark</button>
+                <button type="submit">Voeg Opmerking Toe</button>
             </form>
         </div>
     </div>
 
     <div class="right-panel">
-        <h2>Registered Samples</h2>
+        <h2>Geregistreerde Batches</h2>
 
         <table>
 
@@ -104,7 +104,7 @@ Zettex ELN
                 <th>Status</th>
                 <th>Batch</th>
                 <th>Product</th>
-                <th>Production Date</th>
+                <th>Productie Datum</th>
             </tr>
 
             {% for sample in samples %}

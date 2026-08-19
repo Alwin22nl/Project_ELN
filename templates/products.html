@@ -11,20 +11,20 @@ Zettex ELN
 <div class="container">
     <!-- LEFT PANEL -->
     <div class="left-panel">
-        <h2>Create Product</h2>
+        <h2>Product aanmaken</h2>
         <form method="POST">
             <label>Product Code</label>
             <input 
                 type="text"
                 name="product_code"
                 required>
-            <label>Product Name</label>
+            <label>Product Naam</label>
             <input 
                 type="text"
                 name="product_name"
                 required>
             <hr>
-            <h3>Required Tests</h3>
+            <h3>Vereiste Testen</h3>
             {% for test in tests %}
             <div class="test-option">
                 <input 
@@ -48,14 +48,14 @@ Zettex ELN
             {% endfor %}
             <br>
             <button type="submit">
-                Save Product
+                Product opslaan
             </button>
         </form>
     </div>
 {% endif %}
     <!-- RIGHT PANEL -->
     <div class="right-panel">
-        <h2>Existing Products</h2>
+        <h2>Bestaande Producten</h2>
         <table>
             <tr>
                 <th>Code</th>

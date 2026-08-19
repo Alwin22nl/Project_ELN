@@ -8,18 +8,18 @@ Zettex ELN
 
 <div class="page-navigation">
     <a href="{{ url_for('tensile') }}" class="back-button">
-        ← Back to Tensile Strength
+        ← Terug naar Treksterkte overzicht
     </a>
 </div>
 
-<h1>Measure Tensile Dumbells</h1>
+<h1>Dumbell Meten</h1>
 
 <form method="POST">
     <label>Batch</label>
     <select name="sample_id" required>
 
         <option value="">
-            Select batch...
+            Selecteer Batch...
         </option>
 
         {% for sample in samples %}
@@ -34,14 +34,14 @@ Zettex ELN
     <table>
         <tr>
             <th>Dumbell</th>
-            <th>Width 1</th>
-            <th>Width 2</th>
-            <th>Width 3</th>
-            <th>Avg Width</th>
-            <th>Thickness 1</th>
-            <th>Thickness 2</th>
-            <th>Thickness 3</th>
-            <th>Avg Thickness</th>
+            <th>Breedte 1</th>
+            <th>Breedte 2</th>
+            <th>Breedte 3</th>
+            <th>Gemiddelde Breedte</th>
+            <th>Dikte 1</th>
+            <th>Dikte 2</th>
+            <th>Dikte 3</th>
+            <th>Gemiddelde Dikte</th>
 
         </tr>
 
@@ -133,7 +133,7 @@ Zettex ELN
     </table>
     <br>
     <button type="submit">
-        Save Measurements
+        Meetingen opslaan
     </button>
 </form>
 

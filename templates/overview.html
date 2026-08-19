@@ -25,18 +25,18 @@ Zettex ELN
     </div>
 
     <div class="filter-group">
-        <label>From</label>
-        <input type="text" name="prod_date_from" value="{{ prod_date_from|default('') }}" placeholder="DD-MM-YYYY or MM-YYYY or YYYY" class="filter-input" />
+        <label>Van</label>
+        <input type="text" name="prod_date_from" value="{{ prod_date_from|default('') }}" placeholder="Datum" class="filter-input" />
     </div>
 
     <div class="filter-group">
-        <label>To</label>
-        <input type="text" name="prod_date_to" value="{{ prod_date_to|default('') }}" placeholder="DD-MM-YYYY or MM-YYYY or YYYY" class="filter-input" />
+        <label>Tot</label>
+        <input type="text" name="prod_date_to" value="{{ prod_date_to|default('') }}" placeholder="Datum" class="filter-input" />
     </div>
 
     <div class="filter-actions">
         <button type="submit" class="btn">Filter</button>
-        <a href="{{ url_for('overview_page') }}" class="btn btn-secondary">Clear</a>
+        <a href="{{ url_for('overview_page') }}" class="btn btn-secondary">Wissen</a>
     </div>
 </form>
 

@@ -20,11 +20,11 @@
                 <h2>Zettex ELN</h2>
                 {% if session.get("user_id") %}
                 <a href="/">Dashboard</a>
-                <a href="/sample">Samples</a>
-                <a href="/tests">Tests</a>
-                <a href="/products">Products</a>
-                <a href="{{ url_for('overview_page') }}">Results</a>
-                <a href="{{ url_for('batch_search') }}">Batch Search</a>
+                <a href="/sample">Batches</a>
+                <a href="/tests">Testen</a>
+                <a href="/products">Producten</a>
+                <a href="{{ url_for('overview_page') }}">Resultaten</a>
+                <a href="{{ url_for('batch_search') }}">Batch Zoeken</a>
                 {% endif %}
                 {% if session.role == "admin" %}
                 <a href="{{ url_for('audit_logs_admin') }}">Correction Logs</a>
@@ -36,7 +36,7 @@
                         <div id="userAvatar" class="sidebar-avatar" title="{{ session['name'] }}">{% set _parts = session['name'].split() if session.get('name') else [] %}{% if _parts|length >= 2 %}{{ (_parts[0][0] + _parts[1][0])|upper }}{% elif _parts|length == 1 %}{{ _parts[0][0:2]|upper }}{% else %}{% endif %}</div>
                         <div id="userMenu" class="sidebar-user-menu" aria-hidden="true">
                             <div class="sidebar-user-name">{{ session['name'] }}</div>
-                            <a class="logout-link" href="{{ url_for('logout') }}">Logout</a>
+                            <a class="logout-link" href="{{ url_for('logout') }}">Uitloggen</a>
                         </div>
                     </div>
                 {% endif %}

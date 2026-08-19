@@ -11,19 +11,19 @@ Zettex ELN
     <a href="{{ url_for('tensile') }}"
     class="back-button">
 
-        ← Back to Tensile Strength
+        ← Terug naar Treksterkte
 
     </a>
 </div>
 
-<h1>Tensile Strength Test</h1>
+<h1>Treksterkte Test</h1>
 
 <form method="POST">
-    <label>Select Batch</label>
+    <label>Selecteer Batch</label>
         <select id="batch_select"
         name="sample_id">
             <option value="">
-                Select batch...
+                Selecter batch...
             </option>
     {% for batch in batches %}
 
@@ -41,13 +41,13 @@ Zettex ELN
         <thead>
             <tr>
                 <th>Dumbell</th>
-                <th>Width avg</th>
-                <th>Thickness avg</th>
+                <th>Gemm. Breedte</th>
+                <th>Gemm. Dikte</th>
                 <th>T 50</th>
                 <th>T 100</th>
                 <th>T max</th>
                 <th>E max</th>
-                <th>Remark</th>
+                <th>Opmerking</th>
             </tr>
         </thead>
         <tbody id="specimen_body">
@@ -56,13 +56,13 @@ Zettex ELN
 
     <br>
     <button type="submit">
-    Save Tensile Results
+    Treksterkte Resultaten Opslaan
     </button>
 </form>
 
 <hr>
 
-<h2>Latest Results</h2>
+<h2>Recente Resultaten</h2>
     <table>
         <tr>
             <th>Batch</th>

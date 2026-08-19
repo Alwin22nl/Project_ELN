@@ -6,20 +6,26 @@ Zettex ELN
 
 {% block content %}
 
-<h1>Tensile Strength</h1>
+<h1>TrekSterkte</h1>
+
+<div class="page-navigation">
+    <a href="{{ url_for('tests') }}" class="back-button">
+        terug naar test overzicht
+    </a>
+</div>
 
 <div class="test-grid">
     <a class="test-card"
        href="{{ url_for('tensile_prep') }}">
-        Prepare Dumbells
+        Dumbell mallen vullen
     </a>
     <a class="test-card"
        href="{{ url_for('tensile_measure') }}">
-        Measure Dumbells
+        Dumbells meten
     </a>
     <a class="test-card"
        href="{{ url_for('tensile_test') }}">
-        Perform Test
+        Test uitvoeren
     </a>
 </div>
 
