@@ -11,6 +11,7 @@ Zettex ELN
 <h3>Welkom {{ session["name"] }}!</h3> 
 <p>Hieronder alle openstaande taken</p>
 
+{% if curability_schedule %}
 <div class="dashboard-card full-width">
     <a href="{{ url_for('curability_prep') }}"><h2>Curability Schedule</h2></a>
     <br>
@@ -58,7 +59,9 @@ Zettex ELN
     </table>
 
 </div>
+{% endif %}
 <br>
+{% if after_storage_schedule %}
 <div class="dashboard-card full-width">
     <h2>After Storage Schedule</h2>
     <br>
@@ -122,10 +125,12 @@ Zettex ELN
         </tbody>
     </table>
 </div>
+{% endif %}
 <br>
 <div class="dashboard-grid">
 
     <!-- Rheology -->
+    {% if rheology %}
     <div class="dashboard-card">
         <a href="{{ url_for('rheology') }}"><h2>Rheology</h2></a>
         <br>
@@ -149,8 +154,10 @@ Zettex ELN
             {% endif %}
         </table>
     </div>
+    {% endif %}
 
     <!-- Skinformation -->
+    {% if skinformation %}
     <div class="dashboard-card">
         <a href="{{ url_for('skinformation') }}"><h2>Skinformation</h2></a>
         <br>
@@ -174,8 +181,10 @@ Zettex ELN
             {% endif %}
         </table>
     </div>
+    {% endif %}
 
     <!-- Tensile Strentgh-->
+    {% if tensile %}
     <div class="dashboard-card">
         <a href="{{ url_for('tensile') }}"><h2>Tensile Strength</h2></a>
         <br>
@@ -212,8 +221,10 @@ Zettex ELN
             </tbody>
         </table>
     </div>
+    {% endif %}
 
     <!-- Shore A -->
+    {% if shore_a %}
     <div class="dashboard-card">
         <a href="{{ url_for('shore_a') }}"><h2>Shore A</h2></a>
         <br>
@@ -250,8 +261,10 @@ Zettex ELN
             </tbody>
         </table>
     </div>
+    {% endif %}
 
     <!-- Curability -->
+    {% if curability %}
     <div class="dashboard-card">
         <a href="{{ url_for('curability') }}"><h2>Curability</h2></a>
         <br>
@@ -288,8 +301,10 @@ Zettex ELN
             </tbody>
         </table>
     </div>
+    {% endif %}
 
     <!-- Initial Tack -->
+    {% if initial_tack %}
     <div class="dashboard-card">
         <a href="{{ url_for('initial_tack') }}"><h2>Initial Tack</h2></a>
         <br>
@@ -313,8 +328,10 @@ Zettex ELN
             {% endif %}
         </table>
     </div>
+    {% endif %}
 
     <!-- Density -->
+    {% if density %}
     <div class="dashboard-card">
        <a href="{{ url_for('density') }}"><h2>Density</h2></a>
         <br>
@@ -338,8 +355,10 @@ Zettex ELN
             {% endif %}
         </table>
     </div>
+    {% endif %}
     
     <!-- Adhesion -->
+    {% if adhesion %}
     <div class="dashboard-card">
         <a href="{{ url_for('adhesion') }}"><h2>Adhesion</h2></a>
         <br>
@@ -376,8 +395,10 @@ Zettex ELN
             </tbody>
         </table>
     </div>
+    {% endif %}
 
     <!-- EPDM Adhesion -->
+    {% if epdm_adhesion %}
     <div class="dashboard-card">
         <a href="{{ url_for('epdm_adhesion') }}"><h2>EPDM adhesion</h2></a>
         <br>
@@ -414,6 +435,7 @@ Zettex ELN
             </tbody>
         </table>
     </div>
+    {% endif %}
 </div>
  
 {% endblock %}

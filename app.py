@@ -1004,20 +1004,25 @@ def dashboard():
 
     density = cursor.fetchall()
 
-    return render_template(
-        "home.html",
-        rheology=rheology,
-        initial_tack=initial_tack,
-        skinformation=skinformation,
-        shore_a =shore_a,
-        tensile=tensile,
-        adhesion=adhesion,
-        epdm_adhesion=epdm_adhesion,
-        curability_schedule=curability_schedule,
-        curability=curability,
-        density=density,
-        after_storage_schedule=after_storage_schedule
-    )
+    # Build context with only non-empty test results
+    context = {
+        "rheology": rheology if rheology else None,
+        "initial_tack": initial_tack if initial_tack else None,
+        "skinformation": skinformation if skinformation else None,
+        "shore_a": shore_a if shore_a else None,
+        "tensile": tensile if tensile else None,
+        "adhesion": adhesion if adhesion else None,
+        "epdm_adhesion": epdm_adhesion if epdm_adhesion else None,
+        "curability_schedule": curability_schedule if curability_schedule else None,
+        "curability": curability if curability else None,
+        "density": density if density else None,
+        "after_storage_schedule": after_storage_schedule if after_storage_schedule else None,
+    }
+    
+    # Remove None (empty) entries so template doesn't render them
+    context = {k: v for k, v in context.items() if v}
+
+    return render_template("home.html", **context)
 
 @app.route("/afterstorage/place", methods=["POST"])
 @login_required
