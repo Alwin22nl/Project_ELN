@@ -68,11 +68,11 @@ def format_datetime(value):
 
 TEST_PAGES = [
     {
-        "name": "Rheology",
+        "name": "Rheologie",
         "endpoint": "rheology",
     },
     {
-        "name": "Skinformation",
+        "name": "Huidvorming",
         "endpoint": "skinformation",
     },
     {
@@ -80,7 +80,7 @@ TEST_PAGES = [
         "endpoint": "initial_tack",
     },
     {
-        "name": "Density",
+        "name": "Dichtheid",
         "endpoint": "density",
     },
     {
@@ -88,20 +88,20 @@ TEST_PAGES = [
         "endpoint": "shore_a",
     },
     {
-        "name": "Adhesion",
+        "name": "Hechting",
         "endpoint": "adhesion",
     },
     {
-        "name": "EPDM Adhesion",
+        "name": "EPDM Hechting",
         "endpoint": "epdm_adhesion", 
     },
 
     {
-        "name": "Curability",
+        "name": "Uitharding",
         "endpoint": "curability", 
     },
     {
-        "name": "Tensile Strength",
+        "name": "Trek Sterkte",
         "endpoint": "tensile",
     }       
 ]
@@ -112,7 +112,7 @@ OVERVIEW_TESTS = {
         "field": "yield_stress"
     },
     2: {
-        "header": "Curability 1d",
+        "header": "Uitharding 1d",
         "field": "day_1"
     },
     3: {
@@ -120,7 +120,7 @@ OVERVIEW_TESTS = {
         "field": "shore_a_avg"
     },
     4: {
-        "header": "Density",
+        "header": "Dichtheid",
         "field": "density_product"
     },
     5: {
@@ -128,11 +128,11 @@ OVERVIEW_TESTS = {
         "field": "t_max"
     },
     6: {
-        "header": "Adhesion",
+        "header": "Hechting",
         "field": "adhesion"
     },
     7: {
-        "header": "EPDM Adhesion",
+        "header": "EPDM Hechting",
         "field": "epdm_adhesion"
     },
     8: {
@@ -140,7 +140,7 @@ OVERVIEW_TESTS = {
         "field": "initial_tack"
     },
     9: {
-        "header": "Skinformation",
+        "header": "Huidvorming",
         "field": "skinformation_time"
     }
 }

@@ -13,15 +13,15 @@ Zettex ELN
 
 {% if curability_schedule %}
 <div class="dashboard-card full-width">
-    <a href="{{ url_for('curability_prep') }}"><h2>Curability Schedule</h2></a>
+    <a href="{{ url_for('curability_prep') }}"><h2>Uitharding in diepte agenda</h2></a>
     <br>
     <table class="task-table">
         <thead>
             <tr>
                 <th>Batch</th>
-                <th>Production date</th>
-                <th>Due time</th>
-                <th>Action</th>
+                <th>Productie datum</th>
+                <th>Uithaal tijd</th>
+                <th>Actie</th>
             </tr>
         </thead>
 
@@ -48,7 +48,7 @@ Zettex ELN
 
             <tr>
                 <td colspan="5">
-                    No curability removals scheduled
+                    Geen uitharding in diepte gepland
                 </td>
             </tr>
 
@@ -70,8 +70,8 @@ Zettex ELN
             <tr>
                 <th>Batch</th>
                 <th>Product</th>
-                <th>Due</th>
-                <th>Action</th>
+                <th>Deadline</th>
+                <th>Actie</th>
             </tr>
         </thead>
         <tbody>
@@ -99,7 +99,7 @@ Zettex ELN
                             <input type="text"
                                    name="oven_location">
                             <button type="submit">
-                                Place in oven
+                                In oven plaatsen
                             </button>
                         </form>
                     {% elif row.action == "Remove from oven" %}
@@ -109,7 +109,7 @@ Zettex ELN
                                    name="afterstorage_id"
                                    value="{{ row.afterstorage_id }}">
                             <button type="submit">
-                                Remove from oven
+                                Uit oven halen
                             </button>
                         </form>
                     {% endif %}
@@ -118,7 +118,7 @@ Zettex ELN
         {% else %}
             <tr>
                 <td colspan="4">
-                    No after storage actions waiting
+                    Geen after storage acties gepland
                 </td>
             </tr>
         {% endfor %}
@@ -132,12 +132,12 @@ Zettex ELN
     <!-- Rheology -->
     {% if rheology %}
     <div class="dashboard-card">
-        <a href="{{ url_for('rheology') }}"><h2>Rheology</h2></a>
+        <a href="{{ url_for('rheology') }}"><h2>Rheologie</h2></a>
         <br>
         <table>
             <tr>
                 <th>Batch</th>
-                <th>Production Date</th>
+                <th>Productie Datum</th>
             </tr>
 
             {% for row in rheology %}
@@ -149,7 +149,7 @@ Zettex ELN
 
             {% if rheology|length == 0 %}
             <tr>
-                <td colspan="3">No rheology tests waiting.</td>
+                <td colspan="3">Geen rheologie test gepland</td>
             </tr>
             {% endif %}
         </table>
@@ -159,12 +159,12 @@ Zettex ELN
     <!-- Skinformation -->
     {% if skinformation %}
     <div class="dashboard-card">
-        <a href="{{ url_for('skinformation') }}"><h2>Skinformation</h2></a>
+        <a href="{{ url_for('skinformation') }}"><h2>Huidvorming</h2></a>
         <br>
         <table>
             <tr>
                 <th>Batch</th>
-                <th>Production Date</th>
+                <th>Productie Datum</th>
             </tr>
 
             {% for row in skinformation %}
@@ -176,7 +176,7 @@ Zettex ELN
 
             {% if skinformation|length == 0 %}
             <tr>
-                <td colspan="3">No Skinformation tests waiting.</td>
+                <td colspan="3">Geen huidvorming test gepland</td>
             </tr>
             {% endif %}
         </table>
@@ -186,14 +186,14 @@ Zettex ELN
     <!-- Tensile Strentgh-->
     {% if tensile %}
     <div class="dashboard-card">
-        <a href="{{ url_for('tensile') }}"><h2>Tensile Strength</h2></a>
+        <a href="{{ url_for('tensile') }}"><h2>Trek Sterkte</h2></a>
         <br>
         <table class="task-table">
             <thead>
                 <tr>
                     <th>Batch</th>
-                    <th>Production date</th>
-                    <th>Action</th>
+                    <th>Productie Datum</th>
+                    <th>Actie</th>
                 </tr>
             </thead>
             <tbody>
@@ -214,7 +214,7 @@ Zettex ELN
             {% else %}
                 <tr>
                     <td colspan="4">
-                        No tensile actions waiting
+                        geen treksterkte acties gepland
                     </td>
                 </tr>
             {% endfor %}
@@ -232,8 +232,8 @@ Zettex ELN
             <thead>
                 <tr>
                     <th>Batch</th>
-                    <th>Production date</th>
-                    <th>Action</th>
+                    <th>Productie Datum</th>
+                    <th>Actie</th>
                 </tr>
             </thead>
             <tbody>
@@ -254,7 +254,7 @@ Zettex ELN
             {% else %}
                 <tr>
                     <td colspan="4">
-                        No Shore A actions waiting
+                        geen Shore A acties gepland
                     </td>
                 </tr>
             {% endfor %}
@@ -266,14 +266,14 @@ Zettex ELN
     <!-- Curability -->
     {% if curability %}
     <div class="dashboard-card">
-        <a href="{{ url_for('curability') }}"><h2>Curability</h2></a>
+        <a href="{{ url_for('curability') }}"><h2>Uitharding in Diepte</h2></a>
         <br>
         <table class="task-table">
             <thead>
                 <tr>
                     <th>Batch</th>
-                    <th>Production date</th>
-                    <th>Action</th>
+                    <th>Productie Datum</th>
+                    <th>Actie</th>
                 </tr>
             </thead>
             <tbody>
@@ -294,7 +294,7 @@ Zettex ELN
             {% else %}
                 <tr>
                     <td colspan="4">
-                        No Curability actions waiting
+                        geen Uitharding in Diepte acties gepland
                     </td>
                 </tr>
             {% endfor %}
@@ -311,7 +311,7 @@ Zettex ELN
         <table>
             <tr>
                 <th>Batch</th>
-                <th>Production Date</th>
+                <th>Productie Datum</th>
             </tr>
 
             {% for row in initial_tack %}
@@ -323,7 +323,7 @@ Zettex ELN
 
             {% if initial_tack|length == 0 %}
             <tr>
-                <td colspan="3">No Initial Tack tests waiting.</td>
+                <td colspan="3">geen Initial Tack test gepland</td>
             </tr>
             {% endif %}
         </table>
@@ -333,12 +333,12 @@ Zettex ELN
     <!-- Density -->
     {% if density %}
     <div class="dashboard-card">
-       <a href="{{ url_for('density') }}"><h2>Density</h2></a>
+       <a href="{{ url_for('density') }}"><h2>Dichtheid</h2></a>
         <br>
         <table>
             <tr>
                 <th>Batch</th>
-                <th>Production Date</th>
+                <th>Productie Datum</th>
             </tr>
 
             {% for row in density %}
@@ -350,7 +350,7 @@ Zettex ELN
 
             {% if density|length == 0 %}
             <tr>
-                <td colspan="3">No rheology tests waiting.</td>
+                <td colspan="3">geen Dichtheid test gepland</td>
             </tr>
             {% endif %}
         </table>
@@ -360,14 +360,14 @@ Zettex ELN
     <!-- Adhesion -->
     {% if adhesion %}
     <div class="dashboard-card">
-        <a href="{{ url_for('adhesion') }}"><h2>Adhesion</h2></a>
+        <a href="{{ url_for('adhesion') }}"><h2>Hechting</h2></a>
         <br>
         <table class="task-table">
             <thead>
                 <tr>
                     <th>Batch</th>
-                    <th>Production date</th>
-                    <th>Action</th>
+                    <th>Productie Datum</th>
+                    <th>Actie</th>
                 </tr>
             </thead>
             <tbody>
@@ -388,7 +388,7 @@ Zettex ELN
             {% else %}
                 <tr>
                     <td colspan="4">
-                        No Adhesion actions waiting
+                        geen Hechting acties gepland
                     </td>
                 </tr>
             {% endfor %}
@@ -400,14 +400,14 @@ Zettex ELN
     <!-- EPDM Adhesion -->
     {% if epdm_adhesion %}
     <div class="dashboard-card">
-        <a href="{{ url_for('epdm_adhesion') }}"><h2>EPDM adhesion</h2></a>
+        <a href="{{ url_for('epdm_adhesion') }}"><h2>EPDM Hechting</h2></a>
         <br>
         <table class="task-table">
             <thead>
                 <tr>
                     <th>Batch</th>
-                    <th>Production date</th>
-                    <th>Action</th>
+                    <th>Productie Datum</th>
+                    <th>Actie</th>
                 </tr>
             </thead>
             <tbody>
@@ -428,7 +428,7 @@ Zettex ELN
             {% else %}
                 <tr>
                     <td colspan="4">
-                        No EDPM Adhesion actions waiting
+                        geen EPDM Hechting acties gepland
                     </td>
                 </tr>
             {% endfor %}

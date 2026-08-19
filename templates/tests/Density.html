@@ -8,13 +8,13 @@ Zettex ELN
 
 <div class="page-navigation">
     <a href="{{ url_for('tests') }}" class="back-button">
-        Back to test Overview
+        Terug naar test overzicht
     </a>
 </div>
 
 <div class="container">
     <div class="left-panel">
-        <h1>Density Test</h1>
+        <h1>Dichtheid Test</h1>
         <!-- New Density Entry -->
         <form method="POST">
             <input 
@@ -22,10 +22,10 @@ Zettex ELN
             name="action"
             value="new"
             >
-            <h3>Select Product</h3>
+            <h3>Selecteer Product</h3>
             <select id="product_select" name="product_id">
                 <option value="">
-                    Select product...
+                    Selecteer product...
                 </option>
                 {% for product in products %}
                 <option value="{{ product.product_id }}">
@@ -34,16 +34,16 @@ Zettex ELN
                 {% endfor %}
             </select>
             <br><br>
-            <h3>Select Sample</h3>
+            <h3>Selecteer Batch</h3>
             <select id="sample_select" name="sample_id">
                 <option>
-                    Select product first...
+                    Selecteer product eerst...
                 </option>
             </select>
             <hr>
-            <h2>Density Results</h2>
+            <h2>Dichtheid Resultaten</h2>
             <label>
-                Weight empty Vessel
+                Gewicht leeg
             </label><br>
             <input 
             type="number"
@@ -54,7 +54,7 @@ Zettex ELN
             required>
             <br><br>
             <label>
-                Weight full vessel
+                gewicht vol
             </label><br>
             <input 
             type="number"
@@ -65,7 +65,7 @@ Zettex ELN
             required>
             <br><br>
             <label>
-                Volume of vessel
+                Volume
             </label><br>
             <input 
             type="number"
@@ -76,33 +76,33 @@ Zettex ELN
             required>
             <br><br>
             <label>
-                Remark
+                Opmerking
             </label><br>
                 <textarea name="remark" class="remark-input"></textarea>
             <br><br>
             <button type="submit">
-                Save Density
+                Dichtheid opslaan
             </button>
         </form>
     </div>
     <div class="right-panel">
-        <h2>Latest Results</h2>
+        <h2>Recente Resultaten</h2>
         <table>
             <tr>
                 <th>
-                    Batch number
+                    Batch nummer
                 </th>
                 <th>
-                    Density
+                    Dichtheid
                 </th>
                 <th>
-                    Full Vessel
+                    Gewicht Vol
                 </th>
                 <th>
-                    Empty Vessel
+                    Gewicht leeg
                 </th>
                 <th>
-                    Vessel volume
+                    Volume
                 </th>
                 
             </tr>

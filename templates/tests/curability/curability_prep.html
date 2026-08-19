@@ -13,25 +13,25 @@ Zettex ELN
 <div class="page-navigation">
 
     <a href="{{ url_for('curability') }}" class="back-button">
-        Back to Curability Overview
+        Terug naar Uitharding in diepte Overview
     </a>
 
 </div>
 
 
-<h1>Curability - Specimen Preparation</h1>
+<h1>Uitharding in diepte - Batches inzetten</h1>
 <div class="container">
 <!-- LEFT PANEL -->
     <div class="left-panel">
-        <h2>Prepare New Specimen</h2>
+        <h2>Nieuwe Batch inzetten</h2>
         <form method="POST">
-            <label>Select Sample</label>
+            <label>Selecteer Batch</label>
             <select 
                 name="sample_id"
                 id="sample_select"
                 required>
                 <option value="">
-                    Select sample...
+                    Selecteer Batch...
                 </option>
 
             {% for sample in samples %}
@@ -50,23 +50,23 @@ Zettex ELN
                 id="afterstorage_id">
 
             <br><br>
-            <label>Remark</label>
+            <label>Opmerking</label>
             <textarea name="remark" class="remark-input"></textarea>
             <br><br>
             <button type="submit">
-            Register Preparation
+            Registereer Batch
             </button>
         </form>
     </div>
 
 <!-- RIGHT PANEL -->
     <div class="right-panel">
-        <h2>Prepared Specimens</h2>
+        <h2>Ingezette Batches</h2>
         <table>
             <tr>
                 <th>Batch</th>
                 <th>Product</th>
-                <th>Prepared</th>
+                <th>Ingezet</th>
                 <th>Status</th>
             </tr>
             {% for sample in prepared %}
@@ -92,10 +92,10 @@ Zettex ELN
     {% if hours_passed < 24 %}
 
         <button disabled>
-            Remove 24h specimen
+            Haal 24h uit
         </button>
         <br>
-        Available in
+        Uithalen in:
         {{ ((24 - hours_passed) // 1)|int }}h
     {% else %}
         <form method="POST"
@@ -104,7 +104,7 @@ Zettex ELN
             curability_preparation_id=sample.curability_preparation_id
         ) }}">
             <button type="submit">
-                Remove 24h specimen
+                Haal 24h uit
             </button>
         </form>
     {% endif %}
@@ -113,10 +113,10 @@ Zettex ELN
 
     {% if hours_passed < 168 %}
         <button disabled>
-            Remove 7d specimen
+            Haal 7 dagen uit
         </button>
         <br>
-        Available in
+        Uithalen in:
         {{ ((168 - hours_passed) // 24)|int }}d
     {% else %}
         <form method="POST"
@@ -125,12 +125,12 @@ Zettex ELN
             curability_preparation_id=sample.curability_preparation_id
         ) }}">
             <button type="submit">
-                Remove 7d specimen
+                Haal 7 dagen uit
             </button>
         </form>
     {% endif %}
 {% else %}
-    Ready for Testing
+    Klaar voor opmeten
 {% endif %}
 </td>
             </tr>

@@ -9,20 +9,20 @@ Zettex ELN
 
 <div class="page-navigation">
     <a href="{{ url_for('epdm_adhesion') }}" class="back-button">
-        Back to EPDM Adhesion Overview
+        Terug naar EPDM Hechting overzicht
     </a>
 </div>
 
-<h1>EPDM Adhesion - Specimen Preparation</h1>
+<h1>EPDM Hechting - Substraten inzetten</h1>
 <div class="container">
     <!-- LEFT PANEL -->
     <div class="left-panel">
-        <h2>Prepare New Specimen</h2>
+        <h2>Nieuwe Batch inzetten</h2>
         <form method="POST">
-            <label>Select Sample</label>
+            <label>Selecteer Batch</label>
             <select name="sample_id" required>
                 <option value="">
-                    Select sample...
+                    Selecteer Batch...
                 </option>
                 {% for sample in samples %}
                 <option value="{{ sample.sample_id }}">
@@ -31,26 +31,26 @@ Zettex ELN
                 {% endfor %}
             </select>
             <br><br>
-            <label>Remark</label>
+            <label>Opmerking</label>
             <textarea name="remark" class="remark-input"></textarea>
             <br><br>
             <button type="submit">
-                Register Preparation
+                Registereer Batch
             </button>
         </form>
     </div>
     <!-- RIGHT PANEL -->
     <div class="right-panel">
-        <h2>Prepared Specimens</h2>
+        <h2>Ingezette Batches</h2>
         <p>
-            These samples are curing and will become available
-            for adhesion testing after 7 days.
+            Deze batches zijn in de hechtingstest gezet en zullen beschikbaar zijn
+            voor hechtingstests na 7 dagen.
         </p>
         <table>
             <tr>
                 <th>Batch</th>
                 <th>Product</th>
-                <th>Prepared Date</th>
+                <th>Datum ingezet</th>
                 <th>Status</th>
             </tr>
             {% for sample in prepared %}

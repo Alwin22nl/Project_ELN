@@ -8,19 +8,19 @@ Zettex ELN
 
 <div class="page-navigation">
     <a href="{{ url_for('adhesion') }}" class="back-button">
-        Back to Adhesion Overview
+        Terug naar Hechting overzicht
     </a>
 </div>
 
 <div class="container">
     <div class="left-panel">
-        <h1>Adhesion Test</h1>
+        <h1>Hechting Test</h1>
         <form method="POST">
-            <h3>Select Product</h3>
+            <h3>Selecteer Product</h3>
             <select id="product_select" name="product_id">
 
                 <option value="">
-                    Select product...
+                    Selecteer product...
                 </option>
 
                 {% for product in products %}
@@ -31,27 +31,27 @@ Zettex ELN
 
             </select>
             <br><br>
-            <h3>Select Sample</h3>
+            <h3>Selecteer Batch</h3>
             <select id="sample_select" name="sample_id">
                 <option>
-                    Select product first...
+                    Selecteer product eerst...
                 </option>
             </select>
 
             <hr>
-            <h2>Adhesion Results</h2>
+            <h2>Hechting Resultaat</h2>
 
             <label>Rubber</label><br>
             <input type="number" step="0.01" name="rubber" min="0" max="100" required>
 
             <br><br>
 
-            <label>Copper</label><br>
+            <label>Koper</label><br>
             <input type="number" step="0.01" name="copper" min="0" max="100" required>
 
             <br><br>
 
-            <label>Wood</label><br>
+            <label>Hout</label><br>
             <input type="number" step="0.01" name="wood" min="0" max="100" required>
 
             <br><br>
@@ -66,7 +66,7 @@ Zettex ELN
 
             <br><br>
 
-            <label>Lead</label><br>
+            <label>Lood</label><br>
             <input type="number" step="0.01" name="lead" min="0" max="100" required>
 
             <br><br>
@@ -76,12 +76,12 @@ Zettex ELN
 
             <br><br>
 
-            <label>Concrete</label><br>
+            <label>Beton</label><br>
             <input type="number" step="0.01" name="concrete" min="0" max="100" required>
 
             <br><br>
 
-            <label>Glass</label><br>
+            <label>Glas</label><br>
             <input type="number" step="0.01" name="glass" min="0" max="100" required>
 
             <br><br>
@@ -101,31 +101,31 @@ Zettex ELN
 
             <br><br>
 
-            <label>Remark</label><br>
+            <label>Opmerking</label><br>
             <textarea name="remark" class="remark-input"></textarea>
 
             <br><br>
 
             <button type="submit">
-                Save Adhesion
+                Hechting opslaan
             </button>
         </form>
     </div>
 
     <div class="right-panel">
-        <h2>Latest Results</h2>
+        <h2>Recente Resultaten</h2>
         <table class="compact-table">
             <tr>
-                <th>Batch number</th>
+                <th>Batch nummer</th>
                 <th>Rubber</th>
-                <th>Copper</th>
-                <th>Wood</th>
+                <th>Koper</th>
+                <th>Hout</th>
                 <th>Aluminium</th>
                 <th>Aluminium Anod.</th>
-                <th>Lead</th>
+                <th>Lood</th>
                 <th>RVS</th>
-                <th>Concrete</th>
-                <th>Glass</th>
+                <th>Beton</th>
+                <th>Glas</th>
                 <th>PVC</th>
                 <th>PMMA</th>
                 <th>PC</th>
