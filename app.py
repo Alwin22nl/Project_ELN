@@ -698,12 +698,13 @@ def dashboard():
                         WHERE ts.sample_id = samples.sample_id
                         )
                         THEN 'Opmeten'
-                    WHEN tensile_strength.sample_id IS NOT NULL
+                    WHEN tensile_prep.sample_id IS NOT NULL
                         AND EXISTS (
                         SELECT 1
                         FROM tensile_specimen ts
                         WHERE ts.sample_id = samples.sample_id
                         )
+                        AND tensile_strength.sample_id IS NULL
                         THEN 'Testen'
                     ELSE NULL
                 END AS action
