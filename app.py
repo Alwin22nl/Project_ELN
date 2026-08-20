@@ -690,15 +690,20 @@ def dashboard():
                     WHEN tensile_prep.sample_id IS NULL
                     AND samples.prod_date <= CURRENT_date - INTERVAL '7 days'
                         THEN 'Prepare'
-                    WHEN tensile_prep.prepared_date > CURRENT_DATE - INTERVAL '7 days'
-                        THEN NULL
-                    WHEN NOT EXISTS (
+                    WHEN tensile_prep.sample_id IS NOT NULL
+                        AND tensile_prep.prepared_date::date <= CURRENT_DATE - INTERVAL '7 days'
+                        AND NOT EXISTS (
                         SELECT 1
                         FROM tensile_specimen ts
                         WHERE ts.sample_id = samples.sample_id
                         )
                         THEN 'Measure'
-                    WHEN tensile_strength.sample_id IS NULL
+                    WHEN tensile_strength.sample_id IS NOT NULL
+                        AND EXISTS (
+                        SELECT 1
+                        FROM tensile_specimen ts
+                        WHERE ts.sample_id = samples.sample_id
+                        )
                         THEN 'Test'
                     ELSE NULL
                 END AS action
@@ -744,9 +749,9 @@ def dashboard():
                     WHEN shore_a_prep.sample_id IS NULL
                     AND samples.prod_date <= CURRENT_date - INTERVAL '7 days'
                         THEN 'Prepare'
-                    WHEN shore_a_prep.prepared_date > CURRENT_DATE - INTERVAL '7 days'
-                        THEN NULL
-                    WHEN shore_a.sample_id IS NULL
+                    WHEN shore_a_prep.sample_id IS NOT NULL    
+                    AND shore_a_prep.prepared_date::date <= CURRENT_DATE - INTERVAL '7 days'
+                    AND shore_a.sample_id IS NULL
                         THEN 'Test'
                     ELSE NULL
                 END AS action
@@ -789,9 +794,9 @@ def dashboard():
                     WHEN adhesion_prep.sample_id IS NULL
                     AND samples.prod_date <= CURRENT_date - INTERVAL '7 days'
                         THEN 'Prepare'
-                    WHEN adhesion_prep.prepared_date > CURRENT_DATE - INTERVAL '7 days'
-                        THEN NULL
-                    WHEN adhesion.sample_id IS NULL
+                    WHEN adhesion_prep.sample_id IS NOT NULL
+                        AND adhesion_prep.prepared_date::date <= CURRENT_DATE - INTERVAL '7 days'
+                        AND adhesion.sample_id IS NULL
                         THEN 'Test'
                     ELSE NULL
                 END AS action
@@ -844,9 +849,9 @@ def dashboard():
                     WHEN epdm_adhesion_prep.sample_id IS NULL
                     AND samples.prod_date <= CURRENT_date - INTERVAL '7 days'
                         THEN 'Prepare'
-                    WHEN epdm_adhesion_prep.prepared_date > CURRENT_DATE - INTERVAL '7 days'
-                        THEN NULL
-                    WHEN epdm_adhesion.sample_id IS NULL
+                    WHEN epdm_adhesion_prep.prepared_date::date <= CURRENT_DATE - INTERVAL '7 days'
+                    AND epdm_adhesion_prep.sample_id IS NOT NULL
+                    AND epdm_adhesion.sample_id IS NULL
                         THEN 'Test'
                     ELSE NULL
                 END AS action
