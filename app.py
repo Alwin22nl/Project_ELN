@@ -476,9 +476,9 @@ def dashboard():
                 samples.prod_date,
                 CASE
                     WHEN curability_preparation.removed_24h_at IS NULL
-                        THEN 'Remove 24h sample'
+                        THEN '24h sample Uithalen'
                     WHEN curability_preparation.removed_7d_at IS NULL
-                        THEN 'Remove 7d sample'
+                        THEN '7d sample Uithalen'
                 END AS action,
                 CASE
                     WHEN curability_preparation.removed_24h_at IS NULL
@@ -689,7 +689,7 @@ def dashboard():
                 CASE
                     WHEN tensile_prep.sample_id IS NULL
                     AND samples.prod_date <= CURRENT_date - INTERVAL '7 days'
-                        THEN 'Prepare'
+                        THEN 'Inzetten'
                     WHEN tensile_prep.sample_id IS NOT NULL
                         AND tensile_prep.prepared_date::date <= CURRENT_DATE - INTERVAL '7 days'
                         AND NOT EXISTS (
@@ -697,14 +697,14 @@ def dashboard():
                         FROM tensile_specimen ts
                         WHERE ts.sample_id = samples.sample_id
                         )
-                        THEN 'Measure'
+                        THEN 'Opmeten'
                     WHEN tensile_strength.sample_id IS NOT NULL
                         AND EXISTS (
                         SELECT 1
                         FROM tensile_specimen ts
                         WHERE ts.sample_id = samples.sample_id
                         )
-                        THEN 'Test'
+                        THEN 'Testen'
                     ELSE NULL
                 END AS action
             FROM samples
@@ -748,11 +748,11 @@ def dashboard():
                 CASE
                     WHEN shore_a_prep.sample_id IS NULL
                     AND samples.prod_date <= CURRENT_date - INTERVAL '7 days'
-                        THEN 'Prepare'
+                        THEN 'Inzetten'
                     WHEN shore_a_prep.sample_id IS NOT NULL    
                     AND shore_a_prep.prepared_date::date <= CURRENT_DATE - INTERVAL '7 days'
                     AND shore_a.sample_id IS NULL
-                        THEN 'Test'
+                        THEN 'Testen'
                     ELSE NULL
                 END AS action
             FROM samples
@@ -793,11 +793,11 @@ def dashboard():
                 CASE
                     WHEN adhesion_prep.sample_id IS NULL
                     AND samples.prod_date <= CURRENT_date - INTERVAL '7 days'
-                        THEN 'Prepare'
+                        THEN 'Inzetten'
                     WHEN adhesion_prep.sample_id IS NOT NULL
                         AND adhesion_prep.prepared_date::date <= CURRENT_DATE - INTERVAL '7 days'
                         AND adhesion.sample_id IS NULL
-                        THEN 'Test'
+                        THEN 'Testen'
                     ELSE NULL
                 END AS action
             FROM samples
@@ -848,11 +848,11 @@ def dashboard():
                 CASE
                     WHEN epdm_adhesion_prep.sample_id IS NULL
                     AND samples.prod_date <= CURRENT_date - INTERVAL '7 days'
-                        THEN 'Prepare'
+                        THEN 'Inzetten'
                     WHEN epdm_adhesion_prep.prepared_date::date <= CURRENT_DATE - INTERVAL '7 days'
                     AND epdm_adhesion_prep.sample_id IS NOT NULL
                     AND epdm_adhesion.sample_id IS NULL
-                        THEN 'Test'
+                        THEN 'Testen'
                     ELSE NULL
                 END AS action
             FROM samples
@@ -903,14 +903,14 @@ def dashboard():
                 NULL::INTEGER AS afterstorage_id,
                 CASE
                     WHEN curability_preparation.prepared_date IS NULL
-                        THEN 'Prepare'
+                        THEN 'Inzetten'
                     WHEN curability_preparation.removed_24h_at IS NOT NULL
                     AND curability_preparation.removed_7d_at IS NOT NULL
                     AND (
                         curability.day_1 IS NULL
                         OR curability.day_7 IS NULL
                     )
-                        THEN 'Measure'
+                        THEN 'Opmeten'
                     ELSE NULL
                 END AS action
             FROM samples
@@ -942,14 +942,14 @@ def dashboard():
                 after_storage.afterstorage_id,
                     CASE
                         WHEN curability_prep.afterstorage_id IS NULL
-                            THEN 'Prepare'
+                            THEN 'Inzetten'
                         WHEN curability_prep.removed_24h_at IS NOT NULL
                         AND curability_prep.removed_7d_at IS NOT NULL
                         AND (
                             curability.day_1 IS NULL
                             OR curability.day_7 IS NULL
                         )
-                            THEN 'Measure'
+                            THEN 'Opmeten'
                         ELSE NULL
                     END AS action
             FROM after_storage
