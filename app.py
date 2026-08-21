@@ -1171,7 +1171,7 @@ def sample():
         JOIN products
         ON products.product_id = samples.product_id
         ORDER BY samples.sample_id DESC
-        LIMIT 30;
+        LIMIT 25;
     """)
 
     samples = cursor.fetchall()
