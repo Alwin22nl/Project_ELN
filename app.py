@@ -3424,13 +3424,13 @@ def products():
 
             VALUES
             (%s,%s)
-
             RETURNING product_id
             """,
             (
                 product_code,
                 product_name
             )
+            
         )
         product_id = cursor.fetchone()["product_id"]
         # Get selected tests
@@ -3471,7 +3471,7 @@ def products():
             product_code,
             product_name
         FROM products
-        ORDER BY product_name
+        ORDER BY product_code
         """
     )
     products = cursor.fetchall()
