@@ -65,15 +65,23 @@ Zettex ELN
 <template id="batch-row-template">
 <tr class="batch-row">
     <td>
-        <select name="sample_id[]" required>
+        <select name="sample_id[]" class="sample-select" required>
             <option value="">Selecteer Batch...</option>
             {% for sample in samples %}
-            <option value="{{ sample.sample_id }}">
+            <option
+                value="{{ sample.sample_id }}"
+                data-afterstorage="{{ sample.afterstorage_id or '' }}">
                 {{ sample.display_name }}
             </option>
             {% endfor %}
         </select>
-        <input type="hidden" name="afterstorage_id[]" value="">
+
+        <input
+            type="hidden"
+            name="afterstorage_id[]"
+            class="afterstorage-id"
+            value=""
+        >
     </td>
     <td>
         <input type="number" step="0.1" name="tack_free_time[]" min="1" max="60" required>
@@ -82,7 +90,7 @@ Zettex ELN
         <input type="number" step="0.1" name="temp_tack_free_time[]" min="15.0" max="50.0" required>
     </td>
     <td>
-        <input type="number" step="0.1" name="rh_tack_free_time[]" min="0.0" max="100.0" requiered>
+        <input type="number" step="0.1" name="rh_tack_free_time[]" min="0.0" max="100.0" required>
     </td>
     <td>
         <input type="number" step="0.1" name="skinformation_time[]" min="1" max="60" required>
@@ -91,7 +99,7 @@ Zettex ELN
         <input type="number" step="0.1" name="temp_skinformation_time[]" min="15.0" max="50.0" required>
     </td>
     <td>
-        <input type="number" step="0.1" name="rh_skinformation_time[]" min="0.0" max="100.0" requiered>
+        <input type="number" step="0.1" name="rh_skinformation_time[]" min="0.0" max="100.0" required>
     </td>
     <td>
         <input type="text" name="remark[]" class="remark-input">

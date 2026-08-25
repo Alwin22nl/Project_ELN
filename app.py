@@ -3619,17 +3619,17 @@ def overview_page():
             samples.sample_id,
             samples.batch_nr,
             samples.prod_date,
-            COALESCE(rheology.yield_stress, rheology_as.yield_stress) AS yield_stress,
-            COALESCE(rheology.vis_at_10, rheology_as.vis_at_10) AS vis_at_10,
+            rheology_normal.yield_stress AS yield_stress,
+            rheology_normal.vis_at_10 AS vis_at_10,
             rheology_as.yield_stress AS yield_stress_as,
             rheology_as.vis_at_10 AS vis_at_10_as,
             ROUND(initial_tack.initial_tack, 2) AS initial_tack,
-            COALESCE(skinformation.tack_free_time, skinformation_as.tack_free_time) AS tack_free_time,
-            COALESCE(skinformation.skinformation_time, skinformation_as.skinformation_time) AS skinformation_time,
+            skinformation_normal.tack_free_time AS tack_free_time,
+            skinformation_normal.skinformation_time AS skinformation_time,
             skinformation_as.tack_free_time AS tack_free_time_as,
             skinformation_as.skinformation_time AS skinformation_time_as,
-            COALESCE(curability.day_1, curability_as.day_1) AS day_1,
-            COALESCE(curability.day_7, curability_as.day_7) AS day_7,
+            curability_normal.day_1 AS day_1,
+            curability_normal.day_7 AS day_7,
             curability_as.day_1 AS day_1_as,
             curability_as.day_7 AS day_7_as,
             shore_a.shore_a_avg,
@@ -3649,20 +3649,26 @@ def overview_page():
         FROM samples
         LEFT JOIN after_storage
             ON after_storage.sample_id = samples.sample_id
-        LEFT JOIN rheology
-            ON rheology.sample_id = samples.sample_id
+       LEFT JOIN rheology AS rheology_normal
+            ON rheology_normal.sample_id = samples.sample_id
+            AND rheology_normal.afterstorage_id IS NULL
         LEFT JOIN rheology AS rheology_as
-            ON rheology_as.afterstorage_id = after_storage.afterstorage_id
+            ON rheology_as.sample_id = samples.sample_id
+            AND rheology_as.afterstorage_id = after_storage.afterstorage_id
         LEFT JOIN initial_tack
             ON initial_tack.sample_id = samples.sample_id
-        LEFT JOIN skinformation
-            ON skinformation.sample_id = samples.sample_id
+        LEFT JOIN skinformation AS skinformation_normal
+            ON skinformation_normal.sample_id = samples.sample_id
+            AND skinformation_normal.afterstorage_id IS NULL
         LEFT JOIN skinformation AS skinformation_as
-            ON skinformation_as.afterstorage_id = after_storage.afterstorage_id
-        LEFT JOIN curability
-          ON curability.sample_id = samples.sample_id
+            ON skinformation_as.sample_id = samples.sample_id
+            AND skinformation_as.afterstorage_id = after_storage.afterstorage_id
+        LEFT JOIN curability AS curability_normal
+            ON curability_normal.sample_id = samples.sample_id
+            AND curability_normal.afterstorage_id IS NULL
         LEFT JOIN curability AS curability_as
-          ON curability_as.afterstorage_id = after_storage.afterstorage_id
+            ON curability_as.sample_id = samples.sample_id
+            AND curability_as.afterstorage_id = after_storage.afterstorage_id
         LEFT JOIN shore_a
             ON shore_a.sample_id = samples.sample_id
         LEFT JOIN density
@@ -3730,17 +3736,17 @@ def overview_page():
             samples.sample_id,
             samples.batch_nr,
             samples.prod_date,
-            rheology.yield_stress,
-            rheology.vis_at_10,
+            rheology_normal.yield_stress,
+            rheology_normal.vis_at_10,
             rheology_as.yield_stress,
             rheology_as.vis_at_10,
             initial_tack.initial_tack,
-            skinformation.tack_free_time,
-            skinformation.skinformation_time,
+            skinformation_normal.tack_free_time,
+            skinformation_normal.skinformation_time,
             skinformation_as.tack_free_time,
             skinformation_as.skinformation_time,
-            curability.day_1,
-            curability.day_7,
+            curability_normal.day_1,
+            curability_normal.day_7,
             curability_as.day_1,
             curability_as.day_7,
             shore_a.shore_a_avg,
