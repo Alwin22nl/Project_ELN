@@ -471,7 +471,11 @@ def dashboard():
         FROM (
             SELECT
                 samples.sample_id,
-                samples.batch_nr,
+                CASE
+                    WHEN curability_preparation.afterstorage_id IS NOT NULL
+                        THEN samples.batch_nr || ' AS'
+                    ELSE samples.batch_nr
+                END AS batch_nr,
                 products.product_name,
                 samples.prod_date,
                 CASE
@@ -539,7 +543,7 @@ def dashboard():
             WHERE
                 a.placed_in_oven_at IS NOT NULL
                 AND a.removed_from_oven IS NULL
-                AND a.placed_in_oven_at + INTERVAL '28 days'
+                AND a.placed_in_oven_at::date + INTERVAL '28 days'
                     <= NOW()
         ) AS after_storage_schedule
         ORDER BY due_date;
@@ -1480,6 +1484,10 @@ def rheology():
         """
         SELECT
             samples.batch_nr,
+            CASE 
+                WHEN rheology.afterstorage_id IS NOT NULL THEN samples.batch_nr || ' AS'
+                ELSE samples.batch_nr
+            END AS batch_nr,
             rheology.yield_stress,
             rheology.vis_at_1,
             rheology.vis_at_5,
