@@ -3642,8 +3642,23 @@ def overview_page():
             curability_as.day_7 AS day_7_as,
             shore_a.shore_a_avg,
             ROUND(density.density_product, 2) AS density_product,
-            ROUND(AVG(tensile_specimen.t_max),2) AS t_max,
-            ROUND(AVG(tensile_specimen.e_max),2) AS e_max,
+            ROUND(
+                AVG(tensile_specimen.t_max)
+                FILTER (
+                    WHERE tensile_specimen.remark IS NULL
+                    OR TRIM(tensile_specimen.remark) = ''
+                ),
+                2
+            ) AS t_max,
+
+            ROUND(
+                AVG(tensile_specimen.e_max)
+                FILTER (
+                    WHERE tensile_specimen.remark IS NULL
+                    OR TRIM(tensile_specimen.remark) = ''
+                ),
+                2
+            ) AS e_max,
             CASE
                 WHEN adhesion.sample_id IS NULL
                 THEN ''
