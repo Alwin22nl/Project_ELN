@@ -3784,7 +3784,7 @@ def overview_page():
     results = cursor.fetchall()
 
     averages = {}
-    for title, field in columns:
+    for title, field in columns + as_columns:
         values = []
         for row in results:
             try:
