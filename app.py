@@ -820,7 +820,6 @@ def dashboard():
                     WHERE ptr.product_id = samples.product_id
                     AND ptr.test_type_id = 6
                 )
-
                 AND(
                     samples.batch_sequence = 1
                     OR MOD(
@@ -1572,6 +1571,7 @@ def get_rheology_samples(product_id):
     }
 
 @app.route("/test/skinformation", methods=["GET","POST"])
+@login_required
 def skinformation():
 
     connection = get_connection()
@@ -3648,7 +3648,7 @@ def overview_page():
                     WHERE tensile_specimen.remark IS NULL
                     OR TRIM(tensile_specimen.remark) = ''
                 ),
-                2
+                3
             ) AS t_max,
 
             ROUND(
@@ -3657,7 +3657,7 @@ def overview_page():
                     WHERE tensile_specimen.remark IS NULL
                     OR TRIM(tensile_specimen.remark) = ''
                 ),
-                2
+                3
             ) AS e_max,
             CASE
                 WHEN adhesion.sample_id IS NULL
@@ -3801,7 +3801,7 @@ def overview_page():
                 continue
             values.append(f)
 
-        averages[field] = round(sum(values) / len(values), 2) if values else None
+        averages[field] = round(sum(values) / len(values), 3) if values else None
 
     cursor.close()
     connection.close()
