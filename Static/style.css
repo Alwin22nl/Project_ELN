@@ -367,6 +367,37 @@ body {
 .nice-table tbody tr:nth-child(even){background:rgba(15,23,42,0.02)}
 .nice-table tbody tr:hover{background:rgba(2,6,23,0.04)}
 .nice-table td{vertical-align:middle}
+
+/* Prevent wrapping so names/results stay on one line; use ellipsis for overflow */
+.nice-table th,
+.nice-table td {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.nice-table .as-cell { /* ensure AS columns also don't wrap */
+    white-space: nowrap;
+}
+
+/* Visual distinction for After-Storage (AS) columns */
+.nice-table thead th.as-col{
+    background: linear-gradient(180deg,#f3f6fb,#e9f1fb);
+    color: #0b2540;
+    border-left: 2px solid rgba(11,37,64,0.06);
+    font-style: italic;
+    font-weight: 600;
+}
+.nice-table td.as-cell{
+    background: linear-gradient(90deg, rgba(240,246,255,0.6), rgba(255,255,255,0));
+    color: #0b2540;
+    font-style: italic;
+    border-left: 2px solid rgba(11,37,64,0.04);
+}
+
+/* Slightly reduce font-size in AS columns to fit more content */
+.nice-table td.as-cell, .nice-table thead th.as-col {
+    font-size: 12px;
+}
 .nice-table td.cell-prod_date{white-space:nowrap;font-family:monospace}
 .average-row td{background:linear-gradient(90deg,#f8fafc,#eef2f6);font-weight:700}
 

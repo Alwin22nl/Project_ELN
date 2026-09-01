@@ -6,15 +6,21 @@ Zettex ELN
 
 {% block content %}
 
+<div class="page-navigation">
+    <a href="{{ url_for('tests') }}" class="back-button">
+        terug naar test overzicht
+    </a>
+</div>
+
 <div class="container">
     <div class="left-panel">
         <h1>Initial tack Test</h1>
         <form method="POST">
-            <h3>Select Product</h3>
+            <h3>Selecteer Product</h3>
             <select id="product_select" name="product_id">
 
                 <option value="">
-                    Select product...
+                    Selecteer product...
                 </option>
 
                 {% for product in products %}
@@ -27,27 +33,27 @@ Zettex ELN
 
             <br><br>
 
-            <h3>Select Sample</h3>
+            <h3>Selecteer Batch</h3>
             <select id="sample_select" name="sample_id">
                 <option>
-                    Select product first...
+                    Selecteer product first...
                 </option>
             </select>
 
             <hr>
-            <h2>Initial Tack Results</h2>
+            <h2>Initial Tack Resultaat</h2>
 
-            <label>Area</label><br>
+            <label>Oppervlakte</label><br>
             <input type="number" step="0.01" name="area" min="16.0" max="19.0" required>
 
             <br><br>
 
-            <label>Weight of Area</label><br>
+            <label>Gewicht oppervlakte</label><br>
             <input type="number" step="0.01" name="area_weight" min="40.0" max="60.0" required>
 
             <br><br>
 
-            <label>Total added weight</label><br>
+            <label>Totaal toegevoegd gewicht</label><br>
             <input type="number" step="0.01" name="added_weight" min="40.0" max="1100" required>
 
             <br><br>
@@ -57,27 +63,27 @@ Zettex ELN
 
             <br><br>
 
-            <label>Remark</label><br>
+            <label>Opmerking</label><br>
             <textarea name="remark" class="remark-input"></textarea>
 
             <br><br>
 
             <button type="submit">
-                Save Initial Tack
+                Initial Tack Opslaan
             </button>
         </form>
     </div>
 
     <div class="right-panel">
-        <h2>Latest Results</h2>
+        <h2>Recente Resultaten</h2>
         <table>
             <tr>
-                <th>Batch number</th>
+                <th>Batch nummer</th>
                 <th>Initial Tack</th>
                 <th>Humidity</th>
-                <th>Area</th>
-                <th>Area weight</th>
-                <th>Added weight</th>
+                <th>Oppervlakte</th>
+                <th>Gewicht oppervlakte</th>
+                <th>Totaal toegevoegd gewicht</th>
             </tr>
             {% for result in results %}
             <tr>

@@ -68,11 +68,11 @@ def format_datetime(value):
 
 TEST_PAGES = [
     {
-        "name": "Rheology",
+        "name": "Rheologie",
         "endpoint": "rheology",
     },
     {
-        "name": "Skinformation",
+        "name": "Huidvorming",
         "endpoint": "skinformation",
     },
     {
@@ -80,7 +80,7 @@ TEST_PAGES = [
         "endpoint": "initial_tack",
     },
     {
-        "name": "Density",
+        "name": "Dichtheid",
         "endpoint": "density",
     },
     {
@@ -88,20 +88,20 @@ TEST_PAGES = [
         "endpoint": "shore_a",
     },
     {
-        "name": "Adhesion",
+        "name": "Hechting",
         "endpoint": "adhesion",
     },
     {
-        "name": "EPDM Adhesion",
+        "name": "EPDM Hechting",
         "endpoint": "epdm_adhesion", 
     },
 
     {
-        "name": "Curability",
+        "name": "Uitharding",
         "endpoint": "curability", 
     },
     {
-        "name": "Tensile Strength",
+        "name": "Trek Sterkte",
         "endpoint": "tensile",
     }       
 ]
@@ -112,7 +112,7 @@ OVERVIEW_TESTS = {
         "field": "yield_stress"
     },
     2: {
-        "header": "Curability 1d",
+        "header": "Uitharding 1d",
         "field": "day_1"
     },
     3: {
@@ -120,7 +120,7 @@ OVERVIEW_TESTS = {
         "field": "shore_a_avg"
     },
     4: {
-        "header": "Density",
+        "header": "Dichtheid",
         "field": "density_product"
     },
     5: {
@@ -128,11 +128,11 @@ OVERVIEW_TESTS = {
         "field": "t_max"
     },
     6: {
-        "header": "Adhesion",
+        "header": "Hechting",
         "field": "adhesion"
     },
     7: {
-        "header": "EPDM Adhesion",
+        "header": "EPDM Hechting",
         "field": "epdm_adhesion"
     },
     8: {
@@ -140,7 +140,7 @@ OVERVIEW_TESTS = {
         "field": "initial_tack"
     },
     9: {
-        "header": "Skinformation",
+        "header": "Huidvorming",
         "field": "skinformation_time"
     }
 }
@@ -471,14 +471,18 @@ def dashboard():
         FROM (
             SELECT
                 samples.sample_id,
-                samples.batch_nr,
+                CASE
+                    WHEN curability_preparation.afterstorage_id IS NOT NULL
+                        THEN samples.batch_nr || ' AS'
+                    ELSE samples.batch_nr
+                END AS batch_nr,
                 products.product_name,
                 samples.prod_date,
                 CASE
                     WHEN curability_preparation.removed_24h_at IS NULL
-                        THEN 'Remove 24h sample'
+                        THEN '24h sample Uithalen'
                     WHEN curability_preparation.removed_7d_at IS NULL
-                        THEN 'Remove 7d sample'
+                        THEN '7d sample Uithalen'
                 END AS action,
                 CASE
                     WHEN curability_preparation.removed_24h_at IS NULL
@@ -539,7 +543,7 @@ def dashboard():
             WHERE
                 a.placed_in_oven_at IS NOT NULL
                 AND a.removed_from_oven IS NULL
-                AND a.placed_in_oven_at + INTERVAL '28 days'
+                AND a.placed_in_oven_at::date + INTERVAL '28 days'
                     <= NOW()
         ) AS after_storage_schedule
         ORDER BY due_date;
@@ -689,17 +693,23 @@ def dashboard():
                 CASE
                     WHEN tensile_prep.sample_id IS NULL
                     AND samples.prod_date <= CURRENT_date - INTERVAL '7 days'
-                        THEN 'Prepare'
-                    WHEN tensile_prep.prepared_date > CURRENT_DATE - INTERVAL '7 days'
-                        THEN NULL
-                    WHEN NOT EXISTS (
+                        THEN 'Inzetten'
+                    WHEN tensile_prep.sample_id IS NOT NULL
+                        AND tensile_prep.prepared_date::date <= CURRENT_DATE - INTERVAL '7 days'
+                        AND NOT EXISTS (
                         SELECT 1
                         FROM tensile_specimen ts
                         WHERE ts.sample_id = samples.sample_id
                         )
-                        THEN 'Measure'
-                    WHEN tensile_strength.sample_id IS NULL
-                        THEN 'Test'
+                        THEN 'Opmeten'
+                    WHEN tensile_prep.sample_id IS NOT NULL
+                        AND EXISTS (
+                        SELECT 1
+                        FROM tensile_specimen ts
+                        WHERE ts.sample_id = samples.sample_id
+                        )
+                        AND tensile_strength.sample_id IS NULL
+                        THEN 'Testen'
                     ELSE NULL
                 END AS action
             FROM samples
@@ -743,11 +753,11 @@ def dashboard():
                 CASE
                     WHEN shore_a_prep.sample_id IS NULL
                     AND samples.prod_date <= CURRENT_date - INTERVAL '7 days'
-                        THEN 'Prepare'
-                    WHEN shore_a_prep.prepared_date > CURRENT_DATE - INTERVAL '7 days'
-                        THEN NULL
-                    WHEN shore_a.sample_id IS NULL
-                        THEN 'Test'
+                        THEN 'Inzetten'
+                    WHEN shore_a_prep.sample_id IS NOT NULL    
+                    AND shore_a_prep.prepared_date::date <= CURRENT_DATE - INTERVAL '7 days'
+                    AND shore_a.sample_id IS NULL
+                        THEN 'Testen'
                     ELSE NULL
                 END AS action
             FROM samples
@@ -788,11 +798,11 @@ def dashboard():
                 CASE
                     WHEN adhesion_prep.sample_id IS NULL
                     AND samples.prod_date <= CURRENT_date - INTERVAL '7 days'
-                        THEN 'Prepare'
-                    WHEN adhesion_prep.prepared_date > CURRENT_DATE - INTERVAL '7 days'
-                        THEN NULL
-                    WHEN adhesion.sample_id IS NULL
-                        THEN 'Test'
+                        THEN 'Inzetten'
+                    WHEN adhesion_prep.sample_id IS NOT NULL
+                        AND adhesion_prep.prepared_date::date <= CURRENT_DATE - INTERVAL '7 days'
+                        AND adhesion.sample_id IS NULL
+                        THEN 'Testen'
                     ELSE NULL
                 END AS action
             FROM samples
@@ -810,7 +820,6 @@ def dashboard():
                     WHERE ptr.product_id = samples.product_id
                     AND ptr.test_type_id = 6
                 )
-
                 AND(
                     samples.batch_sequence = 1
                     OR MOD(
@@ -843,11 +852,11 @@ def dashboard():
                 CASE
                     WHEN epdm_adhesion_prep.sample_id IS NULL
                     AND samples.prod_date <= CURRENT_date - INTERVAL '7 days'
-                        THEN 'Prepare'
-                    WHEN epdm_adhesion_prep.prepared_date > CURRENT_DATE - INTERVAL '7 days'
-                        THEN NULL
-                    WHEN epdm_adhesion.sample_id IS NULL
-                        THEN 'Test'
+                        THEN 'Inzetten'
+                    WHEN epdm_adhesion_prep.prepared_date::date <= CURRENT_DATE - INTERVAL '7 days'
+                    AND epdm_adhesion_prep.sample_id IS NOT NULL
+                    AND epdm_adhesion.sample_id IS NULL
+                        THEN 'Testen'
                     ELSE NULL
                 END AS action
             FROM samples
@@ -898,14 +907,14 @@ def dashboard():
                 NULL::INTEGER AS afterstorage_id,
                 CASE
                     WHEN curability_preparation.prepared_date IS NULL
-                        THEN 'Prepare'
+                        THEN 'Inzetten'
                     WHEN curability_preparation.removed_24h_at IS NOT NULL
                     AND curability_preparation.removed_7d_at IS NOT NULL
                     AND (
                         curability.day_1 IS NULL
                         OR curability.day_7 IS NULL
                     )
-                        THEN 'Measure'
+                        THEN 'Opmeten'
                     ELSE NULL
                 END AS action
             FROM samples
@@ -937,14 +946,14 @@ def dashboard():
                 after_storage.afterstorage_id,
                     CASE
                         WHEN curability_prep.afterstorage_id IS NULL
-                            THEN 'Prepare'
+                            THEN 'Inzetten'
                         WHEN curability_prep.removed_24h_at IS NOT NULL
                         AND curability_prep.removed_7d_at IS NOT NULL
                         AND (
                             curability.day_1 IS NULL
                             OR curability.day_7 IS NULL
                         )
-                            THEN 'Measure'
+                            THEN 'Opmeten'
                         ELSE NULL
                     END AS action
             FROM after_storage
@@ -1004,20 +1013,25 @@ def dashboard():
 
     density = cursor.fetchall()
 
-    return render_template(
-        "home.html",
-        rheology=rheology,
-        initial_tack=initial_tack,
-        skinformation=skinformation,
-        shore_a =shore_a,
-        tensile=tensile,
-        adhesion=adhesion,
-        epdm_adhesion=epdm_adhesion,
-        curability_schedule=curability_schedule,
-        curability=curability,
-        density=density,
-        after_storage_schedule=after_storage_schedule
-    )
+    # Build context with only non-empty test results
+    context = {
+        "rheology": rheology if rheology else None,
+        "initial_tack": initial_tack if initial_tack else None,
+        "skinformation": skinformation if skinformation else None,
+        "shore_a": shore_a if shore_a else None,
+        "tensile": tensile if tensile else None,
+        "adhesion": adhesion if adhesion else None,
+        "epdm_adhesion": epdm_adhesion if epdm_adhesion else None,
+        "curability_schedule": curability_schedule if curability_schedule else None,
+        "curability": curability if curability else None,
+        "density": density if density else None,
+        "after_storage_schedule": after_storage_schedule if after_storage_schedule else None,
+    }
+    
+    # Remove None (empty) entries so template doesn't render them
+    context = {k: v for k, v in context.items() if v}
+
+    return render_template("home.html", **context)
 
 @app.route("/afterstorage/place", methods=["POST"])
 @login_required
@@ -1160,7 +1174,7 @@ def sample():
         JOIN products
         ON products.product_id = samples.product_id
         ORDER BY samples.sample_id DESC
-        LIMIT 30;
+        LIMIT 25;
     """)
 
     samples = cursor.fetchall()
@@ -1469,6 +1483,10 @@ def rheology():
         """
         SELECT
             samples.batch_nr,
+            CASE 
+                WHEN rheology.afterstorage_id IS NOT NULL THEN samples.batch_nr || ' AS'
+                ELSE samples.batch_nr
+            END AS batch_nr,
             rheology.yield_stress,
             rheology.vis_at_1,
             rheology.vis_at_5,
@@ -1553,6 +1571,7 @@ def get_rheology_samples(product_id):
     }
 
 @app.route("/test/skinformation", methods=["GET","POST"])
+@login_required
 def skinformation():
 
     connection = get_connection()
@@ -2550,7 +2569,7 @@ def epdm_adhesion_test():
                 pc
             )
             VALUES
-            (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+            (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
             """,
             (
                 request.form["sample_id"],
@@ -3413,13 +3432,13 @@ def products():
 
             VALUES
             (%s,%s)
-
             RETURNING product_id
             """,
             (
                 product_code,
                 product_name
             )
+            
         )
         product_id = cursor.fetchone()["product_id"]
         # Get selected tests
@@ -3460,7 +3479,7 @@ def products():
             product_code,
             product_name
         FROM products
-        ORDER BY product_name
+        ORDER BY product_code
         """
     )
     products = cursor.fetchall()
@@ -3518,6 +3537,7 @@ def overview_page():
             products=products,
             selected_product=None,
             columns=[],
+            as_columns=[],
             results=[],
             batch_nr="",
             prod_date_from="",
@@ -3537,10 +3557,16 @@ def overview_page():
         ("Batch", "batch_nr"),
         ("Production", "prod_date")
     ]
+    as_columns = []
     if 1 in required_tests:
         columns.extend([
             ("Yield Stress", "yield_stress"),
             ("Vis @10", "vis_at_10")
+        ])
+        # after-storage columns for rheology
+        as_columns.extend([
+            ("Yield Stress (AS)", "yield_stress_as"),
+            ("Vis @10 (AS)", "vis_at_10_as")
         ])
 
     if 8 in required_tests:
@@ -3553,11 +3579,21 @@ def overview_page():
             ("Tack Free", "tack_free_time"),
             ("Skin Formation", "skinformation_time")
         ])
+        # after-storage columns for skinformation
+        as_columns.extend([
+            ("Tack Free (AS)", "tack_free_time_as"),
+            ("Skin Formation (AS)", "skinformation_time_as")
+        ])
 
     if 2 in required_tests:
         columns.extend([
             ("Day 1", "day_1"),
             ("Day 7", "day_7")
+        ])
+        # after-storage columns for curability
+        as_columns.extend([
+            ("Day 1 (AS)", "day_1_as"),
+            ("Day 7 (AS)", "day_7_as")
         ])
 
     if 3 in required_tests:
@@ -3591,17 +3627,38 @@ def overview_page():
             samples.sample_id,
             samples.batch_nr,
             samples.prod_date,
-            COALESCE(rheology.yield_stress, rheology_as.yield_stress) AS yield_stress,
-            COALESCE(rheology.vis_at_10, rheology_as.vis_at_10) AS vis_at_10,
+            rheology_normal.yield_stress AS yield_stress,
+            rheology_normal.vis_at_10 AS vis_at_10,
+            rheology_as.yield_stress AS yield_stress_as,
+            rheology_as.vis_at_10 AS vis_at_10_as,
             ROUND(initial_tack.initial_tack, 2) AS initial_tack,
-            COALESCE(skinformation.tack_free_time, skinformation_as.tack_free_time) AS tack_free_time,
-            COALESCE(skinformation.skinformation_time, skinformation_as.skinformation_time) AS skinformation_time,
-            COALESCE(curability.day_1, curability_as.day_1) AS day_1,
-            COALESCE(curability.day_7, curability_as.day_7) AS day_7,
+            skinformation_normal.tack_free_time AS tack_free_time,
+            skinformation_normal.skinformation_time AS skinformation_time,
+            skinformation_as.tack_free_time AS tack_free_time_as,
+            skinformation_as.skinformation_time AS skinformation_time_as,
+            curability_normal.day_1 AS day_1,
+            curability_normal.day_7 AS day_7,
+            curability_as.day_1 AS day_1_as,
+            curability_as.day_7 AS day_7_as,
             shore_a.shore_a_avg,
             ROUND(density.density_product, 2) AS density_product,
-            ROUND(AVG(tensile_specimen.t_max),2) AS t_max,
-            ROUND(AVG(tensile_specimen.e_max),2) AS e_max,
+            ROUND(
+                AVG(tensile_specimen.t_max)
+                FILTER (
+                    WHERE tensile_specimen.remark IS NULL
+                    OR TRIM(tensile_specimen.remark) = ''
+                ),
+                3
+            ) AS t_max,
+
+            ROUND(
+                AVG(tensile_specimen.e_max)
+                FILTER (
+                    WHERE tensile_specimen.remark IS NULL
+                    OR TRIM(tensile_specimen.remark) = ''
+                ),
+                3
+            ) AS e_max,
             CASE
                 WHEN adhesion.sample_id IS NULL
                 THEN ''
@@ -3615,20 +3672,26 @@ def overview_page():
         FROM samples
         LEFT JOIN after_storage
             ON after_storage.sample_id = samples.sample_id
-        LEFT JOIN rheology
-            ON rheology.sample_id = samples.sample_id
+       LEFT JOIN rheology AS rheology_normal
+            ON rheology_normal.sample_id = samples.sample_id
+            AND rheology_normal.afterstorage_id IS NULL
         LEFT JOIN rheology AS rheology_as
-            ON rheology_as.afterstorage_id = after_storage.afterstorage_id
+            ON rheology_as.sample_id = samples.sample_id
+            AND rheology_as.afterstorage_id = after_storage.afterstorage_id
         LEFT JOIN initial_tack
             ON initial_tack.sample_id = samples.sample_id
-        LEFT JOIN skinformation
-            ON skinformation.sample_id = samples.sample_id
+        LEFT JOIN skinformation AS skinformation_normal
+            ON skinformation_normal.sample_id = samples.sample_id
+            AND skinformation_normal.afterstorage_id IS NULL
         LEFT JOIN skinformation AS skinformation_as
-            ON skinformation_as.afterstorage_id = after_storage.afterstorage_id
-        LEFT JOIN curability
-          ON curability.sample_id = samples.sample_id
+            ON skinformation_as.sample_id = samples.sample_id
+            AND skinformation_as.afterstorage_id = after_storage.afterstorage_id
+        LEFT JOIN curability AS curability_normal
+            ON curability_normal.sample_id = samples.sample_id
+            AND curability_normal.afterstorage_id IS NULL
         LEFT JOIN curability AS curability_as
-          ON curability_as.afterstorage_id = after_storage.afterstorage_id
+            ON curability_as.sample_id = samples.sample_id
+            AND curability_as.afterstorage_id = after_storage.afterstorage_id
         LEFT JOIN shore_a
             ON shore_a.sample_id = samples.sample_id
         LEFT JOIN density
@@ -3696,17 +3759,17 @@ def overview_page():
             samples.sample_id,
             samples.batch_nr,
             samples.prod_date,
-            rheology.yield_stress,
-            rheology.vis_at_10,
+            rheology_normal.yield_stress,
+            rheology_normal.vis_at_10,
             rheology_as.yield_stress,
             rheology_as.vis_at_10,
             initial_tack.initial_tack,
-            skinformation.tack_free_time,
-            skinformation.skinformation_time,
+            skinformation_normal.tack_free_time,
+            skinformation_normal.skinformation_time,
             skinformation_as.tack_free_time,
             skinformation_as.skinformation_time,
-            curability.day_1,
-            curability.day_7,
+            curability_normal.day_1,
+            curability_normal.day_7,
             curability_as.day_1,
             curability_as.day_7,
             shore_a.shore_a_avg,
@@ -3721,7 +3784,7 @@ def overview_page():
     results = cursor.fetchall()
 
     averages = {}
-    for title, field in columns:
+    for title, field in columns + as_columns:
         values = []
         for row in results:
             try:
@@ -3738,7 +3801,7 @@ def overview_page():
                 continue
             values.append(f)
 
-        averages[field] = round(sum(values) / len(values), 2) if values else None
+        averages[field] = round(sum(values) / len(values), 3) if values else None
 
     cursor.close()
     connection.close()
@@ -3748,6 +3811,7 @@ def overview_page():
         products=products,
         selected_product=product_id,
         columns=columns,
+        as_columns=as_columns,
         results=results,
         batch_nr=batch_nr,
         prod_date_from=prod_date_from,
@@ -3833,6 +3897,38 @@ def batch_search():
                             "Humidity": rheology["humidity"]
                         }
                     })
+                    # also include any after-storage rheology results for this sample
+                    cursor.execute("""
+                        SELECT
+                            rheology.yield_stress,
+                            rheology.vis_at_1,
+                            rheology.vis_at_5,
+                            rheology.vis_at_10,
+                            rheology.humidity,
+                            rheology.test_date,
+                            users.name AS operator
+                        FROM rheology
+                        JOIN after_storage
+                            ON rheology.afterstorage_id = after_storage.afterstorage_id
+                        JOIN users
+                            ON users.user_id = rheology.operator_id
+                        WHERE after_storage.sample_id = %s
+                    """,
+                    (sample_id,)
+                    )
+                    for r_as in cursor.fetchall():
+                        results.append({
+                            "test_name": "Rheology (after storage)",
+                            "operator": r_as["operator"],
+                            "test_date": format_datetime(r_as["test_date"]),
+                            "values": {
+                                "Yield stress": r_as["yield_stress"],
+                                "Viscosity @1": r_as["vis_at_1"],
+                                "Viscosity @5": r_as["vis_at_5"],
+                                "Viscosity @10": r_as["vis_at_10"],
+                                "Humidity": r_as["humidity"]
+                            }
+                        })
                 else:
                     cursor.execute("""
                         SELECT
@@ -3942,6 +4038,32 @@ def batch_search():
                             "Skinformation": skinformation["skinformation_time"]
                         }
                     })
+                    # also include after-storage skinformation results
+                    cursor.execute("""
+                        SELECT
+                            skinformation.tack_free_time,
+                            skinformation.skinformation_time,
+                            skinformation.test_date,
+                            users.name AS operator
+                        FROM skinformation
+                        JOIN after_storage
+                            ON skinformation.afterstorage_id = after_storage.afterstorage_id
+                        JOIN users
+                            ON users.user_id = skinformation.operator_id
+                        WHERE after_storage.sample_id = %s
+                    """,
+                    (sample_id,)
+                    )
+                    for s_as in cursor.fetchall():
+                        results.append({
+                            "test_name": "Skinformation (after storage)",
+                            "operator": s_as["operator"],
+                            "test_date": format_datetime(s_as["test_date"]),
+                            "values": {
+                                "Tack free": s_as["tack_free_time"],
+                                "Skinformation": s_as["skinformation_time"]
+                            }
+                        })
                 else:
                     cursor.execute("""
                         SELECT
@@ -4087,6 +4209,32 @@ def batch_search():
                             "7d": curability["day_7"]
                         }
                     })
+                    # also include after-storage curability results
+                    cursor.execute("""
+                        SELECT
+                            curability.day_1,
+                            curability.day_7,
+                            curability.test_date,
+                            users.name AS operator
+                        FROM curability
+                        JOIN after_storage
+                            ON curability.afterstorage_id = after_storage.afterstorage_id
+                        JOIN users
+                            ON users.user_id = curability.operator_id
+                        WHERE after_storage.sample_id = %s
+                    """,
+                    (sample_id,)
+                    )
+                    for c_as in cursor.fetchall():
+                        results.append({
+                            "test_name": "Curability (after storage)",
+                            "operator": c_as["operator"],
+                            "test_date": format_datetime(c_as["test_date"]),
+                            "values": {
+                                "24h": c_as["day_1"],
+                                "7d": c_as["day_7"]
+                            }
+                        })
                 else:
                     cursor.execute("""
                         SELECT

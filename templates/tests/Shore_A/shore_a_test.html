@@ -8,19 +8,19 @@ Zettex ELN
 
 <div class="page-navigation">
     <a href="{{ url_for('shore_a') }}" class="back-button">
-        Back to Shore A Overview
+        Terug naar Shore A overzicht
     </a>
 </div>
 
 <div class="container">
     <div class="left-panel">
-        <h1>Shore A Test</h1>
+        <h1>Shore A Testen</h1>
         <form method="POST">
-            <h3>Select Product</h3>
+            <h3>Selecteer Product</h3>
             <select id="product_select" name="product_id">
 
                 <option value="">
-                    Select product...
+                    Selecteer product...
                 </option>
 
                 {% for product in products %}
@@ -31,15 +31,15 @@ Zettex ELN
 
             </select>
             <br><br>
-            <h3>Select Sample</h3>
+            <h3>Selecteer Batch</h3>
             <select id="sample_select" name="sample_id">
                 <option>
-                    Select product first...
+                    Selecteer product eerst...
                 </option>
             </select>
 
             <hr>
-            <h2>Shore A Results</h2>
+            <h2>Shore A Resultaten</h2>
 
             <label>Shore A 1</label><br>
             <input type="number" step="0.01" name="shore_a_1" min="1" max="100" required>
@@ -56,7 +56,7 @@ Zettex ELN
 
             <br><br>
 
-            <label>Temperature</label><br>
+            <label>Temperatuur</label><br>
             <input type="number" step="0.01" name="temperature" min="15" max="50" required>
 
             <br><br>
@@ -66,24 +66,24 @@ Zettex ELN
 
             <br><br>
 
-            <label>Remark</label><br>
+            <label>Opmerking</label><br>
             <textarea name="remark" class="remark-input"></textarea>
 
             <br><br>
 
             <button type="submit">
-                Save Shore A
+                Hardheid opslaan
             </button>
         </form>
     </div>
 
     <div class="right-panel">
-        <h2>Latest Results</h2>
+        <h2>Recente Resultaten</h2>
         <table>
             <tr>
-                <th>Batch number</th>
+                <th>Batch nummer</th>
                 <th>Shore A</th>
-                <th>Temprerature</th>
+                <th>Temperatuur</th>
                 <th>Humidity</th>
             </tr>
 
