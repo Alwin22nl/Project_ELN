@@ -7,12 +7,12 @@ Zettex ELN
 {% block content %}
 
 <div class="skin-header">
-    <h1>Curability</h1>
+    <h1>Uitharding in diepte</h1>
 </div>
 <div class="page-navigation">
 
     <a href="{{ url_for('curability') }}" class="back-button">
-        Back to Curability Overview
+        Terug naar Uitharding in diepte Overview
     </a>
 
 </div>
@@ -21,13 +21,13 @@ Zettex ELN
         <thead>
             <tr>
                 <th>Batch</th>
-                <th>1 Day (mm)</th>
+                <th>1 Dag (mm)</th>
                 <th>Temp (°C)</th>
                 <th>RH (%)</th>
-                <th>7 Days (mm)</th>
+                <th>7 Dagen (mm)</th>
                 <th>Temp (°C)</th>
                 <th>RH (%)</th>
-                <th>Remark</th>
+                <th>Opmerking</th>
                 <th></th>
             </tr>
         </thead>
@@ -36,18 +36,18 @@ Zettex ELN
     </table>
     <br>
     <button type="button" id="add-row">
-        + Add Batch
+        + Batch toevoegen
     </button>
     <button type="submit">
-        Save All Results
+        Resultaten Opslaan
     </button>
 </form>
 
 <template id="batch-row-template">
 <tr class="batch-row">
     <td>
-        <select name="sample_id[]" required>
-            <option value="">Select Batch...</option>
+        <select name="sample_id[]" class="sample-select" required>
+            <option value="">Selecteer Batch...</option>
             {% for sample in samples %}
             <option
                 value="{{ sample.sample_id }}"
@@ -90,17 +90,17 @@ Zettex ELN
 </tr>
 </template>
 
-<h2>Latest Curability Results</h2>
+<h2>Recente Uitharding in diepte Resultaten</h2>
 
 <table class="results-table">
 
     <thead>
         <tr>
             <th>Batch</th>
-            <th>1 Day (mm)</th>
+            <th>1 Dag (mm)</th>
             <th>Temp (°C)</th>
             <th>RH (%)</th>
-            <th>7 Days (mm)</th>
+            <th>7 Dagen (mm)</th>
             <th>Temp (°C)</th>
             <th>RH (%)</th>
         </tr>

@@ -6,16 +6,23 @@ Zettex ELN
 
 {% block content %}
 
-<h1>Adhesion</h1>
+<h1>Hechting</h1>
+
+<div class="page-navigation">
+    <a href="{{ url_for('tests') }}" class="back-button">
+        Terug naar test overzicht
+    </a>
+</div>
+
 
 <div class="test-grid">
     <a class="test-card"
        href="{{ url_for('adhesion_prep') }}">
-        Prepare Specimens
+        Heching inzetten
     </a>
     <a class="test-card"
        href="{{ url_for('adhesion_test') }}">
-        Perform Test
+        Hechting testen
     </a>
 </div>
 

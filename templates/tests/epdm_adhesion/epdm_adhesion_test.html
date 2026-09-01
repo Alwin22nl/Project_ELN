@@ -8,19 +8,19 @@ Zettex ELN
 
 <div class="page-navigation">
     <a href="{{ url_for('epdm_adhesion') }}" class="back-button">
-        Back to EPDM Adhesion Overview
+        Terug naar EPDM Hechting overzicht
     </a>
 </div>
 
 <div class="container">
     <div class="left-panel">
-        <h1>EPDM Adhesion Test</h1>
+        <h1>EPDM Hechting Test</h1>
         <form method="POST">
-            <h3>Select Product</h3>
+            <h3>Selecteer Product</h3>
             <select id="product_select" name="product_id">
 
                 <option value="">
-                    Select product...
+                    Selecteer product...
                 </option>
 
                 {% for product in products %}
@@ -31,15 +31,15 @@ Zettex ELN
 
             </select>
             <br><br>
-            <h3>Select Sample</h3>
+            <h3>Selecteer Batch</h3>
             <select id="sample_select" name="sample_id">
                 <option>
-                    Select product first...
+                    Selecteer product first...
                 </option>
             </select>
 
             <hr>
-             <h2>EPDM Adhesion Results</h2>
+             <h2>EPDM Hechting Resultaat</h2>
 
             <label>EU-EPDM</label><br>
             <input type="number" step="0.01" name="europees" min="0" max="100" required>
@@ -61,12 +61,12 @@ Zettex ELN
 
             <br><br>
 
-            <label>Copper</label><br>
+            <label>Koper</label><br>
             <input type="number" step="0.01" name="copper" min="0" max="100" required>
 
             <br><br>
 
-            <label>Wood</label><br>
+            <label>Hout</label><br>
             <input type="number" step="0.01" name="wood" min="0" max="100" required>
 
             <br><br>
@@ -81,7 +81,7 @@ Zettex ELN
 
             <br><br>
 
-            <label>Lead</label><br>
+            <label>Lood</label><br>
             <input type="number" step="0.01" name="lead" min="0" max="100" required>
 
             <br><br>
@@ -91,12 +91,12 @@ Zettex ELN
 
             <br><br>
 
-            <label>Concrete</label><br>
+            <label>Beton</label><br>
             <input type="number" step="0.01" name="concrete" min="0" max="100" required>
 
             <br><br>
 
-            <label>Glass</label><br>
+            <label>Glas</label><br>
             <input type="number" step="0.01" name="glass" min="0" max="100" required>
 
             <br><br>
@@ -116,22 +116,22 @@ Zettex ELN
 
             <br><br>
 
-            <label>Remark</label><br>
+            <label>Opmerking</label><br>
             <textarea name="remark" class="remark-input"></textarea>
 
             <br><br>
 
             <button type="submit">
-                Save Adhesion
+                Hechting opslaan
             </button>
         </form>
     </div>
 
     <div class="right-panel">
-        <h2>Latest Results</h2>
+        <h2>Recente Resultaten</h2>
         <table class="compact-table">
             <tr>
-                <th>Batch number</th>
+                <th>Batch nummer</th>
                 <th>EU-EPDM</th>
                 <th>TRC-EPDM</th>
                 <th>CL-EPDM</th>
