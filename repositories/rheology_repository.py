@@ -1,8 +1,8 @@
-from models.rheology import Rheologyresult
+from models.rheology import RheologyResult
 from database import get_connection, get_dict_cursor
 
 class RheologyRepository:
-    def add_result(self, result: Rheologyresult):
+    def add_result(self, result: RheologyResult):
         connection = get_connection()
         cursor = connection.cursor()
 
@@ -134,7 +134,7 @@ class RheologyRepository:
                 SELECT 
                     samples.sample_id,
                     after_storage.afterstorage_id,
-                    samples.batch_nr || ' AS' AS dieplay_name
+                    samples.batch_nr || ' AS' AS display_name
                 FROM after_storage
                 JOIN samples
                     ON samples.sample_id = after_storage.sample_id

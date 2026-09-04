@@ -12,7 +12,9 @@ from functools import wraps
 import secrets
 import string
 
+# importing Routes
 from routes.rheology import rheology_bp
+from routes.skinformation import skinformation_bp
 
 load_dotenv()
 today = date.today()
@@ -30,7 +32,7 @@ TEST_PAGES = [
     },
     {
         "name": "Huidvorming",
-        "endpoint": "skinformation",
+        "endpoint": "skinformation.skinformation",
     },
     {
         "name": "Initial Tack",
@@ -1380,124 +1382,7 @@ def tests():
 
 # test routes
 app.register_blueprint(rheology_bp)
-
-@app.route("/test/skinformation", methods=["GET","POST"])
-@login_required
-def skinformation():
-
-    connection = get_connection()
-    cursor = get_dict_cursor(connection)
-
-    if request.method == "POST":
-        sample_ids = request.form.getlist("sample_id[]")
-        tack_times = request.form.getlist("tack_free_time[]")
-        tack_temps = request.form.getlist("temp_tack_free_time[]")
-        tack_rhs = request.form.getlist("rh_tack_free_time[]")
-        skin_times = request.form.getlist("skinformation_time[]")
-        skin_temps = request.form.getlist("temp_skinformation_time[]")
-        skin_rhs = request.form.getlist("rh_skinformation_time[]")
-        remarks = request.form.getlist("remark[]")
-        operator_id = session["user_id"]
-        afterstorage_ids = request.form.getlist("afterstorage_id[]")
-
-        for i in range(len(sample_ids)):
-            if sample_ids[i] == "":
-                continue
-
-            # normalize afterstorage id for this row
-            as_id = None
-            if i < len(afterstorage_ids):
-                val = afterstorage_ids[i]
-                as_id = val if val != "" else None
-
-            cursor.execute(
-                """
-                INSERT INTO skinformation
-                (
-                    sample_id,
-                    operator_id,
-                    afterstorage_id,
-                    remark,
-                    tack_free_time,
-                    temp_tack_free_time,
-                    rh_tack_free_time,
-                    skinformation_time,
-                    temp_skinformation_time,
-                    rh_skinformation_time
-                )
-                VALUES
-                (%s,%s,%s,%s,%s,%s,%s,%s,%s, %s)
-                """,
-                (
-                    sample_ids[i],
-                    operator_id,
-                    as_id,
-                    remarks[i],
-                    tack_times[i],
-                    tack_temps[i],
-                    tack_rhs[i],
-                    skin_times[i],
-                    skin_temps[i],
-                    skin_rhs[i]
-                )
-            )
-        connection.commit()
-        return redirect(url_for("skinformation"))
-
-    cursor.execute(
-    """
-        SELECT
-            samples.sample_id,
-            NULL::INTEGER AS afterstorage_id,
-            samples.batch_nr AS display_name,
-            products.product_name
-        FROM samples
-        JOIN products
-        ON products.product_id = samples.product_id
-        JOIN product_test_requirements
-        ON product_test_requirements.product_id = products.product_id
-        LEFT JOIN skinformation
-        ON skinformation.sample_id = samples.sample_id
-        WHERE
-            product_test_requirements.test_type_id = 9
-        AND skinformation.sample_id IS NULL
-        AND MOD(
-            samples.batch_sequence,
-            product_test_requirements.frequency
-        ) = 0
-        UNION ALL
-        SELECT
-            samples.sample_id,
-            after_storage.afterstorage_id,
-            samples.batch_nr || ' AS' AS display_name,
-            products.product_name
-        FROM after_storage
-        JOIN samples
-        ON samples.sample_id = after_storage.sample_id
-        LEFT JOIN skinformation
-        ON skinformation.afterstorage_id = after_storage.afterstorage_id
-        JOIN products 
-        ON products.product_id = samples.product_id
-        WHERE after_storage.removed_from_oven IS NOT NULL
-            AND skinformation.afterstorage_id IS NULL
-        ORDER BY sample_id
-         """)   
-
-    samples = cursor.fetchall()
-    samples = [
-        {
-            "sample_id": sample["sample_id"],
-            "afterstorage_id": sample["afterstorage_id"],
-            "display_name": sample["display_name"]
-        }
-        for sample in samples
-    ]
-
-    return render_template(
-    "tests/skinformation.html",
-    products=products,
-    samples=samples
-    )
+app.register_blueprint(skinformation_bp)
 
 @app.route("/test/initial_tack", methods=["GET", "POST"])
 @login_required
