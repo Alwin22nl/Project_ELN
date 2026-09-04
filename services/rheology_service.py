@@ -23,3 +23,15 @@ class RheologyService:
         results = self.repository.get_latest_results()
 
         return products, results
+
+    def get_available_samples(self, product_id):
+        samples = self.repository.get_available_samples(product_id)
+
+        return [
+            {
+                "sample_id": sample["sample_id"],
+                "afterstorage_id": sample["afterstorage_id"],
+                "display_name": sample["display_name"]
+            }
+            for sample in samples
+        ]

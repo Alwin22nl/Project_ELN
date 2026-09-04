@@ -41,3 +41,12 @@ def rheology():
         results=results
     )
 
+@rheology_bp.route("/get_rheology_samples/<int:product_id>")
+@login_required
+def get_rheology_samples(product_id):
+
+    samples = service.get_available_samples(product_id)
+
+    return {
+        "samples": samples
+    }

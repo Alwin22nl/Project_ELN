@@ -103,3 +103,53 @@ class RheologyRepository:
         finally:
             cursor.close()
             connection.close()        
+
+    def get_available_samples(self, product_id):
+        connection = get_connection()
+        cursor = get_dict_cursor(connection)
+
+        try:
+            cursor.execute(
+                """
+                SELECT  
+                    samples.sample_id,
+                    NULL::INTEGER AS afterstorage_id,
+                    samples.batch_nr AS display_name
+                FROM samples
+                LEFT JOIN rheology
+                    ON rheology.sample_id = samples.sample_id
+                WHERE samples.product_id = %s
+                    AND samples.prod_date <= CURRENT_DATE -7
+                    AND MOD(
+                        samples.batch_sequence,
+                        (
+                            SELECT frequency
+                            FROM product_test_requirements
+                            WHERE product_id = samples.product_id
+                                AND test_type_id = 1
+                        )   
+                    ) = 0
+                    AND rheology.rheology_id IS NULL
+                UNION ALL
+                SELECT 
+                    samples.sample_id,
+                    after_storage.afterstorage_id,
+                    samples.batch_nr || ' AS' AS dieplay_name
+                FROM after_storage
+                JOIN samples
+                    ON samples.sample_id = after_storage.sample_id
+                LEFT JOIN rheology
+                    ON rheology.afterstorage_id = after_storage.afterstorage_id
+                WHERE samples.product_id = %s
+                    AND after_storage.removed_from_oven IS NOT NULL
+                    AND rheology.afterstorage_id IS NULL
+                ORDER BY sample_id
+                """,
+                (product_id, product_id),           
+            )
+
+            return cursor.fetchall()
+
+        finally:
+            cursor.close()
+            connection.close()
