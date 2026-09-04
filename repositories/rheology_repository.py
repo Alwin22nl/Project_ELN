@@ -1,9 +1,9 @@
 from models.rheology import Rheologyresult
-from database import get_db_connection, get_dict_cursor
+from database import get_connection, get_dict_cursor
 
 class RheologyRepository:
     def add_result(self, result: Rheologyresult):
-        connection = get_db_connection()
+        connection = get_connection()
         cursor = connection.cursor()
 
         try:
@@ -48,7 +48,7 @@ class RheologyRepository:
             connection.close()
 
     def get_required_products(self):
-        connection = get_db_connection()
+        connection = get_connection()
         cursor = get_dict_cursor(connection)
 
         try:
@@ -72,7 +72,7 @@ class RheologyRepository:
             connection.close()
 
     def get_latets_results(self, limit=25):
-        connection = get_db_connection()
+        connection = get_connection()
         cursor = get_dict_cursor(connection)
 
         try:

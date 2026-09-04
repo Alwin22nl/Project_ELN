@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from typing import Optional
 
 @dataclass
-class Rheology:
+class Rheologyresult:
     sample_id: str
     afterstorage_id: Optional[str]
     operator_id: int
