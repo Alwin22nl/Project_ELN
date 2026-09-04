@@ -1,8 +1,8 @@
-from models.rheology import Rheologyresult
+from models.rheology import RheologyResult
 from database import get_connection, get_dict_cursor
 
 class RheologyRepository:
-    def add_result(self, result: Rheologyresult):
+    def add_result(self, result: RheologyResult):
         connection = get_connection()
         cursor = connection.cursor()
 

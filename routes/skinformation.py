@@ -33,9 +33,11 @@ def skinformation():
         return redirect(
             url_for("skinformation.skinformation")
         )
+    
     samples = service.get_available_samples()
 
     return render_template(
         "tests/skinformation.html",
         samples=samples,
+        
     )

@@ -1,45 +1,45 @@
-from models.skinformation import skinformationresult
 from database import get_connection, get_dict_cursor
 
 class SkinformationRepository:
-    def add_result(self, result: skinformationresult):
+    def add_results(self, results):
         connection = get_connection()
         cursor = connection.cursor()
 
         try:
-            cursor.execute(
-                """
-                INSERT INTO skinformation
-                (
-                    sample_id,
-                    afterstorage_id,
-                    operator_id,
-                    remark,
-                    skinformation_time,
-                    temp_skinformation_time,
-                    rh_skinformation_time,
-                    tack_free_time,
-                    temp_tack_free_time,
-                    rh_tack_free_time
+            for result in results:
+                cursor.execute(
+                    """
+                    INSERT INTO skinformation
+                    (
+                        sample_id,
+                        afterstorage_id,
+                        operator_id,
+                        remark,
+                        skinformation_time,
+                        temp_skinformation_time,
+                        rh_skinformation_time,
+                        tack_free_time,
+                        temp_tack_free_time,
+                        rh_tack_free_time
+                    )
+                    VALUES
+                    (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+                    """,
+                    (
+                        result.sample_id,
+                        result.afterstorage_id,
+                        result.operator_id,
+                        result.remark,
+                        result.skinformation_time,
+                        result.temp_skinformation_time,
+                        result.rh_skinformation_time,
+                        result.tack_free_time,
+                        result.temp_tack_free_time,
+                        result.rh_tack_free_time
+                    ),
                 )
-                VALUES
-                (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
-                """,
-                (
-                    result.sample_id,
-                    result.afterstorage_id,
-                    result.operator_id,
-                    result.remark,
-                    result.skinformation_time,
-                    result.temp_skinformation_time,
-                    result.rh_skinformation_time,
-                    result.tack_free_time,
-                    result.temp_tack_free_time,
-                    result.rh_tack_free_time
-                ),
-            )
 
-            connection.commit()
+                connection.commit()
 
         except Exception: 
             connection.rollback()
@@ -49,7 +49,7 @@ class SkinformationRepository:
             cursor.close()
             connection.close()
 
-    def get_available_samples(self, product_id):
+    def get_available_samples(self):
         connection = get_connection()
         cursor = get_dict_cursor(connection)
 
@@ -68,13 +68,12 @@ class SkinformationRepository:
                     ON product_test_requirements.product_id = products.product_id
                 LEFT JOIN skinformation
                     ON skinformation.sample_id = samples.sample_id
-                WHERE samples.product_id = %s
-                    AND samples.prod_date <= CURRENT_DATE -7
+                WHERE samples.prod_date <= CURRENT_DATE -7
                     AND skinformation.sample_id IS NULL
                     AND product_test_requirements.test_type_id = 9
                     AND MOD(
                         samples.batch_sequence,
-                        product.test_requirements.frequency     
+                        product_test_requirements.frequency     
                     ) = 0
                 UNION ALL
                 SELECT 
@@ -92,8 +91,7 @@ class SkinformationRepository:
                 WHERE after_storage.removed_from_oven IS NOT NULL
                     AND skinformation.afterstorage_id IS NULL
                 ORDER BY sample_id
-                """,
-                (product_id, product_id),           
+                """    
             )
 
             return cursor.fetchall()

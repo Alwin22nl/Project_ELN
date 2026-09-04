@@ -1,11 +1,11 @@
-from models.rheology import Rheologyresult
+from models.rheology import RheologyResult
 
 class RheologyService:
     def __init__(self, repository):
         self.repository = repository
 
     def submit_result(self, form, operator_id):
-        result = Rheologyresult(
+        result = RheologyResult(
             sample_id=form["sample_id"],
             afterstorage_id=form.get("afterstorage_id") or None,
             operator_id=operator_id,

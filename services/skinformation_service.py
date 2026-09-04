@@ -1,19 +1,19 @@
-from models.skinformation import skinformationresult
+from models.skinformation import SkinformationResult
 
 class SkinformationService:
     def __init__(self, repository):
         self.repository = repository
 
     def submit_result(self, form, operator_id):
-            sample_ids = form.getlis("sample_id"),
-            afterstorage_ids = form.getlist("afterstorage_id"),
-            remarks = form.getlist("remark"),
-            skin_times = form.getlist("skinformation_time"),
-            skin_temps = form.getlist("temp_skinformation_time"),
-            skin_rhs = form.getlist("rh_skinformation_time"),
-            tack_times = form.getlist("tack_free_time"),   
-            tack_temps = form.getlist("temp_tack_free_time"),
-            tack_rhs = form.getlist("rh_tack_free_time")
+            sample_ids = form.getlist("sample_id[]")
+            afterstorage_ids = form.getlist("afterstorage_id[]")
+            remarks = form.getlist("remark[]")
+            skin_times = form.getlist("skinformation_time[]")
+            skin_temps = form.getlist("temp_skinformation_time[]")
+            skin_rhs = form.getlist("rh_skinformation_time[]")
+            tack_times = form.getlist("tack_free_time[]")
+            tack_temps = form.getlist("temp_tack_free_time[]")
+            tack_rhs = form.getlist("rh_tack_free_time[]")
 
             results = []
 
@@ -29,7 +29,7 @@ class SkinformationService:
                     if value != "":
                         afterstorage_id = value
 
-                result = skinformationresult(
+                result = SkinformationResult(
                     sample_id=sample_ids[i],
                     operator_id=operator_id,
                     afterstorage_id=afterstorage_id,
@@ -43,11 +43,11 @@ class SkinformationService:
                 )
 
                 results.append(result)
-        
-            self.repository.add_result(result)
+            
+            self.repository.add_results(results)
 
-    def get_available_samples(self, product_id):
-        samples = self.repository.get_available_samples(product_id)
+    def get_available_samples(self):
+        samples = self.repository.get_available_samples()
 
         return [
             {
