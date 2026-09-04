@@ -12,6 +12,8 @@ from functools import wraps
 import secrets
 import string
 
+from routes.rheology import rheology_bp
+
 load_dotenv()
 today = date.today()
 
@@ -1422,91 +1424,7 @@ def tests():
     )
 
 # test routes
-@app.route("/test/rheology", methods=["GET", "POST"])
-@login_required
-def rheology():
-
-    connection = get_connection()
-    cursor = get_dict_cursor(connection)
-    if request.method == "POST":
-        cursor.execute(
-            """
-            INSERT INTO rheology
-            (
-                sample_id,
-                afterstorage_id,
-                operator_id,
-                remark,
-                yield_stress,
-                vis_at_1,
-                vis_at_5,
-                vis_at_10,
-                humidity
-            )
-            VALUES
-            (%s,%s,%s,%s,%s,%s,%s,%s,%s)
-            """,
-            (
-                request.form["sample_id"],
-                request.form.get("afterstorage_id") or None,
-                session["user_id"],
-                request.form["remark"],
-                request.form["yield_stress"],
-                request.form["vis_at_1"],
-                request.form["vis_at_5"],
-                request.form["vis_at_10"],
-                request.form["humidity"]
-            )
-        )
-        connection.commit()
-        cursor.close()
-        connection.close()
-        return redirect(url_for("rheology"))
-
-    # GET: Load products requiring rheology
-    cursor.execute(
-        """
-        SELECT
-            products.product_id,
-            products.product_name
-        FROM products
-        JOIN product_test_requirements
-        ON product_test_requirements.product_id =
-           products.product_id
-        WHERE product_test_requirements.test_type_id = 1
-        ORDER BY products.product_name
-        """
-    )
-    products = cursor.fetchall()
-    # Load latest results
-    cursor.execute(
-        """
-        SELECT
-            samples.batch_nr,
-            CASE 
-                WHEN rheology.afterstorage_id IS NOT NULL THEN samples.batch_nr || ' AS'
-                ELSE samples.batch_nr
-            END AS batch_nr,
-            rheology.yield_stress,
-            rheology.vis_at_1,
-            rheology.vis_at_5,
-            rheology.vis_at_10,
-            rheology.humidity
-        FROM rheology
-        JOIN samples
-        ON samples.sample_id = rheology.sample_id
-        ORDER BY rheology.rheology_id DESC
-        LIMIT 25
-        """
-    )
-    results = cursor.fetchall()
-    cursor.close()
-    connection.close()
-    return render_template(
-        "tests/rheology.html",
-        products=products,
-        results=results
-    )
+app.register_blueprint(rheology_bp)
 
 @app.route("/get_rheology_samples/<int:product_id>")
 @login_required
@@ -3650,7 +3568,6 @@ def overview_page():
                 ),
                 3
             ) AS t_max,
-
             ROUND(
                 AVG(tensile_specimen.e_max)
                 FILTER (
@@ -4466,4 +4383,4 @@ def users():
     return "Users page"
 
 if __name__ == "__main__":
-    app.run(debug=False)
+    app.run(debug=True)
