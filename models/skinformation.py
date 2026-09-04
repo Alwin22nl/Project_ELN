@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from typing import Optional
 
 @dataclass
-class skinformation:
+class skinformationresult:
     sample_id: str
     afterstorage_id: Optional[str]
     operator_id: int

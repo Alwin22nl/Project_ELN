@@ -5,25 +5,46 @@ class SkinformationService:
         self.repository = repository
 
     def submit_result(self, form, operator_id):
-        result = skinformationresult(
-            sample_id=form["sample_id"],
-            afterstorage_id=form.get("afterstorage_id") or None,
-            operator_id=operator_id,
-            remark=form["remark"],
-            skinformation_time=form["skinformation_time"],
-            temp_skinformation_time=form["temp_skinformation_time"],
-            rh_skinformation_time=form["rh_skinformation_time"],
-            tack_free_time=form["tack_free_time"],   
-            temp_tack_free_time=form["temp_tack_free_time"],
-            rh_tack_free_time=form["rh_tack_free_time"]
-        )
-        self.repository.add_result(result)
+            sample_ids = form.getlis("sample_id"),
+            afterstorage_ids = form.getlist("afterstorage_id"),
+            remarks = form.getlist("remark"),
+            skin_times = form.getlist("skinformation_time"),
+            skin_temps = form.getlist("temp_skinformation_time"),
+            skin_rhs = form.getlist("rh_skinformation_time"),
+            tack_times = form.getlist("tack_free_time"),   
+            tack_temps = form.getlist("temp_tack_free_time"),
+            tack_rhs = form.getlist("rh_tack_free_time")
 
-    def get_overview(self):
-        products = self.repository.get_required_products()
-        results = self.repository.get_latest_results()
+            results = []
 
-        return products, results
+            for i in range(len(sample_ids)):
+                if sample_ids[i] == "":
+                    continue
+
+                afterstorage_id = None
+
+                if i < len(afterstorage_ids):
+                    value = afterstorage_ids[i]
+
+                    if value != "":
+                        afterstorage_id = value
+
+                result = skinformationresult(
+                    sample_id=sample_ids[i],
+                    operator_id=operator_id,
+                    afterstorage_id=afterstorage_id,
+                    remark=remarks[i],
+                    skinformation_time=skin_times[i],
+                    temp_skinformation_time=skin_temps[i],
+                    rh_skinformation_time=skin_rhs[i],
+                    tack_free_time=tack_times[i],
+                    temp_tack_free_time=tack_temps[i],
+                    rh_tack_free_time=tack_rhs[i]
+                )
+
+                results.append(result)
+        
+            self.repository.add_result(result)
 
     def get_available_samples(self, product_id):
         samples = self.repository.get_available_samples(product_id)
@@ -32,7 +53,8 @@ class SkinformationService:
             {
                 "sample_id": sample["sample_id"],
                 "afterstorage_id": sample["afterstorage_id"],
-                "display_name": sample["display_name"]
+                "display_name": sample["display_name"],
+                "product_name": sample["product_name"]
             }
             for sample in samples
         ]

@@ -33,20 +33,9 @@ def skinformation():
         return redirect(
             url_for("skinformation.skinformation")
         )
-    products, results = service.get_overview()
+    samples = service.get_available_samples()
 
     return render_template(
         "tests/skinformation.html",
-        products=products,
-        results=results
+        samples=samples,
     )
-
-@skinformation_bp.route("/get_skinformation_samples/<int:product_id>")
-@login_required
-def get_skinformation_samples(product_id):
-
-    samples = service.get_available_samples(product_id)
-
-    return {
-        "samples": samples
-    }
