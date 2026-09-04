@@ -2,7 +2,7 @@ import os
 from dotenv import load_dotenv
 from flask import session, Flask, render_template, request, redirect, url_for, jsonify
 from database import get_connection, get_dict_cursor
-from helper import log_change
+from helper import log_change, login_required, admin_required, generate_temp_password, format_datetime
 from datetime import date, timedelta, datetime
 from numbers import Real
 import calendar
@@ -12,6 +12,8 @@ from functools import wraps
 import secrets
 import string
 
+from routes.rheology import rheology_bp
+
 load_dotenv()
 today = date.today()
 
@@ -20,56 +22,11 @@ app.secret_key = os.getenv("SECRET_KEY")
 app.permanent_session_lifetime = timedelta(hours=1)
 app.config["SESSION_REFRESH_EACH_REQUEST"] = True
 
-def login_required(function):
-
-    @wraps(function)
-    def wrapper(*args, **kwargs):
-
-        if "user_id" not in session:
-            return redirect(
-                url_for("login")
-            )
-
-        return function(*args, **kwargs)
-
-    return wrapper
-
-def admin_required(function):
-
-    @wraps(function)
-    def wrapper(*args, **kwargs):
-
-        if session.get("role") != "admin":
-            return redirect(url_for("dashboard"))
-
-        return function(*args, **kwargs)
-
-    return wrapper
-
-def generate_temp_password(length=10):
-
-    characters = (
-        string.ascii_letters +
-        string.digits +
-        "!@#$%"
-    )
-
-    password = "".join(
-        secrets.choice(characters)
-        for _ in range(length)
-    )
-
-    return password
-
-def format_datetime(value):
-    if value:
-        return value.strftime("%d-%m-%Y %H:%M")
-    return ""
 
 TEST_PAGES = [
     {
         "name": "Rheologie",
-        "endpoint": "rheology",
+        "endpoint": "rheology.rheology",
     },
     {
         "name": "Huidvorming",
@@ -1422,153 +1379,7 @@ def tests():
     )
 
 # test routes
-@app.route("/test/rheology", methods=["GET", "POST"])
-@login_required
-def rheology():
-
-    connection = get_connection()
-    cursor = get_dict_cursor(connection)
-    if request.method == "POST":
-        cursor.execute(
-            """
-            INSERT INTO rheology
-            (
-                sample_id,
-                afterstorage_id,
-                operator_id,
-                remark,
-                yield_stress,
-                vis_at_1,
-                vis_at_5,
-                vis_at_10,
-                humidity
-            )
-            VALUES
-            (%s,%s,%s,%s,%s,%s,%s,%s,%s)
-            """,
-            (
-                request.form["sample_id"],
-                request.form.get("afterstorage_id") or None,
-                session["user_id"],
-                request.form["remark"],
-                request.form["yield_stress"],
-                request.form["vis_at_1"],
-                request.form["vis_at_5"],
-                request.form["vis_at_10"],
-                request.form["humidity"]
-            )
-        )
-        connection.commit()
-        cursor.close()
-        connection.close()
-        return redirect(url_for("rheology"))
-
-    # GET: Load products requiring rheology
-    cursor.execute(
-        """
-        SELECT
-            products.product_id,
-            products.product_name
-        FROM products
-        JOIN product_test_requirements
-        ON product_test_requirements.product_id =
-           products.product_id
-        WHERE product_test_requirements.test_type_id = 1
-        ORDER BY products.product_name
-        """
-    )
-    products = cursor.fetchall()
-    # Load latest results
-    cursor.execute(
-        """
-        SELECT
-            samples.batch_nr,
-            CASE 
-                WHEN rheology.afterstorage_id IS NOT NULL THEN samples.batch_nr || ' AS'
-                ELSE samples.batch_nr
-            END AS batch_nr,
-            rheology.yield_stress,
-            rheology.vis_at_1,
-            rheology.vis_at_5,
-            rheology.vis_at_10,
-            rheology.humidity
-        FROM rheology
-        JOIN samples
-        ON samples.sample_id = rheology.sample_id
-        ORDER BY rheology.rheology_id DESC
-        LIMIT 25
-        """
-    )
-    results = cursor.fetchall()
-    cursor.close()
-    connection.close()
-    return render_template(
-        "tests/rheology.html",
-        products=products,
-        results=results
-    )
-
-@app.route("/get_rheology_samples/<int:product_id>")
-@login_required
-def get_rheology_samples(product_id):
-
-    connection = get_connection()
-    cursor = get_dict_cursor(connection)
-
-    cursor.execute(
-        """
-        SELECT
-            samples.sample_id,
-            NULL::INTEGER AS afterstorage_id,
-            samples.batch_nr AS display_name
-        FROM samples
-        LEFT JOIN rheology
-        ON rheology.sample_id = samples.sample_id
-        WHERE samples.product_id = %s
-        AND samples.prod_date <= CURRENT_DATE - 7
-        AND MOD(
-            samples.batch_sequence,
-            (
-                SELECT frequency
-                FROM product_test_requirements
-                WHERE product_id = samples.product_id
-                AND test_type_id = 1
-            )
-        ) = 0
-        AND rheology.sample_id IS NULL
-        UNION ALL
-        SELECT
-            samples.sample_id,
-            after_storage.afterstorage_id,
-            samples.batch_nr || ' AS' AS display_name
-        FROM after_storage
-        JOIN samples
-        ON samples.sample_id = after_storage.sample_id
-        LEFT JOIN rheology
-        ON rheology.afterstorage_id = after_storage.afterstorage_id
-        WHERE 
-            samples.product_id = %s
-            AND after_storage.removed_from_oven IS NOT NULL
-            AND rheology.afterstorage_id IS NULL
-        ORDER BY sample_id
-        """,
-        (product_id, product_id)
-    )
-
-    samples = cursor.fetchall()
-    cursor.close()
-    connection.close()
-
-    return {
-        "samples": [
-            {
-                "sample_id": sample["sample_id"],
-                "afterstorage_id": sample["afterstorage_id"],
-                "display_name": sample["display_name"]
-            }
-            for sample in samples
-        ]
-    }
+app.register_blueprint(rheology_bp)
 
 @app.route("/test/skinformation", methods=["GET","POST"])
 @login_required
@@ -3650,7 +3461,6 @@ def overview_page():
                 ),
                 3
             ) AS t_max,
-
             ROUND(
                 AVG(tensile_specimen.e_max)
                 FILTER (
@@ -4466,4 +4276,4 @@ def users():
     return "Users page"
 
 if __name__ == "__main__":
-    app.run(debug=False)
+    app.run(debug=True)
