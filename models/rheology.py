@@ -7,7 +7,7 @@ class Rheologyresult:
     afterstorage_id: Optional[str]
     operator_id: int
     remark: str
-    yieldstress: str
+    yield_stress: str
     vis_at_1: str
     vis_at_5: str
     vis_at_10: str

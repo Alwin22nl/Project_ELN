@@ -6,7 +6,7 @@ from flask import (
     url_for,
     session
 )
-from flask_login import login_required
+from helper import login_required
 
 from repositories.rheology_repository import RheologyRepository
 from services.rheology_service import RheologyService

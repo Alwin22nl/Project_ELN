@@ -15,7 +15,7 @@ class RheologyRepository:
                     afterstorage_id,
                     operator_id,
                     remark,
-                    yieldstress,
+                    yield_stress,
                     vis_at_1,
                     vis_at_5,
                     vis_at_10,
@@ -29,7 +29,7 @@ class RheologyRepository:
                     result.afterstorage_id,
                     result.operator_id,
                     result.remark,
-                    result.yieldstress,
+                    result.yield_stress,
                     result.vis_at_1,
                     result.vis_at_5,
                     result.vis_at_10,
@@ -60,7 +60,7 @@ class RheologyRepository:
                 FROM products
                 JOIN product_test_requirements
                     ON product_test_requirements.product_id = products.product_id
-                WHERE product_test_requirements.test_id = 1
+                WHERE product_test_requirements.test_type_id = 1
                 ORDER BY products.product_name
                 """
             )
@@ -71,24 +71,24 @@ class RheologyRepository:
             cursor.close()
             connection.close()
 
-    def get_latets_results(self, limit=25):
+    def get_latest_results(self, limit=25):
         connection = get_connection()
         cursor = get_dict_cursor(connection)
 
         try:
-            cursor.excecute(
+            cursor.execute(
                 """
                 SELECT
                     CASE
                         WHEN rheology.afterstorage_id IS NOT NULL
-                        THEN sampples.batch_nr || ' AS'
+                        THEN samples.batch_nr || ' AS'
                         ELSE samples.batch_nr
                     END AS batch_nr,
-                    rheology.yieldstress,
+                    rheology.yield_stress,
                     rheology.vis_at_1,
                     rheology.vis_at_5,
                     rheology.vis_at_10,
-                    rheology.humidity,
+                    rheology.humidity
                     FROM rheology
                     JOIN samples
                         ON samples.sample_id = rheology.sample_id

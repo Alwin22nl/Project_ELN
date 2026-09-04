@@ -71,7 +71,7 @@ def format_datetime(value):
 TEST_PAGES = [
     {
         "name": "Rheologie",
-        "endpoint": "rheology",
+        "endpoint": "rheology.rheology",
     },
     {
         "name": "Huidvorming",

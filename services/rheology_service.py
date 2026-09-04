@@ -10,7 +10,7 @@ class RheologyService:
             afterstorage_id=form.get("afterstorage_id") or None,
             operator_id=operator_id,
             remark=form["remark"],
-            yieldstress=form["yieldstress"],
+            yield_stress=form["yield_stress"],
             vis_at_1=form["vis_at_1"],
             vis_at_5=form["vis_at_5"],
             vis_at_10=form["vis_at_10"],   
