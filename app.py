@@ -16,6 +16,7 @@ import string
 from routes.rheology import rheology_bp
 from routes.skinformation import skinformation_bp
 from routes.initial_tack import initial_tack_bp
+from routes.density import density_bp
 
 load_dotenv()
 today = date.today()
@@ -41,7 +42,7 @@ TEST_PAGES = [
     },
     {
         "name": "Dichtheid",
-        "endpoint": "density",
+        "endpoint": "density.density",
     },
     {
         "name": "Shore A",
@@ -1385,142 +1386,7 @@ def tests():
 app.register_blueprint(rheology_bp)
 app.register_blueprint(skinformation_bp)
 app.register_blueprint(initial_tack_bp)
-
-@app.route("/test/density", methods=["GET", "POST"])
-@login_required
-def density():
-
-    connection = get_connection()
-    cursor = get_dict_cursor(connection)
-    if request.method == "POST":
-        sample_id = request.form["sample_id"]
-        operator_id = session["user_id"]
-        remark = request.form.get("remark")
-        vessel_empty = float(request.form["vessel_empty"])
-        vessel_full = float(request.form["vessel_full"])
-        vessel_volume = float(request.form["vessel_volume"])
-        density_product = (vessel_full - vessel_empty) / vessel_volume
-
-        cursor.execute(
-            """
-            INSERT INTO density
-            (
-                sample_id,
-                operator_id,
-                remark,
-                vessel_empty,
-                vessel_full,
-                vessel_volume,
-                density_product
-            )
-            VALUES (%s,%s,%s,%s,%s,%s,%s)
-            """,
-            (
-                sample_id,
-                operator_id,
-                remark,
-                vessel_empty,
-                vessel_full,
-                vessel_volume,
-                density_product
-            )
-        )
-
-        connection.commit()
-        cursor.close()
-        connection.close()
-        return redirect(url_for("density"))
-
-
-    # Load products requiring density
-    cursor.execute(
-        """
-        SELECT
-            products.product_id,
-            products.product_name
-        FROM products
-        JOIN product_test_requirements
-        ON product_test_requirements.product_id =
-           products.product_id
-        WHERE product_test_requirements.test_type_id = 4
-        ORDER BY products.product_name
-        """
-    )
-    products = cursor.fetchall()
-    # Load latest results
-    cursor.execute(
-        """
-        SELECT
-            density.density_id,
-            samples.batch_nr,
-            density.vessel_empty,
-            density.vessel_full,
-            density.vessel_volume,
-            density.density_product,
-            density.remark
-        FROM density
-        JOIN samples
-        ON samples.sample_id = density.sample_id
-        ORDER BY density.density_id DESC
-        LIMIT 25
-        """
-    )
-    results = cursor.fetchall()
-    cursor.close()
-    connection.close()
-    return render_template(
-        "tests/density.html",
-        products=products,
-        results=results
-    )
-
-@app.route("/get_density_samples/<int:product_id>")
-def get_density_samples(product_id):
-
-    connection = get_connection()
-    cursor = get_dict_cursor(connection)
-
-    cursor.execute(
-        """
-        SELECT
-            samples.sample_id,
-            samples.batch_nr
-        FROM samples
-        LEFT JOIN density
-        ON density.sample_id = samples.sample_id
-        WHERE samples.product_id = %s
-        AND samples.prod_date <= CURRENT_DATE - 7
-        AND (
-            samples.batch_sequence = 1
-            OR MOD(
-                samples.batch_sequence,
-                (
-                    SELECT frequency
-                    FROM product_test_requirements
-                    WHERE product_id = samples.product_id
-                    AND test_type_id = 4
-                )
-            ) = 0
-        )
-        AND density.sample_id IS NULL
-        ORDER BY samples.sample_id
-        """,
-        (product_id,)
-    )
-
-    samples = cursor.fetchall()
-    cursor.close()
-    connection.close()
-
-    return {
-        "samples": [
-            {
-                "id": sample["sample_id"],
-                "batch_nr": sample["batch_nr"]
-            }
-            for sample in samples
-        ]
-    }
+app.register_blueprint(density_bp)
 
 @app.route("/test/shore_a")
 @login_required
