@@ -3,9 +3,10 @@ from flask import(
     redirect,
     render_template,
     request,
-    url_for
+    url_for,
     session
 )
+
 from helper import login_required
 
 from repositories.density_repository import DensityRepository
@@ -22,8 +23,8 @@ service = DensityService(repository)
 
 @density_bp.route("/density", methods=["GET", "POST"])
 @login_required
-def density()
-    if request.method == "POST"
+def density():
+    if request.method == "POST":
         service.submit_result(
             request.form,
             operator_id=session["user_id"]
@@ -42,7 +43,7 @@ def density()
 
 @density_bp.route("/get_density_samples/<int:product_id>")
 @login_required
-def get_density_samples(product_id)
+def get_density_samples(product_id):
 
     samples = service.get_available_samples(product_id)
 

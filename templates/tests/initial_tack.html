@@ -116,45 +116,18 @@ document
 
     sample_dropdown.innerHTML =
         "<option>Loading...</option>";
-fetch("/test/get_initial_tack_samples/" + product_id)
-    .then(response => {
-        console.log(
-            "Initial Tack response:",
-            response.status,
-            response.url
-        );
-
-        if (!response.ok) {
-            throw new Error(
-                "Request failed with status " + response.status
-            );
-        }
-
-        return response.json();
-    })
+    fetch("/get_initial_tack_samples/" + product_id)
+    .then(response => response.json())
     .then(data => {
         sample_dropdown.innerHTML =
             "<option>Select sample...</option>";
 
         data.samples.forEach(function(sample) {
             let option = document.createElement("option");
-
-            option.value = sample.sample_id;
-            option.dataset.afterstorage =
-                sample.afterstorage_id || "";
-            option.text = sample.display_name;
-
+            option.value = sample.id;
+            option.text = sample.batch_nr;
             sample_dropdown.appendChild(option);
         });
-    })
-    .catch(error => {
-        console.error(
-            "Error loading Initial Tack samples:",
-            error
-        );
-
-        sample_dropdown.innerHTML =
-            "<option>Error loading samples</option>";
     });
 });
 </script>
