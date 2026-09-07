@@ -16,7 +16,7 @@ class DensityRepository:
                     remark,
                     vessel_empty,
                     vessel_full,
-                    vessel_volume
+                    vessel_volume,
                     density_product
                 )
                 VALUES (%s,%s,%s,%s,%s,%s,%s)
@@ -55,7 +55,7 @@ class DensityRepository:
                 FROM products
                 JOIN product_test_requirements
                 ON product_test_requirements.product_id = products.product_id
-                WHERE product_test_reuirements.test_type_id = 4
+                WHERE product_test_requirements.test_type_id = 4
                 ORDER BY products.product_name
                 """
             )
@@ -74,7 +74,7 @@ class DensityRepository:
             cursor.execute(
                 """
                 SELECT
-                    density.density_id
+                    density.density_id,
                     samples.batch_nr,
                     density.vessel_empty,
                     density.vessel_full,
@@ -114,12 +114,15 @@ class DensityRepository:
                 AND (
                     samples.batch_sequence = 1
                     OR MOD(
+                        samples.batch_sequence,
+                        (
                         SELECT frequency
                         FROM product_test_requirements
                         WHERE product_id = samples.product_id
                         AND test_type_id = 4
-                    )
-                ) = 0
+                        )
+                    ) = 0
+                )
                 AND density.sample_id IS NULL
                 ORDER BY samples.sample_id
                 """,
@@ -131,4 +134,3 @@ class DensityRepository:
         finally:
             cursor.close()
             connection.close()
-                    
