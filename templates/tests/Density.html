@@ -144,7 +144,7 @@ document
     }
     sample_dropdown.innerHTML =
         "<option>Loading...</option>";
-    fetch("/get_density_samples/" + product_id)
+    fetch("/test/get_density_samples/" + product_id)
     .then(response => response.json())
     .then(data => {
         sample_dropdown.innerHTML =
