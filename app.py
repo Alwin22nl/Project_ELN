@@ -15,6 +15,7 @@ import string
 # importing Routes
 from routes.rheology import rheology_bp
 from routes.skinformation import skinformation_bp
+from routes.initial_tack import initial_tack_bp
 
 load_dotenv()
 today = date.today()
@@ -36,7 +37,7 @@ TEST_PAGES = [
     },
     {
         "name": "Initial Tack",
-        "endpoint": "initial_tack",
+        "endpoint": "initial_tack.initial_tack",
     },
     {
         "name": "Dichtheid",
@@ -1383,139 +1384,7 @@ def tests():
 # test routes
 app.register_blueprint(rheology_bp)
 app.register_blueprint(skinformation_bp)
-
-@app.route("/test/initial_tack", methods=["GET", "POST"])
-@login_required
-def initial_tack():
-
-    connection = get_connection()
-    cursor = get_dict_cursor(connection)
-    if request.method == "POST":
-        sample_id = request.form["sample_id"]
-        operator_id = session["user_id"]
-        remark = request.form["remark"]
-        area = float(request.form["area"])
-        area_weight = float(request.form["area_weight"])
-        added_weight = float(request.form["added_weight"])
-        humidity = request.form["humidity"]
-        initial_tack = (area_weight + added_weight) / area
-
-        cursor.execute(
-            """
-            INSERT INTO initial_tack
-            (
-                sample_id,
-                operator_id,
-                remark,
-                area,
-                area_weight,
-                added_weight,
-                humidity,
-                initial_tack
-            )
-            VALUES (%s,%s,%s,%s,%s,%s,%s,%s)
-            """,
-            (
-                sample_id,
-                operator_id,
-                remark,
-                area,
-                area_weight,
-                added_weight,
-                humidity,
-                initial_tack
-            )
-        )
-        connection.commit()
-        cursor.close()
-        connection.close()
-        return redirect(url_for("initial_tack"))
-
-    # GET: Load products requiring initial_tack
-    cursor.execute(
-        """
-        SELECT
-            products.product_id,
-            products.product_name
-        FROM products
-        JOIN product_test_requirements
-        ON product_test_requirements.product_id =
-           products.product_id
-        WHERE product_test_requirements.test_type_id = 8
-        ORDER BY products.product_name
-        """
-    )
-    products = cursor.fetchall()
-    # Load latest results
-    cursor.execute(
-        """
-        SELECT
-            samples.batch_nr,
-            initial_tack.area,
-            initial_tack.area_weight,
-            initial_tack.added_weight,
-            initial_tack.initial_tack,
-            initial_tack.humidity
-        FROM initial_tack
-        JOIN samples
-        ON samples.sample_id = initial_tack.sample_id
-        ORDER BY initial_tack.initial_tack_id DESC
-        LIMIT 25
-        """
-    )
-    results = cursor.fetchall()
-    cursor.close()
-    connection.close()
-    return render_template(
-        "tests/initial_tack.html",
-        products=products,
-        results=results
-    )
-
-@app.route("/get_initial_tack_samples/<int:product_id>")
-def get_initial_tack_samples(product_id):
-
-    connection = get_connection()
-    cursor = get_dict_cursor(connection)
-
-    cursor.execute(
-        """
-        SELECT
-            samples.sample_id,
-            samples.batch_nr
-        FROM samples
-        LEFT JOIN initial_tack
-        ON initial_tack.sample_id = samples.sample_id
-        WHERE samples.product_id = %s
-        AND samples.prod_date <= CURRENT_DATE - 7
-        AND MOD(
-            samples.batch_sequence,
-            (
-                SELECT frequency
-                FROM product_test_requirements
-                WHERE product_id = samples.product_id
-                AND test_type_id = 8
-            )
-        ) = 0
-        AND initial_tack.sample_id IS NULL
-        ORDER BY samples.sample_id
-        """,
-        (product_id,)
-    )
-
-    samples = cursor.fetchall()
-    cursor.close()
-    connection.close()
-
-    return {
-        "samples": [
-            {
-                "id": sample["sample_id"],
-                "batch_nr": sample["batch_nr"]
-            }
-            for sample in samples
-        ]
-    }
+app.register_blueprint(initial_tack_bp)
 
 @app.route("/test/density", methods=["GET", "POST"])
 @login_required
