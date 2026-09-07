@@ -79,13 +79,13 @@ class InitialTackRepository:
                     samples.batch_nr,
                     initial_tack.area,
                     initial_tack.area_weight,
-                    initial_tack.added_weight
+                    initial_tack.added_weight,
                     initial_tack.initial_tack,
                     initial_tack.humidity
                 FROM initial_tack
                 JOIN samples
                 ON samples.sample_id = initial_tack.sample_id
-                ORDER BY initial_tack.initial_tack_id
+                ORDER BY initial_tack.initial_tack_id DESC
                 LIMIT %s
                 """,
                 (limit,),
@@ -102,11 +102,11 @@ class InitialTackRepository:
         cursor = get_dict_cursor(connection)
 
         try:
-            cursor.excecute(
+            cursor.execute(
                 """
                 SELECT
                     samples.sample_id,
-                    samples.batch_nr
+                    samples.batch_nr AS display_name
                 FROM samples
                 LEFT JOIN initial_tack
                 ON initial_tack.sample_id = samples.sample_id
@@ -124,7 +124,7 @@ class InitialTackRepository:
                 AND initial_tack.sample_id IS NULL
                 ORDER BY samples.sample_id
                 """,
-                (product_id, product_id)
+                (product_id,)
             )
 
             return cursor.fetchall()

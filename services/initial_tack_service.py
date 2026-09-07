@@ -19,7 +19,7 @@ class InitialTackService:
 
     def get_overview(self):
         products = self.repository.get_required_products()
-        results = self.repository.get_latets_results
+        results = self.repository.get_latest_results()
 
         return products, results
 
