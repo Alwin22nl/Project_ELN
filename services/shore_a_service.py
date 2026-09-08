@@ -16,7 +16,7 @@ class ShoreAService:
             humidity=form["humidity"],
         )
         shore_a_avg = result.calculate_avg_shore_a()
-        self.repository.add_test_result(result, shore_a_avg)
+        self.repository.submit_test_result(result, shore_a_avg)
 
     def submit_prep_result(self, form, operator_id):
         result = ShoreAPrepResult(

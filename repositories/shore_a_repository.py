@@ -1,7 +1,7 @@
 from models.shore_a import ShoreAPrepResult, ShoreATestResult
 from database import get_connection, get_dict_cursor
 
-class ShoreAPrepRepository:
+class ShoreARepository:
     def add_prep_result(self, result: ShoreAPrepResult):
         connection = get_connection()
         cursor = connection.cursor()
@@ -56,7 +56,7 @@ class ShoreAPrepRepository:
                 )
                 VALUES
                 (%s,%s,%s,%s,%s,%s,%s,%s,%s)
-                """
+                """,
                 (
                     result.sample_id,
                     result.operator_id,
@@ -88,7 +88,7 @@ class ShoreAPrepRepository:
             cursor.execute(
                 """
                 SELECT
-                    samples.sample_id.
+                    samples.sample_id,
                     samples.batch_nr AS display_name,
                     products.product_name
                 FROM samples
@@ -99,6 +99,7 @@ class ShoreAPrepRepository:
                 LEFT JOIN shore_a_preperation AS shore_a_prep
                 ON shore_a_prep.sample_id = samples.sample_id
                 WHERE product_test_requirements.test_type_id = 3
+                AND samples.product_id = %s
                 AND shore_a_prep.sample_id IS NULL
                 AND samples.prod_date <= CURRENT_DATE - 7
                 AND
@@ -158,7 +159,7 @@ class ShoreAPrepRepository:
             cursor.execute(
                 """
                 SELECT 
-                    products.product_id
+                    products.product_id,
                     products.product_name
                 FROM products
                 JOIN product_test_requirements
@@ -212,7 +213,7 @@ class ShoreAPrepRepository:
             cursor.execute(
                 """
                 SELECT 
-                    samples.batch_nr.
+                    samples.batch_nr,
                     products.product_name,
                     shore_a_prep.prepared_date
                 FROM shore_a_preparation AS shore_a_prep
