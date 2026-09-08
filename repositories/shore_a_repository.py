@@ -96,7 +96,7 @@ class ShoreARepository:
                 ON products.product_id = samples.product_id
                 JOIN product_test_requirements
                 ON product_test_requirements.product_id = products.product_id
-                LEFT JOIN shore_a_preperation AS shore_a_prep
+                LEFT JOIN shore_a_preparation AS shore_a_prep
                 ON shore_a_prep.sample_id = samples.sample_id
                 WHERE product_test_requirements.test_type_id = 3
                 AND samples.product_id = %s
@@ -111,7 +111,7 @@ class ShoreARepository:
                         product_test_requirements.frequency
                     ) = 0
                 )
-                ORDER BY samples.product_id, samples.sample_id
+                ORDER BY samples.product_id, samples.sample_id;
                 """,
                 (product_id,)
             )
@@ -132,7 +132,7 @@ class ShoreARepository:
                 SELECT
                     samples.sample_id,
                     samples.batch_nr AS display_name
-                FROM shore_a_preperation AS shore_a_prep
+                FROM shore_a_preparation AS shore_a_prep
                 JOIN samples
                 ON samples.sample_id = shore_a_prep.sample_id
                 LEFT JOIN shore_a
@@ -140,7 +140,7 @@ class ShoreARepository:
                 WHERE samples.product_id = %s
                 AND shore_a.sample_id IS NULL
                 AND shore_a_prep.prepared_date::date <= CURRENT_DATE - INTERVAL '7 days'
-                ORDER BY samples.product_id, samples.sample_id
+                ORDER BY samples.product_id, samples.sample_id;
                 """,
                 (product_id,)
             )

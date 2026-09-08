@@ -12,8 +12,7 @@ class ShoreATestResult:
     humidity: str
 
     def calculate_avg_shore_a(self):
-        return ((self.shore_a_1 + self.shore_a_2 + self.shore_a_3) / 3)
-
+        return round((self.shore_a_1 + self.shore_a_2 + self.shore_a_3) / 3)
 @dataclass    
 class ShoreAPrepResult:
     sample_id : str

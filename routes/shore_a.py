@@ -7,6 +7,7 @@ from flask import(
     session
 )
 
+from datetime import date
 from helper import login_required
 
 from repositories.shore_a_repository import ShoreARepository
@@ -45,7 +46,8 @@ def shore_a_prep():
     return render_template(
         "tests/shore_a/shore_a_prep.html",
         products=products,
-        results = results
+        results = results,
+        today=date.today()
     )
 
    
@@ -66,7 +68,7 @@ def shore_a_test():
     products, results = service.get_test_overview()
 
     return render_template(
-        "tests/shore_a/shore_a_prep.html",
+        "tests/shore_a/shore_a_test.html",
         products=products,
         results = results
     )

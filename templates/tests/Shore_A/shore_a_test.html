@@ -32,7 +32,7 @@ Zettex ELN
             </select>
             <br><br>
             <h3>Selecteer Batch</h3>
-            <select id="sample_select" name="sample_id">
+            <select id="sample_select" name="sample_id" required>
                 <option>
                     Selecteer product eerst...
                 </option>
@@ -126,8 +126,8 @@ document
 
         data.samples.forEach(function(sample) {
             let option = document.createElement("option");
-            option.value = sample.id;
-            option.text = sample.batch_nr;
+            option.value = sample.sample_id;
+            option.text = sample.display_name;
             sample_dropdown.appendChild(option);
         });
     });
