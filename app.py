@@ -1,16 +1,22 @@
+# import full library's
 import os
+import secrets
+import string
+import calendar
+import re
+
+# import partial library's
 from dotenv import load_dotenv
 from flask import session, Flask, render_template, request, redirect, url_for, jsonify
 from database import get_connection, get_dict_cursor
-from helper import log_change, login_required, admin_required, generate_temp_password, format_datetime
 from datetime import date, timedelta, datetime
 from numbers import Real
-import calendar
-import re
 from werkzeug.security import generate_password_hash, check_password_hash
 from functools import wraps
-import secrets
-import string
+
+# importing other Py files
+from config.test import TEST_PAGES, OVERVIEW_TESTS
+from helper import log_change, login_required, admin_required, generate_temp_password, format_datetime
 
 # importing Routes
 from routes.rheology import rheology_bp
@@ -26,86 +32,6 @@ app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY")
 app.permanent_session_lifetime = timedelta(hours=1)
 app.config["SESSION_REFRESH_EACH_REQUEST"] = True
-
-
-TEST_PAGES = [
-    {
-        "name": "Rheologie",
-        "endpoint": "rheology.rheology",
-    },
-    {
-        "name": "Huidvorming",
-        "endpoint": "skinformation.skinformation",
-    },
-    {
-        "name": "Initial Tack",
-        "endpoint": "initial_tack.initial_tack",
-    },
-    {
-        "name": "Dichtheid",
-        "endpoint": "density.density",
-    },
-    {
-        "name": "Shore A",
-        "endpoint": "shore_a.shore_a",
-    },
-    {
-        "name": "Hechting",
-        "endpoint": "adhesion",
-    },
-    {
-        "name": "EPDM Hechting",
-        "endpoint": "epdm_adhesion", 
-    },
-
-    {
-        "name": "Uitharding",
-        "endpoint": "curability", 
-    },
-    {
-        "name": "Trek Sterkte",
-        "endpoint": "tensile",
-    }       
-]
-
-OVERVIEW_TESTS = {
-    1: {
-        "header": "Yield Stress",
-        "field": "yield_stress"
-    },
-    2: {
-        "header": "Uitharding 1d",
-        "field": "day_1"
-    },
-    3: {
-        "header": "Shore A",
-        "field": "shore_a_avg"
-    },
-    4: {
-        "header": "Dichtheid",
-        "field": "density_product"
-    },
-    5: {
-        "header": "T-Max",
-        "field": "t_max"
-    },
-    6: {
-        "header": "Hechting",
-        "field": "adhesion"
-    },
-    7: {
-        "header": "EPDM Hechting",
-        "field": "epdm_adhesion"
-    },
-    8: {
-        "header": "Initial Tack",
-        "field": "initial_tack"
-    },
-    9: {
-        "header": "Huidvorming",
-        "field": "skinformation_time"
-    }
-}
 
 # routes
 @app.route("/login", methods=["GET","POST"])
