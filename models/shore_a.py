@@ -5,11 +5,9 @@ class ShoreATestResult:
     sample_id : str
     operator_id : int
     remark : str
-
     shore_a_1 : float
     shore_a_2 : float
     shore_a_3 : float
-
     temperature : str
     humidity: str
 

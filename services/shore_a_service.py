@@ -26,9 +26,15 @@ class ShoreAService:
         )
         self.repository.add_prep_result(result)
 
-    def get_overview(self):
+    def get_test_overview(self):
         products = self.repository.get_required_products()
         results = self.repository.get_latest_results()
+
+        return products, results
+
+    def get_prep_overview(self):
+        products = self.repository.get_required_products()
+        results = self.repository.get_prep_list()
 
         return products, results
     
