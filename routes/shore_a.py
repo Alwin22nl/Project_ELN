@@ -36,9 +36,9 @@ def shore_a_prep():
             operator_id=session["user_id"]
         )
 
-         return redirect(
-                url_for("shore_a.shore_a_prep")
-            )
+        return redirect(
+            url_for("shore_a.shore_a_prep")
+        )
     
     products, results = service.get_prep_overview()
 
