@@ -50,8 +50,6 @@ def shore_a_prep():
         today=date.today()
     )
 
-   
-
 @shore_a_bp.route("/shore_a/shore_a_test", methods=["GET", "POST"])
 @login_required
 def shore_a_test():
