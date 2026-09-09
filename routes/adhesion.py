@@ -81,7 +81,7 @@ def get_adhesion_prep_sample(product_id):
 @adhesion_bp.route("/get_adhesion_test_samples/<int:product_id>")
 @login_required
 def get_adhesion_test_samples(product_id):
-    samples = service.get_samples_for_test(operator_id)
+    samples = service.get_samples_for_test(product_id)
 
     return {
         "samples": samples
