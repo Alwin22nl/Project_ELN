@@ -20,7 +20,7 @@ adhesion_bp = Blueprint(
 )
 
 repository = AdhesionRepository()
-service = AdhesionService()
+service = AdhesionService(repository)
 
 @adhesion_bp.route("/adhesion")
 @login_required

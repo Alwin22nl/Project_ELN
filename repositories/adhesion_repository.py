@@ -2,7 +2,7 @@ from models.adhesion import AdhesionPrep, AdhesionTest
 from database import get_connection, get_dict_cursor
 
 class AdhesionRepository:
-    def add_prep_result(self, result: AdhesionPrep):
+    def add_adhesion_prep(self, result: AdhesionPrep):
         connection = get_connection()
         cursor = connection.cursor()
 
@@ -35,7 +35,7 @@ class AdhesionRepository:
             cursor.close()
             connection.close()
 
-    def submit_test_result(self, result: AdhesionTest):
+    def submit_test_results(self, result: AdhesionTest):
         connection = get_connection()
         cursor = connection.cursor()
 
@@ -134,7 +134,7 @@ class AdhesionRepository:
             cursor.close()
             connection.close()
 
-    def get_sample_for_test(self, product_id):
+    def get_samples_for_test(self, product_id):
         connection = get_connection()
         cursor = get_dict_cursor(connection)
 
@@ -142,7 +142,7 @@ class AdhesionRepository:
             cursor.execute(
                 """
                 SELECT
-                    samples.batch_id,
+                    samples.sample_id,
                     samples.batch_nr AS display_name
                 FROM adhesion_preparation AS adhesion_prep
                 JOIN samples
@@ -151,7 +151,7 @@ class AdhesionRepository:
                 ON adhesion.sample_id = samples.sample_id
                 WHERE samples.product_id = %s
                 AND adhesion.sample_id IS NULL
-                AND adhesion_prep.prepared_date::date <= CURRENT_DATE - INERVAL '7 days'
+                AND adhesion_prep.prepared_date::date <= CURRENT_DATE - INTERVAL '7 days'
                 ORDER BY samples.sample_id
                 """,
                 (product_id,)
@@ -174,7 +174,7 @@ class AdhesionRepository:
                     products.product_id,
                     products.product_name
                 FROM products
-                JOIN product_test_requirments
+                JOIN product_test_requirements
                 ON product_test_requirements.product_id = products.product_id
                 WHERE product_test_requirements.test_type_id = 6
                 ORDER BY products.product_name
@@ -239,7 +239,7 @@ class AdhesionRepository:
                 ON samples.sample_id = adhesion_prep.sample_id
                 JOIN products
                 ON products.product_id = samples.product_id
-                LEF JOIN adhesion
+                LEFT JOIN adhesion
                 ON adhesion.sample_id = samples.sample_id
                 WHERE adhesion.sample_id IS NULL
                 ORDER BY prepared_date DESC
