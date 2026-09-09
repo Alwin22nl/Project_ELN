@@ -18,7 +18,7 @@ from functools import wraps
 from config.test import TEST_PAGES, OVERVIEW_TESTS
 from helper import log_change, login_required, admin_required, generate_temp_password, format_datetime
 
-# importing Routes
+# importing Test Routes
 from routes.rheology import rheology_bp
 from routes.skinformation import skinformation_bp
 from routes.initial_tack import initial_tack_bp
