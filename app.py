@@ -3068,21 +3068,21 @@ def batch_search():
                         "test_date": format_datetime(epdm["test_date"]),
 
                         "values": {
-                            "Eu-EPDM": epdm_adhesion["europees"],
-                            "TRC-EPDM": epdm_adhesion["trc"],
-                            "CL-EPDM": epdm_adhesion["carlisle"],
-                            "Rubber": epdm_adhesion["rubber"],
-                            "Copper": epdm_adhesion["copper"],
-                            "Wood": epdm_adhesion["wood"],
-                            "Aluminium": epdm_adhesion["aluminium"],
-                            "Aluminium Anod.": epdm_adhesion["aliminium_anod"],
-                            "Lead": epdm_adhesion["lead"],
-                            "RVS": epdm_adhesion["rvs"],
-                            "Concrete": epdm_adhesion["concrete"],
-                            "Glass": epdm_adhesion["glass"],
-                            "PVC": epdm_adhesion["pvc"],
-                            "PMMA": epdm_adhesion["pmma"],
-                            "PC": epdm_adhesion["pc"]
+                            "Eu-EPDM": epdm["europees"],
+                            "TRC-EPDM": epdm["trc"],
+                            "CL-EPDM": epdm["carlisle"],
+                            "Rubber": epdm["rubber"],
+                            "Copper": epdm["copper"],
+                            "Wood": epdm["wood"],
+                            "Aluminium": epdm["aluminium"],
+                            "Aluminium Anod.": epdm["aluminium_anod"],
+                            "Lead": epdm["lead"],
+                            "RVS": epdm["rvs"],
+                            "Concrete": epdm["concrete"],
+                            "Glass": epdm["glass"],
+                            "PVC": epdm["pvc"],
+                            "PMMA": epdm["pmma"],
+                            "PC": epdm["pc"]
                         }
                     })
                 else:

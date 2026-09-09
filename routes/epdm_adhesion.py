@@ -80,7 +80,7 @@ def get_epdm_adhesion_prep_sample(product_id):
 
 @epdm_adhesion_bp.route("/get_epdm_adhesion_test_samples/<int:product_id>")
 @login_required
-def get_epdm_adhesion_prep_sample(product_id):
+def get_epdm_adhesion_test_sample(product_id):
     samples = service.get_samples_for_test(product_id)
 
     return {
