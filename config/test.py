@@ -25,7 +25,7 @@ TEST_PAGES = [
     },
     {
         "name": "EPDM Hechting",
-        "endpoint": "epdm_adhesion", 
+        "endpoint": "epdm_adhesion.epdm_adhesion", 
     },
 
     {

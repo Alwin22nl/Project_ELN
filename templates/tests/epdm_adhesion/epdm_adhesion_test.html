@@ -7,7 +7,7 @@ Zettex ELN
 {% block content %}
 
 <div class="page-navigation">
-    <a href="{{ url_for('epdm_adhesion') }}" class="back-button">
+    <a href="{{ url_for('epdm_adhesion.epdm_adhesion') }}" class="back-button">
         Terug naar EPDM Hechting overzicht
     </a>
 </div>
@@ -168,7 +168,7 @@ document
 
     sample_dropdown.innerHTML =
         "<option>Loading...</option>";
-    fetch("/get_epdm_adhesion_samples/" + product_id)
+    fetch("/test/get_epdm_adhesion_samples/" + product_id)
     .then(response => response.json())
     .then(data => {
         sample_dropdown.innerHTML =
@@ -176,8 +176,8 @@ document
 
         data.samples.forEach(function(sample) {
             let option = document.createElement("option");
-            option.value = sample.id;
-            option.text = sample.batch_nr;
+            option.value = sample.sample_id;
+            option.text = sample.display_name;
             sample_dropdown.appendChild(option);
         });
     });
