@@ -13,7 +13,7 @@ class EpdmAdhesionTest:
     remark: str
     europees: float
     trc: float
-    carlise: float
+    carlisle: float
     rubber: float
     copper: float
     wood: float
