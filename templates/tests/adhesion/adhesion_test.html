@@ -7,7 +7,7 @@ Zettex ELN
 {% block content %}
 
 <div class="page-navigation">
-    <a href="{{ url_for('adhesion') }}" class="back-button">
+    <a href="{{ url_for('adhesion.adhesion') }}" class="back-button">
         Terug naar Hechting overzicht
     </a>
 </div>
@@ -32,7 +32,7 @@ Zettex ELN
             </select>
             <br><br>
             <h3>Selecteer Batch</h3>
-            <select id="sample_select" name="sample_id">
+            <select id="sample_select" name="sample_id" required>
                 <option>
                     Selecteer product eerst...
                 </option>
@@ -171,7 +171,7 @@ document
 
     sample_dropdown.innerHTML =
         "<option>Loading...</option>";
-    fetch("/get_adhesion_samples/" + product_id)
+    fetch("/test/get_adhesion_test_samples/" + product_id)
     .then(response => response.json())
     .then(data => {
         sample_dropdown.innerHTML =
@@ -179,8 +179,8 @@ document
 
         data.samples.forEach(function(sample) {
             let option = document.createElement("option");
-            option.value = sample.id;
-            option.text = sample.batch_nr;
+            option.value = sample.sample_id;
+            option.text = sample.display_name;
             sample_dropdown.appendChild(option);
         });
     });
