@@ -8,20 +8,19 @@ class CurabilityService:
         result = CurabilityPrep(
             sample_id=form["sample_id"],
             operator_id=operator_id,
+            afterstorage_id=form.get("afterstorage_id") or None,
             remark=form["remark"],
         )
         self.repository.add_curability_prep(result)
 
-    def curability_remove_24h(self, curability_preparation_id, operator_id):
+    def curability_remove_24h(self, curability_preparation_id):
         self.repository.curability_remove_24h(
-            curability_preparation_id,
-            operator_id
+            curability_preparation_id
         )
 
-    def curability_remove_7d(self, curability_preparation_id, operator_id):
+    def curability_remove_7d(self, curability_preparation_id):
         self.repository.curability_remove_7d(
-            curability_preparation_id,
-            operator_id
+            curability_preparation_id
         )
 
     def submit_test_result(self, form, operator_id):

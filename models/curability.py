@@ -5,6 +5,7 @@ from typing import Optional
 class CurabilityPrep:
     sample_id: str
     operator_id: int
+    afterstorage_id: Optional[str]
     remark: str
 
 @dataclass
