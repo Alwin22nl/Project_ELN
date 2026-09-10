@@ -19,7 +19,7 @@ class EpdmService:
             remark=form["remark"],
             europees=form["europees"],
             trc=form["trc"],
-            carlise=form["carlisel"],
+            carlisle=form["carlisle"],
             rubber=form["rubber"],
             copper=form["copper"],
             wood=form["wood"],

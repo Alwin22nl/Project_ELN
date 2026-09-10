@@ -150,16 +150,17 @@ class EpdmAdhesionRepository:
                 SELECT
                     samples.sample_id,
                     samples.batch_nr AS display_name
-                FROM sampels
+                FROM samples
                 JOIN epdm_adhesion_preparation AS epdm_prep
                 ON epdm_prep.sample_id = samples.sample_id
                 LEFT JOIN epdm_adhesion
                 ON epdm_adhesion.sample_id = samples.sample_id
                 WHERE samples.product_id = %s
                 AND epdm_adhesion.sample_id IS NULL
-                AND epdm_prep.prepared_date:: <= CURRENT_DATE - INTERVAL '7 days'
+                AND epdm_prep.prepared_date::date <= CURRENT_DATE - INTERVAL '7 days'
                 ORDER BY samples.sample_id
-                """
+                """,
+                (product_id,)
             )
 
             return cursor.fetchall()
@@ -186,7 +187,7 @@ class EpdmAdhesionRepository:
                 """
             )
 
-            return cursor.fetchall
+            return cursor.fetchall()
 
         finally:
             cursor.close()
