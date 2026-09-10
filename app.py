@@ -25,6 +25,7 @@ from routes.initial_tack import initial_tack_bp
 from routes.density import density_bp
 from routes.shore_a import shore_a_bp
 from routes.adhesion import adhesion_bp
+from routes.epdm_adhesion import epdm_adhesion_bp
 
 load_dotenv()
 today = date.today()
@@ -1317,248 +1318,7 @@ app.register_blueprint(initial_tack_bp)
 app.register_blueprint(density_bp)
 app.register_blueprint(shore_a_bp)
 app.register_blueprint(adhesion_bp)
-
-@app.route("/test/epdm_adhesion")
-@login_required
-def epdm_adhesion():
-
-    return render_template("tests/epdm_adhesion/epdm_adhesion.html")
-
-@app.route("/test/epdm_adhesion/prep", methods=["GET","POST"])
-@login_required
-def epdm_adhesion_prep():
-
-    connection = get_connection()
-    cursor = get_dict_cursor(connection)
-
-    if request.method == "POST":
-        cursor.execute(
-            """
-            INSERT INTO epdm_adhesion_preparation
-            (
-                sample_id,
-                operator_id,
-                remark
-            )
-            VALUES
-            (%s,%s,%s)
-            """,
-            (
-                request.form["sample_id"],
-                session["user_id"],
-                request.form["remark"]
-            )
-        )
-        connection.commit()
-        cursor.close()
-        connection.close()
-        return redirect(url_for("epdm_adhesion_prep"))
-    
-    
-    cursor.execute(
-            """
-            SELECT
-                samples.sample_id,
-                samples.batch_nr,
-                products.product_name
-            FROM samples
-            JOIN products
-            ON products.product_id = samples.product_id
-            JOIN product_test_requirements
-            ON product_test_requirements.product_id =
-            products.product_id
-            LEFT JOIN epdm_adhesion_preparation
-            ON epdm_adhesion_preparation.sample_id =
-            samples.sample_id
-            WHERE
-                product_test_requirements.test_type_id = 7
-            AND epdm_adhesion_preparation.sample_id IS NULL
-            AND samples.prod_date <= CURRENT_DATE - 7
-            AND
-            (
-                samples.batch_sequence = 1
-                OR
-                MOD(
-                    samples.batch_sequence,
-                    product_test_requirements.frequency
-                ) = 0
-            )
-            ORDER BY samples.batch_sequence
-            """
-    )   
-
-    samples = cursor.fetchall()
-    cursor.execute(
-        """
-        SELECT
-            samples.batch_nr,
-            products.product_name,
-            epdm_adhesion_preparation.prepared_date
-        FROM epdm_adhesion_preparation
-        JOIN samples
-        ON samples.sample_id =
-           epdm_adhesion_preparation.sample_id
-        JOIN products
-        ON products.product_id =
-           samples.product_id
-        LEFT JOIN epdm_adhesion
-        ON epdm_adhesion.sample_id =
-           samples.sample_id
-        WHERE epdm_adhesion.sample_id IS NULL
-        ORDER BY prepared_date DESC
-        """
-    )
-
-    prepared = cursor.fetchall()
-    cursor.close()
-    connection.close()
-
-    return render_template(
-        "tests/epdm_adhesion/epdm_adhesion_prep.html",
-        samples=samples,
-        prepared=prepared,
-        today=date.today()
-    )
-
-@app.route("/test/epdm_adhesion/test", methods=["GET","POST"])
-@login_required
-def epdm_adhesion_test():
-
-    connection = get_connection()
-    cursor = get_dict_cursor(connection)
-
-    # Save new adhesion result
-
-    if request.method == "POST":
- 
-        cursor.execute(
-            """
-            INSERT INTO epdm_adhesion
-            (
-                sample_id,
-                operator_id,
-                remark,
-                europees,
-                trc,
-                carlisle,
-                rubber,
-                copper,
-                wood,
-                aluminium,
-                aluminium_anod,
-                lead,
-                rvs,
-                concrete,
-                glass,
-                pvc,
-                pmma,
-                pc
-            )
-            VALUES
-            (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
-            """,
-            (
-                request.form["sample_id"],
-                session["user_id"],   
-                request.form["remark"],
-                request.form["europees"],
-                request.form["trc"],
-                request.form["carlisle"],
-                request.form["rubber"],
-                request.form["copper"],
-                request.form["wood"],
-                request.form["aluminium"],
-                request.form["aluminium_anod"],
-                request.form["lead"],
-                request.form["rvs"],
-                request.form["concrete"],
-                request.form["glass"],
-                request.form["pvc"],
-                request.form["pmma"],
-                request.form["pc"]
-            )
-        )
-        connection.commit()
-        cursor.close()
-        connection.close()
-        return redirect(url_for("epdm_adhesion_test"))
-
-    # Products requiring adhesion testing
-    cursor.execute(
-        """
-        SELECT
-            products.product_id,
-            products.product_name
-        FROM products
-        JOIN product_test_requirements
-        ON product_test_requirements.product_id = products.product_id
-        WHERE product_test_requirements.test_type_id = 7
-        ORDER BY products.product_name
-        """
-    )
-    products = cursor.fetchall()
-
-    # Latest Adhesion results
-    cursor.execute(
-        """
-        SELECT
-            samples.batch_nr,
-            epdm_adhesion.europees,
-            epdm_adhesion.trc,
-            epdm_adhesion.carlisle
-        FROM epdm_adhesion
-        JOIN samples
-        ON samples.sample_id = epdm_adhesion.sample_id
-        ORDER BY epdm_adhesion.epdm_adhesion_id DESC
-        LIMIT 25
-        """
-    )
-    results = cursor.fetchall()
-    cursor.close()
-    connection.close()
-    return render_template(
-        "tests/epdm_adhesion/epdm_adhesion_test.html",
-        products=products,
-        results=results
-    )
-
-@app.route("/get_epdm_adhesion_samples/<int:product_id>")
-def get_epdm_adhesion_samples(product_id):
-
-    connection = get_connection()
-    cursor = get_dict_cursor(connection)
-    cursor.execute(
-        """
-        SELECT
-            samples.sample_id,
-            samples.batch_nr
-
-        FROM epdm_adhesion_preparation
-        JOIN samples
-        ON samples.sample_id = epdm_adhesion_preparation.sample_id
-        LEFT JOIN epdm_adhesion
-        ON epdm_adhesion.sample_id = samples.sample_id
-        WHERE samples.product_id = %s
-        AND epdm_adhesion.sample_id IS NULL
-        AND epdm_adhesion_preparation.prepared_date::date
-            <= CURRENT_DATE - INTERVAL '7 days'
-
-        ORDER BY samples.sample_id
-        """,
-        (product_id,)
-    )
-    samples = cursor.fetchall()
-    cursor.close()
-    connection.close()
-    return {
-    "samples": [
-        {
-            "id": sample["sample_id"],
-            "batch_nr": sample["batch_nr"]
-        }
-        for sample in samples
-    ]
-    }
+app.register_blueprint(epdm_adhesion_bp)
 
 @app.route("/test/curability")
 @login_required
@@ -3308,21 +3068,21 @@ def batch_search():
                         "test_date": format_datetime(epdm["test_date"]),
 
                         "values": {
-                            "Eu-EPDM": epdm_adhesion["europees"],
-                            "TRC-EPDM": epdm_adhesion["trc"],
-                            "CL-EPDM": epdm_adhesion["carlisle"],
-                            "Rubber": epdm_adhesion["rubber"],
-                            "Copper": epdm_adhesion["copper"],
-                            "Wood": epdm_adhesion["wood"],
-                            "Aluminium": epdm_adhesion["aluminium"],
-                            "Aluminium Anod.": epdm_adhesion["aliminium_anod"],
-                            "Lead": epdm_adhesion["lead"],
-                            "RVS": epdm_adhesion["rvs"],
-                            "Concrete": epdm_adhesion["concrete"],
-                            "Glass": epdm_adhesion["glass"],
-                            "PVC": epdm_adhesion["pvc"],
-                            "PMMA": epdm_adhesion["pmma"],
-                            "PC": epdm_adhesion["pc"]
+                            "Eu-EPDM": epdm["europees"],
+                            "TRC-EPDM": epdm["trc"],
+                            "CL-EPDM": epdm["carlisle"],
+                            "Rubber": epdm["rubber"],
+                            "Copper": epdm["copper"],
+                            "Wood": epdm["wood"],
+                            "Aluminium": epdm["aluminium"],
+                            "Aluminium Anod.": epdm["aluminium_anod"],
+                            "Lead": epdm["lead"],
+                            "RVS": epdm["rvs"],
+                            "Concrete": epdm["concrete"],
+                            "Glass": epdm["glass"],
+                            "PVC": epdm["pvc"],
+                            "PMMA": epdm["pmma"],
+                            "PC": epdm["pc"]
                         }
                     })
                 else:
