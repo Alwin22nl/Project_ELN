@@ -72,10 +72,10 @@ class CurabilityService:
         return products, results
 
     def get_test_overview(self):
-        products = self.repository.get_required_products()
+        samples = self.repository.get_samples_for_test()
         results = self.repository.get_latest_results()
 
-        return products, results
+        return samples, results
 
     def get_samples_for_prep(self, product_id):
         samples = self.repository.get_samples_for_prep(product_id)
@@ -89,12 +89,13 @@ class CurabilityService:
             for sample in samples
         ]
 
-    def get_samples_for_test(self, product_id):
-        samples = self.repository.get_samples_for_test(product_id)
+    def get_samples_for_test(self):
+        samples = self.repository.get_samples_for_test()
 
         return [
             {
                 "sample_id": sample["sample_id"],
+                "afterstorage_id": sample["afterstorage_id"],
                 "display_name": sample["display_name"]
             }
             for sample in samples

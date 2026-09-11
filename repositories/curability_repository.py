@@ -191,7 +191,7 @@ class CurabilityRepository:
             cursor.close()
             connection.close()
 
-    def get_samples_for_test(self, product_id):
+    def get_samples_for_test(self):
         connection = get_connection()
         cursor = get_dict_cursor(connection)
 
@@ -207,10 +207,9 @@ class CurabilityRepository:
                 ON samples.sample_id = curability_prep.sample_id
                 LEFT JOIN curability
                 ON curability.sample_id = samples.sample_id
-                WHERE samples.product_id = %s
-                AND curability.sample_id IS NULL
+                WHERE curability.sample_id IS NULL
                 AND curability_prep.removed_24h_at IS NOT NULL
-                AND curability.prep.removed_7d_at IS NOT NULL
+                AND curability_prep.removed_7d_at IS NOT NULL
                 UNION ALL
                 SELECT
                     samples.sample_id,
@@ -223,13 +222,11 @@ class CurabilityRepository:
                 ON curability_prep.afterstorage_id = after_storage.afterstorage_id
                 LEFT JOIN curability
                 ON curability.afterstorage_id = after_storage.afterstorage_id
-                WHERE samples.product_id = %s
-                AND curability_prep.removed_24h_at IS NOT NULL
+                WHERE curability_prep.removed_24h_at IS NOT NULL
                 AND curability_prep.removed_7d_at IS NOT NULL
                 AND curability.afterstorage_id IS NULL
-                ORDER BY product_id, sample_id;
-                """,
-                (product_id,)
+                ORDER BY sample_id
+                """
             )
 
             return cursor.fetchall()
@@ -315,9 +312,13 @@ class CurabilityRepository:
             cursor.execute(
                 """
                 SELECT
-                    samples.batch_nr AS display_name
+                    CASE
+                        WHEN curability.afterstorage_id IS NOT NULL
+                        THEN samples.batch_nr || ' AS'
+                        ELSE samples.batch_nr
+                    END AS display_name,
                     curability.day_1,
-                    curability.tmp_day1,
+                    curability.temp_day1,
                     curability.rh_day1,
                     curability.day_7,
                     curability.temp_day7,
@@ -325,7 +326,7 @@ class CurabilityRepository:
                 FROM curability
                 JOIN samples
                 ON samples.sample_id = curability.sample_id
-                ORDER BY curability.sample_id DESC
+                ORDER BY curability.cureability_id DESC
                 LIMIT %s
                 """,
                 (limit,),

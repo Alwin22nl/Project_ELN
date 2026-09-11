@@ -81,11 +81,11 @@ def curability_test():
             url_for("curability.curability_test")
         )
 
-    products, results = service.get_test_overview()
+    samples, results = service.get_test_overview()
 
     return render_template(
         "tests/curability/curability_test.html",
-        products=products,
+        samples=samples,
         results=results
     )
 
@@ -93,15 +93,6 @@ def curability_test():
 @login_required
 def get_curability_prep_samples(product_id):
     samples = service.get_samples_for_prep(product_id)
-
-    return {
-        "samples": samples
-    }
-
-@curability_bp.route("/get_curability_test_samples/<int:product_id>")
-@login_required
-def get_curability_test_samples(product_id):
-    samples = service.get_samples_for_test(product_id)
 
     return {
         "samples": samples

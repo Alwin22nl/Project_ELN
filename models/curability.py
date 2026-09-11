@@ -15,7 +15,7 @@ class CurabilityTest:
     operator_id: int
     remark: str
 
-    day_1 = float
+    day_1: float
     temp_day1: float
     rh_day1: float
 
