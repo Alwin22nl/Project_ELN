@@ -28,7 +28,7 @@ def epdm_adhesion():
 
     return render_template("tests/epdm_adhesion/epdm_adhesion.html")
 
-@epdm_adhesion_bp.route("/epdm_adhesion/epd_andhesion_prep", methods=["GET", "POST"])
+@epdm_adhesion_bp.route("/epdm_adhesion/epdm_andhesion_prep", methods=["GET", "POST"])
 @login_required
 def epdm_adhesion_prep():
     if request.method == "POST":
@@ -45,7 +45,7 @@ def epdm_adhesion_prep():
         "tests/epdm_adhesion/epdm_adhesion_prep.html",
         products=products,
         results=results,
-        todat=date.today()
+        today=date.today()
     )
 
 @epdm_adhesion_bp.route("/epdm_adhesion/epdm_adhesion_test", methods=["GET", "POST"])
