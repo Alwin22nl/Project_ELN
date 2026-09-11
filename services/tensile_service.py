@@ -97,7 +97,18 @@ class TensileService:
         return [
             {
                 "sample_id": sample["sample_id"],
-                "display_name": sample["display_name"]
+                "batch_nr": sample["batch_nr"]
+            }
+            for sample in samples
+        ]
+
+    def get_samples_for_measurement(self):
+        samples = self.repository.get_samples_for_measurement()
+
+        return [
+            {
+                "sample_id": sample["sample_id"],
+                "batch_nr": sample["batch_nr"] 
             }
             for sample in samples
         ]
@@ -108,7 +119,7 @@ class TensileService:
         return [
             {
                 "sample_id": sample["sample_id"],
-                "display_name": sample["display_name"]
+                "batch_nr": sample["batch_nr"]
             }
             for sample in samples
         ]
