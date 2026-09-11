@@ -17,7 +17,7 @@ document
     }
 
 
-    fetch("/get_tensile_specimens/" + sample_id)
+    fetch("test/get_tensile_specimens/" + sample_id)
 
     .then(response => response.json())
 

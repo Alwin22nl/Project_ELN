@@ -34,7 +34,7 @@ TEST_PAGES = [
     },
     {
         "name": "Treksterkte",
-        "endpoint": "tensile",
+        "endpoint": "tensile.tensile",
     }       
 ]
 
