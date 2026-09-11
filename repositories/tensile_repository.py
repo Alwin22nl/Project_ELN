@@ -272,6 +272,42 @@ class TensileRepository:
             cursor.close()
             connection.close()
 
+    def get_prep_list(self):
+        connection = get_connection()
+        cursor = get_dict_cursor(connection)
+
+        try:
+            cursor.execute(
+                """
+                SELECT
+                    samples.sample_id,
+                    samples.batch_nr,
+                    products.product_name,
+                    tensile_strength_preparation.prepared_date,
+                    EXISTS
+                    (
+                        SELECT 1
+                        FROM tensile_specimen
+                        WHERE tensile_specimen.sample_id = samples.sample_id
+                    ) AS measured
+                FROM tensile_strength_preparation
+                JOIN samples
+                ON samples.sample_id = tensile_strength_preparation.sample_id
+                JOIN products
+                ON products.product_id = samples.product_id
+                LEFT JOIN tensile_strength
+                ON tensile_strength.sample_id = samples.sample_id
+                WHERE tensile_strength.sample_id IS NULL
+                ORDER BY tensile_strength_preparation.prepared_date DESC;
+                """
+            )
+
+            return cursor.fetchall()
+
+        finally: 
+            cursor.close()
+            connection.close()
+    
     def get_latest_results(self, limit=25):
         connection = get_connection()
         cursor = get_dict_cursor(connection)

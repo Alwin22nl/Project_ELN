@@ -39,12 +39,12 @@ def tensile_prep():
         return redirect(
             url_for("tensile.tensile_prep")
         )
-    products, results = service.get_prep_overview()
+    samples, prepared = service.get_prep_overview()
 
     return render_template(
         "tests/tensile/tensile_prep.html",
-        products=products,
-        results=results,
+        samples=samples,
+        prepared=prepared,
         today=date.today()
     )
 
@@ -58,9 +58,10 @@ def tensile_measure():
         return redirect (
             url_for("tensile.tensile_measure")
         )
-
+    samples = service.get_samples_for_measurement()
     return render_template(
-        "tests/tensile/tensile_measure.html"
+        "tests/tensile/tensile_measure.html",
+        samples=samples
     )
 
 @tensile_bp.route("/tensile/tensile_test", methods=["GET", "POST"])

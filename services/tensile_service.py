@@ -80,13 +80,13 @@ class TensileService:
         )
 
     def get_prep_overview(self):
-        products = self.repository.get_required_products()
-        results = self.repository.get_prep_list()
+        samples = self.repository.get_samples_for_prep()
+        prepared = self.repository.get_prep_list()
 
-        return products, results
+        return samples, prepared
 
     def get_test_overview(self):
-        products = self.repository.get_required_products()
+        products = self.repository.get_samples_for_test()
         results = self.repository.get_latest_results()
 
         return products, results
