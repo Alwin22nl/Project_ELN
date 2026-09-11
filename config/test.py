@@ -30,7 +30,7 @@ TEST_PAGES = [
 
     {
         "name": "Uitharding",
-        "endpoint": "curability", 
+        "endpoint": "curability.curability", 
     },
     {
         "name": "Treksterkte",

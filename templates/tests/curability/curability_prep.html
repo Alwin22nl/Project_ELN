@@ -12,7 +12,7 @@ Zettex ELN
 
 <div class="page-navigation">
 
-    <a href="{{ url_for('curability') }}" class="back-button">
+    <a href="{{ url_for('curability.curability') }}" class="back-button">
         Terug naar Uitharding in diepte Overview
     </a>
 
@@ -100,8 +100,8 @@ Zettex ELN
     {% else %}
         <form method="POST"
         action="{{ url_for(
-            'curability_remove_24h',
-            curability_preparation_id=sample.curability_preparation_id
+            'curability.curability_remove_24h',
+            curability.curability_preparation_id=sample.curability_preparation_id
         ) }}">
             <button type="submit">
                 Haal 24h uit
@@ -121,8 +121,8 @@ Zettex ELN
     {% else %}
         <form method="POST"
         action="{{ url_for(
-            'curability_remove_7d',
-            curability_preparation_id=sample.curability_preparation_id
+            'curability.curability_remove_7d',
+            curability.curability_preparation_id=sample.curability_preparation_id
         ) }}">
             <button type="submit">
                 Haal 7 dagen uit
