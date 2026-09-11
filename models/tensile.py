@@ -9,7 +9,6 @@ class TensilePrep:
 class TensileMeasure:
     sample_id: str
     specimen_no: int
-    remark: str
 
     width1: float
     width2: float
@@ -28,7 +27,7 @@ class TensileMeasure:
 class TensileTest:
     specimen_id: int
     remark: str
-    
+
     t_50: float
     t_100: float
     t_max: float
