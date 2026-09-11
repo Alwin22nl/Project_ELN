@@ -7,7 +7,7 @@ from flask import(
     session
 )
 
-from datetime import date
+from datetime import datetime
 from helper import login_required
 
 from repositories.curability_repository import CurabilityRepository
@@ -43,10 +43,10 @@ def curability_prep():
     products, results = service.get_prep_overview()
 
     return render_template(
-        "test/curability/curability_prep.html",
+        "tests/curability/curability_prep.html",
         products=products,
         results=results,
-        today=date.today()
+        now=datetime.now()
     )
 
 @curability_bp.route("/curability/remove_24h/<int:curability_preparation_id>", methods=["POST"])
@@ -84,7 +84,7 @@ def curability_test():
     products, results = service.get_test_overview()
 
     return render_template(
-        "test/curability/curability_test.html",
+        "tests/curability/curability_test.html",
         products=products,
         results=results
     )

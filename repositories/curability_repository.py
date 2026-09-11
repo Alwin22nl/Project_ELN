@@ -141,19 +141,19 @@ class CurabilityRepository:
             cursor.execute(
                 """
                 SELECT
-                    samples.sample_id
+                    samples.sample_id,
                     NULL::INTEGER AS afterstorage_id,
                     samples.batch_nr AS display_name,
                     products.product_name
                 FROM samples
-                JOIN porducts
+                JOIN products
                 ON products.product_id = samples.product_id
-                JOIN product_test_requiremenst AS ptr
+                JOIN product_test_requirements AS ptr
                 ON ptr.product_id = products.product_id
                 LEFT JOIN curability_preparation AS curability_prep
                 ON curability_prep.sample_id = samples.sample_id
                 WHERE ptr.test_type_id = 2
-                AND curability.prep.sample_id IS NULL
+                AND curability_prep.sample_id IS NULL
                 AND samples.product_id = %s
                 AND samples.prod_date <= CURRENT_DATE - 7
                 AND
@@ -170,7 +170,7 @@ class CurabilityRepository:
                     samples.sample_id,
                     after_storage.afterstorage_id,
                     samples.batch_nr || ' AS' AS display_name,
-                    products.product_name,
+                    products.product_name
                 FROM after_storage
                 JOIN samples
                 ON samples.sample_id = after_storage.sample_id
@@ -272,7 +272,7 @@ class CurabilityRepository:
                 SELECT 
                     curability_prep.curability_preparation_id,
                     samples.sample_id,
-                    curability_prep.afterstorage_id
+                    curability_prep.afterstorage_id,
                     CASE
                         WHEN curability_prep.afterstorage_id IS NOT NULL
                         THEN samples.batch_nr || ' AS'
@@ -289,14 +289,14 @@ class CurabilityRepository:
                 ON products.product_id = samples.product_id
                 LEFT JOIN curability
                 ON(
-                    curability_prep.after_storage_id IS NULL
-                    AND curability.sample_id is samples.sample_id
+                    curability_prep.afterstorage_id IS NULL
+                    AND curability.sample_id = samples.sample_id
                 )
                 OR (
                     curability_prep.afterstorage_id IS NOT NULL
-                    AN curability.afterstorage_id = curability_prep.afterstorage_id
+                    AND curability.afterstorage_id = curability_prep.afterstorage_id
                 )
-                WHERE curability.curability_id IS NULL
+                WHERE curability.cureability_id IS NULL
                 ORDER BY curability_prep.prepared_date DESC
                 """
             )

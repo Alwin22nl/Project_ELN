@@ -83,6 +83,7 @@ class CurabilityService:
         return [
             {
                 "sample_id": sample["sample_id"],
+                "afterstorage_id": sample["afterstorage_id"],
                 "display_name": sample["display_name"]
             }
             for sample in samples
