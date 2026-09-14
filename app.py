@@ -18,6 +18,9 @@ from functools import wraps
 from config.test import TEST_PAGES, OVERVIEW_TESTS
 from helper import log_change, login_required, admin_required, generate_temp_password, format_datetime
 
+#importing routes
+from routes.authentication import authentication_bp
+
 # importing Test Routes
 from routes.rheology import rheology_bp
 from routes.skinformation import skinformation_bp
@@ -38,68 +41,7 @@ app.permanent_session_lifetime = timedelta(hours=1)
 app.config["SESSION_REFRESH_EACH_REQUEST"] = True
 
 # routes
-@app.route("/login", methods=["GET","POST"])
-def login():
-
-    if request.method == "POST":
-
-        username = request.form["username"]
-        password = request.form["password"]
-
-
-        connection = get_connection()
-        cursor = get_dict_cursor(connection)
-
-        cursor.execute(
-            """
-            SELECT *
-            FROM users
-            WHERE LOWER(username) = LOWER(%s)
-            AND active = TRUE
-            """,
-            (username,)
-        )
-
-        user = cursor.fetchone()
-
-        cursor.close()
-        connection.close()
-
-        if user and check_password_hash(
-            user["password_hash"],
-            password
-        ):
-
-            session.permanent = True
-
-            session["user_id"] = user["user_id"]
-            session["username"] = user["username"]
-            session["role"] = user["user_role"]
-            session["name"] = user["name"]
-
-
-            if user["must_change_password"]:
-                return redirect(url_for("change_password"))
-
-            else: 
-                return redirect(
-                url_for("dashboard")
-            )
-
-        # if we reach here, authentication failed
-        return render_template("login.html", error="Invalid username or password.")
-
-    return render_template("login.html")
-
-@app.route("/logout")
-def logout():
-
-    session.clear()
-
-    return redirect(
-        url_for("login")
-    )
-
+app.register_blueprint(authentication_bp)
 
 @app.route('/get_samples/<int:product_id>')
 @login_required
@@ -166,42 +108,6 @@ def sample_append_remark():
     connection.close()
 
     return redirect(url_for('sample'))
-
-@app.route("/change_password", methods=["GET", "POST"])
-@login_required
-def change_password():
-
-    if request.method == "POST":
-        password1 = request.form["password1"]
-        password2 = request.form["password2"]
-        if password1 != password2:
-            return render_template(
-                "change_password.html",
-                error="Passwords do not match."
-            )
-        password_hash = generate_password_hash(password1)
-        connection = get_connection()
-        cursor = get_dict_cursor(connection)
-
-        cursor.execute(
-            """
-            UPDATE users
-            SET
-                password_hash = %s,
-                must_change_password = FALSE
-            WHERE user_id = %s
-            """,
-            (
-                password_hash,
-                session["user_id"]
-            )
-        )
-        connection.commit()
-        cursor.close()
-        connection.close()
-        return redirect(url_for("dashboard"))
-
-    return render_template("change_password.html")
 
 @app.route("/admin")
 @login_required
