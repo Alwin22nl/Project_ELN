@@ -75,11 +75,11 @@ def tensile_test():
         return redirect(
             url_for("tensile.tensile_test")
         )
-    products, results = service.get_test_overview()
+    batches, results = service.get_test_overview()
 
     return render_template(
         "tests/tensile/tensile_test.html",
-        products=products,
+        batches=batches,
         results=results
     )
 

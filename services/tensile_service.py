@@ -86,10 +86,10 @@ class TensileService:
         return samples, prepared
 
     def get_test_overview(self):
-        products = self.repository.get_samples_for_test()
+        batches = self.repository.get_samples_for_test()
         results = self.repository.get_latest_results()
 
-        return products, results
+        return batches, results
 
     def get_samples_for_prep(self):
         samples = self.repository.get_samples_for_prep()
@@ -108,7 +108,8 @@ class TensileService:
         return [
             {
                 "sample_id": sample["sample_id"],
-                "batch_nr": sample["batch_nr"] 
+                "batch_nr": sample["batch_nr"],
+                "product_name": sample["product_name"] 
             }
             for sample in samples
         ]
@@ -119,7 +120,8 @@ class TensileService:
         return [
             {
                 "sample_id": sample["sample_id"],
-                "batch_nr": sample["batch_nr"]
+                "batch_nr": sample["batch_nr"],
+                "product_name": sample["product_name"]
             }
             for sample in samples
         ]
