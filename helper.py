@@ -17,7 +17,7 @@ def login_required(function):
 
         if "user_id" not in session:
             return redirect(
-                url_for("login")
+                url_for("authentication.login")
             )
 
         return function(*args, **kwargs)
