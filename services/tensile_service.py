@@ -45,7 +45,7 @@ class TensileService:
 
             specimens.append(specimen)
 
-        self.repository.add_speciments(specimens)
+        self.repository.add_specimens(specimens)
 
     def submit_test_result(self, form, operator_id):
         sample_id = form["sample_id"]
@@ -54,7 +54,7 @@ class TensileService:
 
         t_50s = form.getlist("t_50[]")
         t_100s = form.getlist("t_100[]")
-        t_maxs = form.getlist("t-max[]")
+        t_maxs = form.getlist("t_max[]")
         e_maxs = form.getlist("e_max[]")
 
         results = []
@@ -124,4 +124,17 @@ class TensileService:
                 "product_name": sample["product_name"]
             }
             for sample in samples
+        ]
+
+    def get_tensile_specimens(self, sample_id):
+        specimens = self.repository.get_tensile_specimens(sample_id)
+
+        return [
+            {
+                "specimen_id": specimen["specimen_id"],
+                "specimen_no": specimen["specimen_no"],
+                "width_avg": specimen["width_avg"],
+                "thickness_avg": specimen["thickness_avg"]
+            }
+            for specimen in specimens
         ]

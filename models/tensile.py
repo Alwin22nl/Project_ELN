@@ -6,24 +6,26 @@ class TensilePrep:
     operator_id: int
     remark: str
 
+@dataclass
 class TensileMeasure:
     sample_id: str
     specimen_no: int
 
-    width1: float
-    width2: float
-    width3: float
+    width_1: float
+    width_2: float
+    width_3: float
 
-    thickness1: float
-    thickness2: float
-    thickness3: float
+    thickness_1: float
+    thickness_2: float
+    thickness_3: float
 
     def calculate_width_avg(self):
-        return ((self.width1 + self.width2 + self.width3) / 3)
+        return ((self.width_1 + self.width_2 + self.width_3) / 3)
 
     def calculate_thickness_avg(self):
-        return ((self.thickness1 + self.thickness2 + self.thickness3) / 3)
+        return ((self.thickness_1 + self.thickness_2 + self.thickness_3) / 3)
 
+@dataclass
 class TensileTest:
     specimen_id: int
     remark: str

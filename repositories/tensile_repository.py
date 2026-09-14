@@ -103,7 +103,7 @@ class TensileRepository:
                         e_max = %s,
                         t_50 = %s,
                         t_100 = %s,
-                        remark = %s,
+                        remark = %s
                     WHERE specimen_id = %s
                     """,
                     (

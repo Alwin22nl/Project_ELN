@@ -109,3 +109,11 @@ def get_tensile_test_sample():
     return {
         "samples": samples
     }
+@tensile_bp.route("/get_tensile_specimens/<int:sample_id>")
+@login_required
+def get_tensile_specimens(sample_id):
+    specimens = service.get_tensile_specimens(sample_id)
+
+    return {
+        "specimens": specimens
+    }
