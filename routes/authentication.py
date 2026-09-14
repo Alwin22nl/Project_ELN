@@ -13,7 +13,7 @@ from repositories.authentication_repository import AuthenticationRepository
 from services.authentication_service import AuthenticationService
 
 authentication_bp = Blueprint(
-    "authenication",
+    "authentication",
     __name__
 )
 
@@ -42,7 +42,7 @@ def login():
 
         session["user_id"] = user["user_id"]
         session["username"] = user["username"]
-        session["role"] = user["role"]
+        session["role"] = user["user_role"]
         session["name"] = user["name"]
 
         if user["must_change_password"]:
@@ -73,8 +73,18 @@ def change_password():
                 error="Wachtwoorden komen niet overeen"
             )
 
-        return redirect("dashboard")
+        return redirect(
+            url_for("/")
+        )
 
     return render_template(
         "change_password.html"
+    )
+
+@authentication_bp.route("/logout")
+def logout():
+    session.clear()
+
+    return redirect(
+        url_for(".login")
     )

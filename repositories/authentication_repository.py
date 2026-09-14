@@ -2,7 +2,7 @@ from database import get_connection, get_dict_cursor
 
 class AuthenticationRepository:
     def get_active_users_by_username(self, username):
-        connection = get_connection
+        connection = get_connection()
         cursor = get_dict_cursor(connection)
 
         try:
@@ -16,7 +16,7 @@ class AuthenticationRepository:
                 (username,)
             )
 
-            return cursor.fetchall()
+            return cursor.fetchone()
 
         finally: 
             cursor.close()
@@ -31,7 +31,7 @@ class AuthenticationRepository:
                 """
                 UPDATE users
                 SET 
-                    password_hash = %s
+                    password_hash = %s,
                     must_change_password = FALSE
                 WHERE user_id = %s
                 """,
@@ -48,4 +48,3 @@ class AuthenticationRepository:
             cursor.close()
             connection.close()
 
-            

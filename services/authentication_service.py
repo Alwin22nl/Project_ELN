@@ -5,12 +5,12 @@ class AuthenticationService:
         self.repository = repository
 
     def authenticate(self, username, password):
-        user = self.repository.get_active_user_by_username(username)
+        user = self.repository.get_active_users_by_username(username)
 
         if not user:
             return None
 
-        if not check_password_hash(user["password_hash", password]):
+        if not check_password_hash(user["password_hash"], password):
             return None
 
         return user
