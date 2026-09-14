@@ -50,7 +50,7 @@ Inactive
 <td>
 
 <form method="POST"
-action="{{ url_for('reset_password', user_id=user.user_id) }}">
+action="{{ url_for('admin.reset_password', user_id=user.user_id) }}">
 
 <button type="submit">
 Reset Password
@@ -66,7 +66,7 @@ Reset Password
 
 </table>
 
-<a href="{{ url_for('create_user') }}">
+<a href="{{ url_for('admin.create_user') }}">
     Create New User
 </a>
 

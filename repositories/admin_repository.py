@@ -10,7 +10,7 @@ class AdminRepository:
                 """
                 SELECT
                     user_id,
-                    user_name,
+                    username,
                     name,
                     user_role,
                     active
