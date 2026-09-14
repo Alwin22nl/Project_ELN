@@ -27,8 +27,8 @@
                 <a href="{{ url_for('batch_search') }}">Batch Zoeken</a>
                 {% endif %}
                 {% if session.role == "admin" %}
-                <a href="{{ url_for('audit_logs_admin') }}">Correction Logs</a>
-                <a href="{{ url_for('admin_page') }}">Administration</a>
+                <a href="{{ url_for('admin.audit_logs_admin') }}">Correction Logs</a>
+                <a href="{{ url_for('admin.admin_page') }}">Administration</a>
                 {% endif %}
                 <div class="sidebar-bottom">
                 {% if session.get("user_id") %}

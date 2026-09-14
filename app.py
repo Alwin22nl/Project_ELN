@@ -20,6 +20,7 @@ from helper import log_change, login_required, admin_required, generate_temp_pas
 
 #importing routes
 from routes.authentication import authentication_bp
+from routes.admin import admin_bp
 
 # importing Test Routes
 from routes.rheology import rheology_bp
@@ -42,6 +43,7 @@ app.config["SESSION_REFRESH_EACH_REQUEST"] = True
 
 # routes
 app.register_blueprint(authentication_bp)
+app.register_blueprint(admin_bp)
 
 @app.route('/get_samples/<int:product_id>')
 @login_required
@@ -108,154 +110,6 @@ def sample_append_remark():
     connection.close()
 
     return redirect(url_for('sample'))
-
-@app.route("/admin")
-@login_required
-@admin_required
-def admin_page():
-
-    connection = get_connection()
-    cursor = get_dict_cursor(connection)
-
-    cursor.execute(
-        """
-        SELECT
-            user_id,
-            username,
-            name,
-            user_role,
-            active
-        FROM users
-        ORDER BY username
-        """
-    )
-
-    users = cursor.fetchall()
-
-    cursor.close()
-    connection.close()
-
-    return render_template(
-        "admin/admin.html",
-        users=users
-    )
-
-@app.route("/admin/audit_logs")
-@login_required
-@admin_required
-def audit_logs_admin():
-    if session.get("role") != "admin":
-        return "Access denied", 403
-    connection = get_connection()
-    cursor = get_dict_cursor(connection)
-    cursor.execute("""
-        SELECT
-            audit_log.audit_id,
-            audit_log.table_name,
-            audit_log.record_id,
-            audit_log.changed_at,
-            audit_log.old_values,
-            audit_log.new_values,
-            audit_log.reason,
-            users.username
-        FROM audit_log
-        JOIN users
-        ON users.user_id = audit_log.changed_by
-        ORDER BY audit_log.changed_at DESC
-    """)
-    logs = cursor.fetchall()
-
-    cursor.close()
-    connection.close()
-    return render_template(
-        "admin/audit_logs.html",
-        logs=logs
-    )
-
-@app.route("/admin/reset_password/<int:user_id>", methods=["POST"])
-@login_required
-@admin_required
-def reset_password(user_id):
-
-    temp_password = generate_temp_password()
-    password_hash = generate_password_hash(
-        temp_password
-    )
-    connection = get_connection()
-    cursor = get_dict_cursor(connection)
-    cursor.execute(
-        """
-        UPDATE users
-        SET
-            password_hash = %s,
-            must_change_password = TRUE
-        WHERE user_id = %s
-        """,
-        (
-            password_hash,
-            user_id
-        )
-    )
-    connection.commit()
-    cursor.close()
-    connection.close()
-
-    return render_template(
-        "admin/password_reset.html",
-        password=temp_password
-    )
-
-@app.route("/admin/create_user", methods=["GET","POST"])
-@login_required
-@admin_required
-def create_user():
-
-    if request.method == "POST":
-
-        username = request.form["username"]
-        name = request.form["name"]
-        role = request.form["user_role"]
-
-        # temporary password
-        temp_password = generate_temp_password()
-        password_hash = generate_password_hash(
-            temp_password
-        )
-        connection = get_connection()
-        cursor = get_dict_cursor(connection)
-        cursor.execute(
-            """
-            INSERT INTO users
-            (
-                username,
-                name,
-                password_hash,
-                user_role,
-                must_change_password,
-                active
-            )
-            VALUES
-            (%s,%s,%s,%s,TRUE,TRUE)
-            """,
-            (
-                username,
-                name,
-                password_hash,
-                role
-            )
-        )
-        connection.commit()
-        cursor.close()
-        connection.close()
-        return render_template(
-            "admin/user_created.html",
-            username=username,
-            password=temp_password
-        )
-
-    return render_template(
-        "admin/create_user.html"
-    )
 
 @app.route("/")
 @login_required
