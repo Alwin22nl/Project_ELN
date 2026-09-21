@@ -3,7 +3,9 @@ from flask import(
     render_template,
     redirect,
     request,
-    url_for
+    url_for,
+    session,
+    jsonify
 )
 
 from helper import login_required
@@ -43,3 +45,32 @@ def sample():
         samples=samples,
         error=error
     )
+
+@sample_bp.route("/sample/append_remark", methods=["POST"])
+@login_required
+def sample_append_remark():
+    sample_id = request.form.get("sample_id")
+    remark = request.form.get("remark")
+
+    user = (
+        session.get("name")
+        or session.get("username")
+        or "unknown"
+    )
+
+    service.append_remark(
+        sample_id=sample_id,
+        remark=remark,
+        user=user
+    )
+
+    return redirect(
+        url_for(".sample")
+    )
+
+@sample_bp.route("/get_samples/<int:product_id>")
+@login_required
+def get_samples(product_id):
+    samples = service.get_samples_by_product(product_id)
+
+    return jsonify(samples)

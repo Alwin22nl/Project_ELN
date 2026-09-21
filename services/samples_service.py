@@ -1,4 +1,4 @@
-from datetime import date, timedelta
+from datetime import date, timedelta, datetime
 from models.samples import Samples
 
 class SamplesService:
@@ -81,8 +81,9 @@ class SamplesService:
                 set()
             )
 
-            all_tests_completed = required.issubset(
-                completed
+            all_tests_completed = (
+                bool(required)
+                and required.issubset(completed)
             )
 
             if all_tests_completed:
@@ -96,10 +97,48 @@ class SamplesService:
 
             sample_list.append({
                 "batch_nr": sample["batch_nr"],
-                "product": sample["product"],
+                "product": sample["product_name"],
                 "prod_date": sample["prod_date"],
                 "due_date": due_date,
                 "status": status,
             })
 
         return products, sample_list
+
+    def append_remark(self, sample_id, remark, user):
+        if not sample_id or not remark:
+            return False
+        timestamp = datetime.now().strftime("%d-%m-%Y %H-%M")
+
+        appended = (
+            f"{remark} "
+            f"({timestamp} by {user})"
+        )
+
+        self.repository.append_remark(sample_id, appended)
+
+        return True
+
+    def get_samples_by_product(self, product_id):
+        rows = self.repository.get_samples_by_product(product_id)
+
+        results = []
+
+        for row in rows:
+            display = row["batch_nr"] or ""
+
+            if row.get("prod_date"):
+                formatted_date = row["prod_date"].strftime("%d-%m-%y")
+
+                if display:
+                    display = f"{display} - {formatted_date}"
+                else:
+                    display = formatted_date
+
+            results.append({
+                "sample_id": row["sample_id"],
+                "display": display,
+                "remark": row.get("remakr")
+            })
+
+        return results

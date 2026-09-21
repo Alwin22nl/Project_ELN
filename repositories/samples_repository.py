@@ -30,7 +30,7 @@ class SampleRepository:
             cursor.execute(
                 """
                 SELECT 
-                    COALCSCE(MAX(batch_sequence), 0) +1 AS next_sequence
+                    COALESCE(MAX(batch_sequence), 0) +1 AS next_sequence
                 FROM samples
                 WHERE product_id = %s
                 """,
@@ -54,11 +54,12 @@ class SampleRepository:
                 (
                     batch_nr,
                     prod_date,
+                    product_id,
                     batch_sequence,
                     after_storage_required,
                     remark
                 )
-                VALLUES
+                VALUES
                 (%s,%s,%s,%s,%s,%s)
                 """,
                 (
@@ -66,7 +67,7 @@ class SampleRepository:
                     sample.prod_date,
                     sample.product_id,
                     batch_sequence,
-                    sample.after_storage_required,
+                    sample.afterstorage_required,
                     sample.remark
                 )
             )
@@ -91,12 +92,12 @@ class SampleRepository:
                 SELECT
                     product_id,
                     product_name
-                FROM products,
+                FROM products
                 ORDER BY product_name
                 """
             )
 
-            return cursor.fetchall
+            return cursor.fetchall()
 
         finally:
             cursor.close()
@@ -230,3 +231,63 @@ class SampleRepository:
             cursor.close()
             connection.close()
 
+    def append_remark(self, sample_id, appended_remark):
+        connection = get_connection()
+        cursor = get_dict_cursor(connection)
+
+        try:
+            cursor.execute(
+                """
+                UPDATE samples
+                SET remark = 
+                    CASE
+                        WHEN remark IS NULL OR remark = ''
+                        THEN %s
+                        ELSE remark || E'\\n' || %s
+                    END
+                WHERE sample_id = %s
+                """,
+                (
+                    appended_remark,
+                    appended_remark,
+                    sample_id,
+                )
+            )
+
+            connection.commit()
+
+        except Exception:
+            connection.rollback()
+            raise
+
+        finally: 
+            cursor.close()
+            connection.close()
+
+    def get_samples_by_product(self, product_id):
+        connection = get_connection()
+        cursor = get_dict_cursor(connection)
+
+        try:
+            cursor.execute(
+                """
+                SELECT
+                    sample_id,
+                    batch_nr,
+                    prod_date,
+                    remark
+                FROM samples
+                WHERE product_id = %s
+                ORDER BY 
+                    prod_date DESC NULLS LAST,
+                    sample_id DESC
+                """,
+                (product_id,)
+            )
+
+            return cursor.fetchall()
+
+        finally:
+            cursor.close()
+            connection.close()
+    
