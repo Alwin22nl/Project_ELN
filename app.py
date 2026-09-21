@@ -26,6 +26,7 @@ from routes.dashboard import dashboard_bp
 from routes.products import product_bp
 
 # importing Test Routes
+from routes.tests import test_bp
 from routes.rheology import rheology_bp
 from routes.skinformation import skinformation_bp
 from routes.initial_tack import initial_tack_bp
@@ -51,16 +52,8 @@ app.register_blueprint(sample_bp)
 app.register_blueprint(dashboard_bp)
 app.register_blueprint(product_bp)
 
-@app.route("/tests")
-@login_required
-def tests():
-
-    return render_template(
-        "tests.html",
-        tests=TEST_PAGES
-    )
-
 # test routes
+app.register_blueprint(test_bp)
 app.register_blueprint(rheology_bp)
 app.register_blueprint(skinformation_bp)
 app.register_blueprint(initial_tack_bp)
