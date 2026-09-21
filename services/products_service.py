@@ -1,7 +1,7 @@
 from models.products import Product
 
 class ProductService:
-    def __init__(self, repository)
+    def __init__(self, repository):
         self.repository = repository
 
     def create_product(self, form):
