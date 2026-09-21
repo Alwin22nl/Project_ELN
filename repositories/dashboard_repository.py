@@ -595,4 +595,64 @@ class DashboardRepository:
 
         return cursor.fetchall()
 
-    
+    def place_afterstorage(self, sample_id, oven_location):
+        connection = get_connection()
+        cursor = connection.cursor()
+
+        try:
+            cursor.execute(
+                """
+                INSERT INTO after_storage
+                    (
+                        sample_id,
+                        placed_in_oven_at,
+                        oven_location
+                    )
+                VALUES
+                    (
+                        %s,
+                        NOW(),
+                        %s
+                    )
+                """,
+                (
+                    sample_id,
+                    oven_location
+                )
+            )
+
+            connection.commit()
+
+        except Exception:
+            connection.rollback()
+            raise
+
+        finally:
+            cursor.close()
+            connection.close()
+
+    def remove_afterstorage(self, afterstorage_id):
+        connection = get_connection()
+        cursor = connection.cursor()
+
+        try:
+            cursor.execute(
+            """
+            UPDATE after_storage
+            SET removed_from_oven = NOW()
+            WHERE afterstorage_id = %s
+            """,
+            (afterstorage_id,)
+            )
+
+            connection.commit()
+
+        except Exception:
+            connection.rollback()
+            raise
+
+        finally:
+            cursor.close()
+            connection.close()
+
+        
