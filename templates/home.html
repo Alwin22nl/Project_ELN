@@ -89,7 +89,7 @@ Zettex ELN
                 <td>
                     {% if row.action == "Place in oven" %}
                         <form method="POST"
-                              action="{{ url_for('place_afterstorage') }}">
+                              action="{{ url_for('dashboard.place_afterstorage') }}">
                             <input type="hidden"
                                    name="sample_id"
                                    value="{{ row.sample_id }}">
@@ -104,7 +104,7 @@ Zettex ELN
                         </form>
                     {% elif row.action == "Remove from oven" %}
                         <form method="POST"
-                              action="{{ url_for('remove_afterstorage') }}">
+                              action="{{ url_for('dashboard.remove_afterstorage') }}">
                             <input type="hidden"
                                    name="afterstorage_id"
                                    value="{{ row.afterstorage_id }}">
