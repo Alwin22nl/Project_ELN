@@ -179,7 +179,7 @@ class OverviewService:
 
         return averages   
 
-    def get_overview(self, product_id, batch_nr="", prod_date_from="", prod_date_to="")
+    def get_overview(self, product_id, batch_nr="", prod_date_from="", prod_date_to=""):
         products = self.repository.get_products()
 
         if not product_id:
