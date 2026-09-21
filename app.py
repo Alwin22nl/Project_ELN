@@ -23,6 +23,7 @@ from routes.authentication import authentication_bp
 from routes.admin import admin_bp
 from routes.samples import sample_bp
 from routes.dashboard import dashboard_bp
+from routes.products import product_bp
 
 # importing Test Routes
 from routes.rheology import rheology_bp
@@ -48,6 +49,7 @@ app.register_blueprint(authentication_bp)
 app.register_blueprint(admin_bp)
 app.register_blueprint(sample_bp)
 app.register_blueprint(dashboard_bp)
+app.register_blueprint(product_bp)
 
 @app.route("/tests")
 @login_required
@@ -68,101 +70,6 @@ app.register_blueprint(adhesion_bp)
 app.register_blueprint(epdm_adhesion_bp)
 app.register_blueprint(curability_bp)
 app.register_blueprint(tensile_bp)
-
-@app.route("/products", methods=["GET", "POST"])
-@login_required
-def products():
-
-    connection = get_connection()
-    cursor = get_dict_cursor(connection)
-
-
-    if request.method == "POST":
-        product_code = request.form["product_code"]
-        product_name = request.form["product_name"]
-        # Create product
-        cursor.execute(
-            """
-            INSERT INTO products
-            (
-                product_code,
-                product_name
-            )
-
-            VALUES
-            (%s,%s)
-            RETURNING product_id
-            """,
-            (
-                product_code,
-                product_name
-            )
-            
-        )
-        product_id = cursor.fetchone()["product_id"]
-        # Get selected tests
-        selected_tests = request.form.getlist("required_tests")
-
-        # Save test requirements
-        for test_id in selected_tests:
-            frequency = request.form.get(
-                f"frequency_{test_id}",
-                1
-            )
-            cursor.execute(
-                """
-                INSERT INTO product_test_requirements
-                (
-                    product_id,
-                    test_type_id,
-                    frequency
-                )
-                VALUES
-                (%s,%s,%s)
-                """,
-                (
-                    product_id,
-                    test_id,
-                    frequency
-                )
-            )
-        connection.commit()
-        cursor.close()
-        connection.close()
-        return redirect(url_for("products"))
-    # Load products
-    cursor.execute(
-        """
-        SELECT
-            product_id,
-            product_code,
-            product_name
-        FROM products
-        ORDER BY product_code
-        """
-    )
-    products = cursor.fetchall()
-    # Load available tests
-    cursor.execute(
-        """
-        SELECT
-            test_type_id,
-            test_name
-        FROM test_types
-        ORDER BY test_name
-        """
-    )
-
-    tests = cursor.fetchall()
-
-    cursor.close()
-    connection.close()
-
-    return render_template(
-        "products.html",
-        products=products,
-        tests=tests
-    )
 
 @app.route("/overview", methods=["GET", "POST"])
 @login_required
