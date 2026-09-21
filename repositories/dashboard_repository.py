@@ -2,14 +2,14 @@ from database import get_dict_cursor, get_connection
 
 class DashboardRepository:
     def get_dashboard_data(self):
-        connection = get_connection
+        connection = get_connection()
         cursor = get_dict_cursor(connection)
 
         try:
-            return{
+            return {
                 "curability_schedule": self.get_curability_schedule(cursor),
                 "after_storage_schedule": self.get_after_storage_schedule(cursor),
-                "rheology": self.get_reology_tasks(cursor),
+                "rheology": self.get_rheology_tasks(cursor),
                 "skinformation": self.get_skinformation_tasks(cursor),
                 "initial_tack": self.get_initial_tack_tasks(cursor),
                 "tensile": self.get_tensile_tasks(cursor),
