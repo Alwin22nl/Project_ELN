@@ -20,7 +20,7 @@
                 <h2>Zettex ELN</h2>
                 {% if session.get("user_id") %}
                 <a href="/">Dashboard</a>
-                <a href="/sample">Batches</a>
+                <a href="{{ url_for('sample.sample') }}">Batches</a>
                 <a href="/tests">Testen</a>
                 <a href="/products">Producten</a>
                 <a href="{{ url_for('overview_page') }}">Resultaten</a>
