@@ -142,7 +142,7 @@ class OverviewRepository:
             query_args = [product_id]
 
             if batch_nr:
-                query += """"
+                query += """
                     AND samples.batch_nr ILIKE %s
                 """
 
@@ -154,7 +154,7 @@ class OverviewRepository:
                     BETWEEN %s AND %s
                 """
 
-                query_args.extend(date_from, date_to)
+                query_args.extend([date_from, date_to])
 
             elif date_from:
                 query += """
@@ -169,6 +169,31 @@ class OverviewRepository:
                 """
 
                 query_args.append(date_to)
+
+            query += """
+                GROUP BY
+                    samples.sample_id,
+                    samples.batch_nr,
+                    samples.prod_date,
+                    rheology_normal.yield_stress,
+                    rheology_normal.vis_at_10,
+                    rheology_as.yield_stress,
+                    rheology_as.vis_at_10,
+                    initial_tack.initial_tack,
+                    skinformation_normal.tack_free_time,
+                    skinformation_normal.skinformation_time,
+                    skinformation_as.tack_free_time,
+                    skinformation_as.skinformation_time,
+                    curability_normal.day_1,
+                    curability_normal.day_7,
+                    curability_as.day_1,
+                    curability_as.day_7,
+                    shore_a.shore_a_avg,
+                    density.density_product,
+                    adhesion.sample_id,
+                    epdm_adhesion.sample_id
+                ORDER BY samples.sample_id
+                """
 
             cursor.execute(query, tuple(query_args))
 

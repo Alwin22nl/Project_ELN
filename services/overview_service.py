@@ -205,16 +205,16 @@ class OverviewService:
             required_tests
         )
 
-        from_start, from_end = self.parse_partial_date(
+        from_start, from_end = self.parse_partion_date(
             prod_date_from
         )
 
-        to_start, to_end = self.parse_partial_date(
+        to_start, to_end = self.parse_partion_date(
             prod_date_to
         )
 
-        date_from = from_start or to_start
-        date_to = to_end or from_end
+        date_from = from_start 
+        date_to = to_end
 
         results = self.repository.get_results(
             product_id=product_id,
