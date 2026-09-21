@@ -19,7 +19,7 @@
             <nav class="sidebar">
                 <h2>Zettex ELN</h2>
                 {% if session.get("user_id") %}
-                <a href="/">Dashboard</a>
+                <a href="{{ urlfor('dashboard.dashboard')}}">Dashboard</a>
                 <a href="{{ url_for('sample.sample') }}">Batches</a>
                 <a href="/tests">Testen</a>
                 <a href="/products">Producten</a>
