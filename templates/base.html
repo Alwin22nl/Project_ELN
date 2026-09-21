@@ -21,9 +21,9 @@
                 {% if session.get("user_id") %}
                 <a href="{{ url_for('dashboard.dashboard')}}">Dashboard</a>
                 <a href="{{ url_for('sample.sample') }}">Batches</a>
-                <a href="/tests">Testen</a>
+                <a href="{{ url_for('tests.tests')}}">Testen</a>
                 <a href="{{ url_for('product.products')}}">Producten</a>
-                <a href="{{ url_for('overview_page') }}">Resultaten</a>
+                <a href="{{ url_for('overview.overview_page') }}">Resultaten</a>
                 <a href="{{ url_for('batch_search') }}">Batch Zoeken</a>
                 {% endif %}
                 {% if session.role == "admin" %}
