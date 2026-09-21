@@ -4,7 +4,7 @@ from database import get_connection, get_dict_cursor
 class ProductsRepository:
     def create_product(self, product, requirements):
         connection = get_connection()
-        cursor = connection.cursor()
+        cursor = get_dict_cursor(connection)
 
         try:
             cursor.execute(
@@ -12,7 +12,7 @@ class ProductsRepository:
                 INSERT INTO products
                 (
                     product_code,
-                    product_name,
+                    product_name
                 )
                 VALUES
                 (%s,%s)
@@ -98,4 +98,3 @@ class ProductsRepository:
             cursor.close()
             connection.close()
 
-            
