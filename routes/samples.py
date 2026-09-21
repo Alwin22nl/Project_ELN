@@ -19,7 +19,7 @@ sample_bp = Blueprint(
 repository = SampleRepository()
 service = SamplesService(repository)
 
-sample_bp.route("/sample", methods=["GET", "POST"])
+@sample_bp.route("/sample", methods=["GET", "POST"])
 @login_required
 def sample():
 
