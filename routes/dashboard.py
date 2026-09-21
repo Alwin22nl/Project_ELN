@@ -29,3 +29,26 @@ def dashboard():
         "home.html",
         **context
     )
+
+@dashboard_bp.route("/afterstorage/place", methods=["POST"])
+@login_required
+def place_afterstorage():
+    service.place_afterstorage(
+        sample_id=request.form["sample_id"],
+        oven_location=request.form["oven_location"]
+    )
+
+    return redirect(
+        url_for(".dashboard")
+    )
+
+@dashboard_bp.route("/afterstorage/remove", methods=["POST"])
+@login_required
+def remove_afterstorage():
+    service.remove_afterstorage(
+        afterstorage_id=request.form["afterstorage_id"]
+    )
+
+    return redirect(
+        url_for(".dashboard")
+    )

@@ -22,6 +22,7 @@ from helper import log_change, login_required, admin_required, generate_temp_pas
 from routes.authentication import authentication_bp
 from routes.admin import admin_bp
 from routes.samples import sample_bp
+from routes.dashboard import dashboard_bp
 
 # importing Test Routes
 from routes.rheology import rheology_bp
@@ -46,6 +47,7 @@ app.config["SESSION_REFRESH_EACH_REQUEST"] = True
 app.register_blueprint(authentication_bp)
 app.register_blueprint(admin_bp)
 app.register_blueprint(sample_bp)
+app.register_blueprint(dashboard_bp)
 
 @app.route("/")
 @login_required
