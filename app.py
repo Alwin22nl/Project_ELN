@@ -4,7 +4,7 @@ import os
 # import partial library's
 from dotenv import load_dotenv
 from flask import Flask
-from datetime import date, timedelta
+from datetime import timedelta
 
 #importing routes
 from routes.authentication import authentication_bp
