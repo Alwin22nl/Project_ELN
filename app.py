@@ -1,22 +1,10 @@
 # import full library's
 import os
-import secrets
-import string
-import calendar
-import re
 
 # import partial library's
 from dotenv import load_dotenv
-from flask import session, Flask, render_template, request, redirect, url_for, jsonify
-from database import get_connection, get_dict_cursor
-from datetime import date, timedelta, datetime
-from numbers import Real
-from werkzeug.security import generate_password_hash, check_password_hash
-from functools import wraps
-
-# importing other Py files
-from config.test import TEST_PAGES, OVERVIEW_TESTS
-from helper import log_change, login_required, admin_required, generate_temp_password, format_datetime
+from flask import Flask
+from datetime import date, timedelta
 
 #importing routes
 from routes.authentication import authentication_bp
@@ -40,8 +28,6 @@ from routes.curability import curability_bp
 from routes.tensile import tensile_bp
 
 load_dotenv()
-today = date.today()
-
 app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY")
 app.permanent_session_lifetime = timedelta(hours=1)
