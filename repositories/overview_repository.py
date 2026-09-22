@@ -350,3 +350,66 @@ class OverviewRepository:
         finally:
             cursor.close()
             connection.close()
+
+    def get_initial_tack_details(self, sample_id):
+        connection = get_connection()
+        cursor = get_dict_cursor(connection)
+
+        try:
+            cursor.execute(
+                """
+                SELECT
+                    users.name AS operator,
+                    initial_tack.test_date,
+                    initial_tack.remark,
+                    initial_tack.humidity,
+                    initial_tack.area,
+                    initial_tack.area_weight,
+                    initial_tack.added_weight
+                FROM initial_tack
+                JOIN users
+                ON users.user_id = initial_tack.operator_id
+                WHERE sample_id = %s
+                """,
+                (sample_id,)
+            )
+
+            row = cursor.fetchone()
+
+            if not row:
+                return {}
+
+            return {
+                "operator": row["operator"],
+
+                "test_date": (
+                    row["test_date"].strftime("%d-%m-%Y %H:%M")
+                    if row["test_date"]
+                    else ""
+                ),
+
+                "remark": row["remark"],
+
+                "environment": {
+                    "Humidity": row["humidity"]
+                },
+
+                "details":[
+                    {
+                        "name": "Oppervlak",
+                        "value": row["area"]
+                    },
+                    {
+                        "name": "Gewicht opp.",
+                        "value": row["area_weight"]
+                    },
+                    {
+                        "name": "Toegevoegd gewicht",
+                        "value": row["added_weight"]
+                    }
+                ]
+            }
+
+        finally:
+            cursor.close()
+            connection.close()

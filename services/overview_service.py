@@ -253,4 +253,7 @@ class OverviewService:
         if test_type == "shore_a":
             return self.repository.get_shore_a_details(sample_id)
 
+        if test_type == "initial_tack":
+            return self.repository.get_initial_tack_details(sample_id)
+
         return {}

@@ -87,7 +87,12 @@ Zettex ELN
                         "vis_at_10"
                     ] %}
                     {% set is_shore_a = field == "shore_a_avg" %}
-                    {% set has_hover = is_rheology or is_shore_a %}
+                    {% set is_initial_tack = field == "initial_tack" %}
+                    {% set has_hover = 
+                        is_rheology 
+                        or is_shore_a
+                        or is_initial_tack    
+                    %}
                     <td
                         class="cell-{{ field }}
                         {% if has_hover %} result-hover{% endif %}"
@@ -99,6 +104,8 @@ Zettex ELN
                             data-test-type="rheology"
                             {% elif is_shore_a %}
                             data-test-type="shore_a"
+                            {% elif is_initial_tack %}
+                            data-test-type="initial_tack"
 
                             {% endif %}
                             data-afterstorage="false"
@@ -290,12 +297,12 @@ document.querySelectorAll(
                 html += "<hr><strong>Ruwe Data</strong><br>";
                 for (const detail of data.details) {
                     if (
-                        value !== null
-                        && value !== ""
+                        detail.value !== null
+                        && detail.value !== ""
                     ) {
                         html +=
-                            `<strong>${name}:</strong>
-                            ${value}<br>`;
+                            `<strong>${detail.name}:</strong>
+                            ${detail.value}<br>`;
                     }
                 }
             }
