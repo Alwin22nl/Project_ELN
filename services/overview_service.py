@@ -268,4 +268,7 @@ class OverviewService:
         if test_type == "curabilityday7":
             return self.repository.get_curabilityday7_details(sample_id, afterstorage)
 
+        if test_type == "density":
+            return self.repository.get_density_details(sample_id)
+
         return {}

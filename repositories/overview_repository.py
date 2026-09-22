@@ -673,3 +673,58 @@ class OverviewRepository:
         finally:
             cursor.close()
             connection.close()
+
+    def get_density_details(self, sample_id):
+        connection = get_connection()
+        cursor = get_dict_cursor(connection)
+
+        try:
+            cursor.execute(
+                """
+                SELECT
+                    users.name AS operator,
+                    density.test_date,
+                    density.remark,
+                    density.vessel_empty,
+                    density.vessel_full
+                FROM density
+                JOIN users
+                ON users.user_id = density.operator_id
+                WHERE sample_id = %s
+                """,
+                (sample_id,)
+            )
+
+            row = cursor.fetchone()
+
+            if not row:
+                return {}
+
+            return {
+                "operator": row["operator"],
+
+                "test_date": (
+                    row["test_date"].strftime("%d-%m-%Y %H:%M")
+                    if row["test_date"]
+                    else ""
+                ),
+
+                "remark": row["remark"],
+
+                "environment": {},
+
+                "details":[
+                    {
+                        "name": "Gewicht leeg",
+                        "value": row["vessel_empty"]
+                    },
+                    {
+                        "name": "Gewicht vol",
+                        "value": row["vessel_full"]
+                    },
+                ]
+            }
+
+        finally:
+            cursor.close()
+            connection.close()

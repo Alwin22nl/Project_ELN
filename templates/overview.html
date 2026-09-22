@@ -92,6 +92,7 @@ Zettex ELN
                     {% set is_skinformation = field == "skinformation_time" %}
                     {% set is_curabilityday1 = field == "day_1" %}
                     {% set is_curabilityday7 = field == "day_7" %}
+                    {% set is_density = field == "density_product" %}
                     
                     {% set has_hover = 
                         is_rheology 
@@ -101,6 +102,7 @@ Zettex ELN
                         or is_skinformation
                         or is_curabilityday1
                         or is_curabilityday7
+                        or is_density
                     %}
                     <td
                         class="cell-{{ field }}
@@ -123,6 +125,8 @@ Zettex ELN
                                 data-test-type="curabilityday1"
                             {% elif is_curabilityday7 %}
                                 data-test-type="curabilityday7"
+                            {% elif is_density %}
+                                data-test-type="density"
 
                             {% endif %}
                             data-afterstorage="false"
@@ -322,7 +326,10 @@ document.querySelectorAll(
             }
 
 
-            if (data.environment) {
+            if (
+                data.environment
+                && Object.keys(data.environment).length > 0
+            ) {
                 html += "<hr><strong>Omstandigheden</strong><br>";
                 for (
                     const [name, value]
