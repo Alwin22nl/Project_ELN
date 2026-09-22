@@ -88,10 +88,12 @@ Zettex ELN
                     ] %}
                     {% set is_shore_a = field == "shore_a_avg" %}
                     {% set is_initial_tack = field == "initial_tack" %}
+                    {% set is_tack_free = field == "tack_free_time" %}
                     {% set has_hover = 
                         is_rheology 
                         or is_shore_a
-                        or is_initial_tack    
+                        or is_initial_tack   
+                        or is_tack_free 
                     %}
                     <td
                         class="cell-{{ field }}
@@ -106,6 +108,8 @@ Zettex ELN
                             data-test-type="shore_a"
                             {% elif is_initial_tack %}
                             data-test-type="initial_tack"
+                            {% elif is_tack_free %}
+                            data-test-type="tack_free"
 
                             {% endif %}
                             data-afterstorage="false"
@@ -129,24 +133,46 @@ Zettex ELN
 
                 {% endfor %}
                 {% for title, field in as_columns %}
+
                     {% set is_rheology = field in [
                         "yield_stress_as",
                         "vis_at_10_as"
                     ] %}
+
+                    {% set is_tack_free = field == "tack_free_time_as" %}
+
+                    {% set has_hover =
+                        is_rheology
+                        or is_tack_free
+                    %}
+
                     <td
                         class="cell-{{ field }} as-cell
-                        {% if is_rheology %} result-hover{% endif %}"
+                        {% if has_hover %} result-hover{% endif %}"
 
-                        {% if is_rheology %}
+                        {% if has_hover %}
+
                             data-sample-id="{{ row.sample_id }}"
-                            data-test-type="rheology"
+
+                            {% if is_rheology %}
+                                data-test-type="rheology"
+
+                            {% elif is_tack_free %}
+                                data-test-type="tack_free"
+
+                            {% endif %}
+
                             data-afterstorage="true"
+
                         {% endif %}
                     >
+
                         {% if row[field] is not none %}
                             {{ row[field] }}
                         {% endif %}
+
                     </td>
+
                 {% endfor %}
             </tr>
             {% endfor %}
@@ -293,7 +319,10 @@ document.querySelectorAll(
                 }
             }
 
-            if (data.details) {
+            if (
+                data.details 
+                && data.details.length > 0
+            ) {
                 html += "<hr><strong>Ruwe Data</strong><br>";
                 for (const detail of data.details) {
                     if (
