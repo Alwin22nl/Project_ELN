@@ -259,4 +259,7 @@ class OverviewService:
         if test_type == "tack_free":
             return self.repository.get_tack_free_details(sample_id, afterstorage)
 
+        if test_type == "skinformation":
+            return self.repository.get_skinformation_details(sample_id, afterstorage)
+
         return {}

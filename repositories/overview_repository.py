@@ -478,3 +478,68 @@ class OverviewRepository:
         finally:
             cursor.close()
             connection.close()
+
+    def get_skinformation_details(self, sample_id, afterstorage=False):
+        connection = get_connection()
+        cursor = get_dict_cursor(connection)
+
+        try:
+            if afterstorage:
+                cursor.execute(
+                    """
+                    SELECT
+                        users.name AS operator,
+                        skinformation.test_date,
+                        skinformation.remark,
+                        skinformation.temp_skinformation_time,
+                        skinformation.rh_skinformation_time
+                    FROM skinformation
+                    JOIN users 
+                    ON users.user_id = skinformation.operator_id
+                    WHERE skinformation.sample_id = %s
+                    AND skinformation.afterstorage_id IS NOT NULL
+                    """,
+                    (sample_id,)
+                )
+
+            else:
+                cursor.execute(
+                    """
+                    SELECT
+                        users.name AS operator,
+                        skinformation.test_date,
+                        skinformation.remark,
+                        skinformation.temp_skinformation_time,
+                        skinformation.rh_skinformation_time
+                    FROM skinformation
+                    JOIN users 
+                    ON users.user_id = skinformation.operator_id
+                    WHERE skinformation.sample_id = %s
+                    AND skinformation.afterstorage_id IS NULL
+                    """,
+                    (sample_id,)
+                )
+
+            row = cursor.fetchone()
+
+            if not row: 
+                return {}
+
+            return{
+                "operator": row["operator"],
+                "test_date":( 
+                    row["test_date"].strftime("%d-%m-%Y %H:%M") 
+                    if row["test_date"]
+                    else "" 
+                ),
+                "remark": row["remark"] or "",
+                "environment": {
+                    "Temperature": row["temp_skinformation_time"],
+                    "Humidity": row["rh_skinformation_time"]
+                },
+                "details": []
+            }
+
+        finally:
+            cursor.close()
+            connection.close()
