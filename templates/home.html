@@ -13,7 +13,7 @@ Zettex ELN
 
 {% if curability_schedule %}
 <div class="dashboard-card full-width">
-    <a href="{{ url_for('curability_prep') }}"><h2>Uitharding in diepte agenda</h2></a>
+    <a href="{{ url_for('curability.curability_prep') }}"><h2>Uitharding in diepte agenda</h2></a>
     <br>
     <table class="task-table">
         <thead>
@@ -89,7 +89,7 @@ Zettex ELN
                 <td>
                     {% if row.action == "Place in oven" %}
                         <form method="POST"
-                              action="{{ url_for('place_afterstorage') }}">
+                              action="{{ url_for('dashboard.place_afterstorage') }}">
                             <input type="hidden"
                                    name="sample_id"
                                    value="{{ row.sample_id }}">
@@ -104,7 +104,7 @@ Zettex ELN
                         </form>
                     {% elif row.action == "Remove from oven" %}
                         <form method="POST"
-                              action="{{ url_for('remove_afterstorage') }}">
+                              action="{{ url_for('dashboard.remove_afterstorage') }}">
                             <input type="hidden"
                                    name="afterstorage_id"
                                    value="{{ row.afterstorage_id }}">
@@ -132,7 +132,7 @@ Zettex ELN
     <!-- Rheology -->
     {% if rheology %}
     <div class="dashboard-card">
-        <a href="{{ url_for('rheology') }}"><h2>Rheologie</h2></a>
+        <a href="{{ url_for('rheology.rheology') }}"><h2>Rheologie</h2></a>
         <br>
         <table>
             <tr>
@@ -159,7 +159,7 @@ Zettex ELN
     <!-- Skinformation -->
     {% if skinformation %}
     <div class="dashboard-card">
-        <a href="{{ url_for('skinformation') }}"><h2>Huidvorming</h2></a>
+        <a href="{{ url_for('skinformation.skinformation') }}"><h2>Huidvorming</h2></a>
         <br>
         <table>
             <tr>
@@ -186,7 +186,7 @@ Zettex ELN
     <!-- Tensile Strentgh-->
     {% if tensile %}
     <div class="dashboard-card">
-        <a href="{{ url_for('tensile') }}"><h2>Trek Sterkte</h2></a>
+        <a href="{{ url_for('tensile.tensile') }}"><h2>Trek Sterkte</h2></a>
         <br>
         <table class="task-table">
             <thead>
@@ -226,7 +226,7 @@ Zettex ELN
     <!-- Shore A -->
     {% if shore_a %}
     <div class="dashboard-card">
-        <a href="{{ url_for('shore_a') }}"><h2>Shore A</h2></a>
+        <a href="{{ url_for('shore_a.shore_a') }}"><h2>Shore A</h2></a>
         <br>
         <table class="task-table">
             <thead>
@@ -266,7 +266,7 @@ Zettex ELN
     <!-- Curability -->
     {% if curability %}
     <div class="dashboard-card">
-        <a href="{{ url_for('curability') }}"><h2>Uitharding in Diepte</h2></a>
+        <a href="{{ url_for('curability.curability') }}"><h2>Uitharding in Diepte</h2></a>
         <br>
         <table class="task-table">
             <thead>
@@ -306,7 +306,7 @@ Zettex ELN
     <!-- Initial Tack -->
     {% if initial_tack %}
     <div class="dashboard-card">
-        <a href="{{ url_for('initial_tack') }}"><h2>Initial Tack</h2></a>
+        <a href="{{ url_for('initial_tack.initial_tack') }}"><h2>Initial Tack</h2></a>
         <br>
         <table>
             <tr>
@@ -333,7 +333,7 @@ Zettex ELN
     <!-- Density -->
     {% if density %}
     <div class="dashboard-card">
-       <a href="{{ url_for('density') }}"><h2>Dichtheid</h2></a>
+       <a href="{{ url_for('density.density') }}"><h2>Dichtheid</h2></a>
         <br>
         <table>
             <tr>
@@ -360,7 +360,7 @@ Zettex ELN
     <!-- Adhesion -->
     {% if adhesion %}
     <div class="dashboard-card">
-        <a href="{{ url_for('adhesion') }}"><h2>Hechting</h2></a>
+        <a href="{{ url_for('adhesion.adhesion') }}"><h2>Hechting</h2></a>
         <br>
         <table class="task-table">
             <thead>
@@ -400,7 +400,7 @@ Zettex ELN
     <!-- EPDM Adhesion -->
     {% if epdm_adhesion %}
     <div class="dashboard-card">
-        <a href="{{ url_for('epdm_adhesion') }}"><h2>EPDM Hechting</h2></a>
+        <a href="{{ url_for('epdm_adhesion.epdm_adhesion') }}"><h2>EPDM Hechting</h2></a>
         <br>
         <table class="task-table">
             <thead>

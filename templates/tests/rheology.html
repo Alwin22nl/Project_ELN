@@ -7,7 +7,7 @@ Zettex ELN
 {% block content %}
 
 <div class="page-navigation">
-    <a href="{{ url_for('tests') }}" class="back-button">
+    <a href="{{ url_for('tests.tests') }}" class="back-button">
         terug naar test overzicht
     </a>
 </div>
@@ -124,7 +124,7 @@ document
 
     sample_dropdown.innerHTML =
         "<option>Loading...</option>";
-    fetch("/get_rheology_samples/" + product_id)
+    fetch("/test/get_rheology_samples/" + product_id)
     .then(response => response.json())
     .then(data => {
         sample_dropdown.innerHTML =

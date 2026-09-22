@@ -6,76 +6,205 @@ Zettex ELN
 
 
 {% block content %}
+
 <div class="page-navigation">
-    <a href="{{ url_for('shore_a') }}" class="back-button">
+    <a href="{{ url_for('shore_a.shore_a') }}" class="back-button">
         Terug naar Shore A overzicht
     </a>
 </div>
 
+
 <h1>Shore A - Mal vullen</h1>
+
+
 <div class="container">
+
     <!-- LEFT PANEL -->
     <div class="left-panel">
+
         <h2>Nieuwe Batch vullen</h2>
+
         <form method="POST">
-            <label>Selecteer Batch</label>
-            <select name="sample_id" required>
+
+            <!-- PRODUCT SELECTION -->
+            <label for="product_id">
+                Selecteer Product
+            </label>
+
+            <select id="product_id" required>
                 <option value="">
-                    Selecteer Batch...
+                    Selecteer Product...
                 </option>
-                {% for sample in samples %}
-                <option value="{{ sample.sample_id }}">
-                    {{ sample.batch_nr }} - {{ sample.product_name }}
-                 </option>
+
+                {% for product in products %}
+                    <option value="{{ product.product_id }}">
+                        {{ product.product_name }}
+                    </option>
                 {% endfor %}
             </select>
+
             <br><br>
-            <label>Opmerking</label>
-            <textarea name="remark" class="remark-input"></textarea>
+
+
+            <!-- BATCH SELECTION -->
+            <label for="sample_id">
+                Selecteer Batch
+            </label>
+
+            <select
+                name="sample_id"
+                id="sample_id"
+                required
+                disabled
+            >
+                <option value="">
+                    Selecteer eerst een product...
+                </option>
+            </select>
+            <br><br>
+            <!-- REMARK -->
+            <label for="remark">
+                Opmerking
+            </label>
+            <textarea
+                name="remark"
+                id="remark"
+                class="remark-input"
+            ></textarea>
             <br><br>
             <button type="submit">
                 Batch opslaan
             </button>
         </form>
     </div>
+
     <!-- RIGHT PANEL -->
     <div class="right-panel">
+
         <h2>Gevulde Batches</h2>
         <p>
             Deze batches zijn aan het uitharden en zullen beschikbaar zijn
             voor Shore A testen na 7 dagen.
         </p>
         <table>
-            <tr>
-                <th>Batch</th>
-                <th>Product</th>
-                <th>Datum Gevuld</th>
-                <th>Status</th>
-            </tr>
-            {% for sample in prepared %}
-            <tr>
-                <td>
-                    {{ sample.batch_nr }}
-                </td>
-                <td>
-                    {{ sample.product_name }}
-                </td>
-                <td>
-                    {{ sample.prepared_date.strftime('%d-%m-%Y') }}
-                </td>
-                <td>
-                    {% set days = (today - sample.prepared_date.date()).days %}
-                    {% if days >= 7 %}
-                        Ready for Testing
-                    {% else %}
-                        {{ days }} / 7 days curing
-                    {% endif %}
-            </td>
-
-            </tr>
-            {% endfor %}
+            <thead>
+                <tr>
+                    <th>Batch</th>
+                    <th>Product</th>
+                    <th>Datum Gevuld</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for sample in results %}
+                    <tr>
+                        <td>
+                            {{ sample.batch_nr }}
+                        </td>
+                        <td>
+                            {{ sample.product_name }}
+                        </td>
+                        <td>
+                            {{ sample.prepared_date.strftime('%d-%m-%Y') }}
+                        </td>
+                        <td>
+                            {% set days =
+                                (today - sample.prepared_date.date()).days
+                            %}
+                            {% if days >= 7 %}
+                                Ready for Testing
+                            {% else %}
+                                {{ days }} / 7 days curing
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="4">
+                            Geen batches momenteel aan het uitharden.
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
         </table>
     </div>
 </div>
 
+
+<script>
+
+document
+    .getElementById("product_id")
+    .addEventListener("change", function () {
+
+        const productId = this.value;
+
+        const sampleSelect =
+            document.getElementById("sample_id");
+        sampleSelect.innerHTML =
+            '<option value="">Selecteer Batch...</option>';
+
+        sampleSelect.disabled = true;
+
+        if (!productId) {
+
+            sampleSelect.innerHTML =
+                '<option value="">Selecteer eerst een product...</option>';
+
+            return;
+        }
+
+        fetch(
+            `/test/get_shore_a_prep_samples/${productId}`
+        )
+
+        .then(response => {
+
+            if (!response.ok) {
+                throw new Error(
+                    `HTTP error: ${response.status}`
+                );
+            }
+            return response.json();
+        })
+
+        .then(data => {
+
+            if (data.samples.length === 0) {
+
+                sampleSelect.innerHTML =
+                    '<option value="">Geen beschikbare batches</option>';
+
+                return;
+            }
+
+            data.samples.forEach(sample => {
+
+                const option =
+                    document.createElement("option");
+
+                option.value =
+                    sample.sample_id;
+
+                option.textContent =
+                    sample.display_name;
+
+                sampleSelect.appendChild(option);
+            });
+
+            sampleSelect.disabled = false;
+        })
+
+        .catch(error => {
+
+            console.error(
+                "Error loading Shore A preparation samples:",
+                error
+            );
+
+            sampleSelect.innerHTML =
+                '<option value="">Fout bij laden batches</option>';
+        });
+    });
+</script>
 {% endblock %}

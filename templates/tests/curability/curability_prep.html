@@ -1,18 +1,15 @@
 {% extends "base.html" %}
 
-
 {% block title %}
 Zettex ELN
 {% endblock %}
 
 
-
 {% block content %}
-
 
 <div class="page-navigation">
 
-    <a href="{{ url_for('curability') }}" class="back-button">
+    <a href="{{ url_for('curability.curability') }}" class="back-button">
         Terug naar Uitharding in diepte Overview
     </a>
 
@@ -20,160 +17,396 @@ Zettex ELN
 
 
 <h1>Uitharding in diepte - Batches inzetten</h1>
+
+
 <div class="container">
-<!-- LEFT PANEL -->
+
+    <!-- LEFT PANEL -->
     <div class="left-panel">
+
         <h2>Nieuwe Batch inzetten</h2>
+
         <form method="POST">
-            <label>Selecteer Batch</label>
-            <select 
+
+            <!-- PRODUCT -->
+            <label for="product_select">
+                Selecteer Product
+            </label>
+
+            <select
+                id="product_select"
+                required
+            >
+                <option value="">
+                    Selecteer Product...
+                </option>
+
+                {% for product in products %}
+                    <option value="{{ product.product_id }}">
+                        {{ product.product_name }}
+                    </option>
+                {% endfor %}
+            </select>
+
+
+            <br><br>
+
+
+            <!-- SAMPLE -->
+            <label for="sample_select">
+                Selecteer Batch
+            </label>
+
+            <select
                 name="sample_id"
                 id="sample_select"
-                required>
+                required
+            >
                 <option value="">
-                    Selecteer Batch...
+                    Selecteer eerst een product...
                 </option>
-
-            {% for sample in samples %}
-
-                <option 
-                    value="{{ sample.sample_id }}"
-                    data-afterstorage="{{ sample.afterstorage_id or '' }}">
-                    {{ sample.display_name }}
-                </option>
-
-            {% endfor %}
             </select>
-            <input 
+
+
+            <!-- AFTERSTORAGE -->
+            <input
                 type="hidden"
                 name="afterstorage_id"
-                id="afterstorage_id">
+                id="afterstorage_id"
+            >
+
 
             <br><br>
-            <label>Opmerking</label>
-            <textarea name="remark" class="remark-input"></textarea>
+
+
+            <!-- REMARK -->
+            <label for="remark">
+                Opmerking
+            </label>
+
+            <textarea
+                name="remark"
+                id="remark"
+                class="remark-input"
+            ></textarea>
+
+
             <br><br>
+
+
             <button type="submit">
-            Registereer Batch
+                Registreer Batch
             </button>
+
         </form>
+
     </div>
 
-<!-- RIGHT PANEL -->
+
+
+    <!-- RIGHT PANEL -->
     <div class="right-panel">
+
         <h2>Ingezette Batches</h2>
+
         <table>
-            <tr>
-                <th>Batch</th>
-                <th>Product</th>
-                <th>Ingezet</th>
-                <th>Status</th>
-            </tr>
-            {% for sample in prepared %}
-            <tr>
 
-                <td>
-                    {{ sample.display_name }}
-                </td>
-                <td>
-                    {{ sample.product_name }}
-                </td>
-                <td>
-                {{ sample.prepared_date.strftime('%d-%m-%Y') }}
-                </td>
-<td>
-
-{% set hours_passed = ((now - sample.prepared_date).total_seconds() / 3600) %}
+            <thead>
+                <tr>
+                    <th>Batch</th>
+                    <th>Product</th>
+                    <th>Ingezet</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
 
 
-{% if sample.removed_24h_at is none %}
+            <tbody>
+
+                {% for sample in results %}
+
+                    <tr>
+
+                        <td>
+                            {{ sample.display_name }}
+                        </td>
 
 
-    {% if hours_passed < 24 %}
+                        <td>
+                            {{ sample.product_name }}
+                        </td>
 
-        <button disabled>
-            Haal 24h uit
-        </button>
-        <br>
-        Uithalen in:
-        {{ ((24 - hours_passed) // 1)|int }}h
-    {% else %}
-        <form method="POST"
-        action="{{ url_for(
-            'curability_remove_24h',
-            curability_preparation_id=sample.curability_preparation_id
-        ) }}">
-            <button type="submit">
-                Haal 24h uit
-            </button>
-        </form>
-    {% endif %}
 
-{% elif sample.removed_7d_at is none %}
+                        <td>
+                            {{ sample.prepared_date.strftime('%d-%m-%Y') }}
+                        </td>
 
-    {% if hours_passed < 168 %}
-        <button disabled>
-            Haal 7 dagen uit
-        </button>
-        <br>
-        Uithalen in:
-        {{ ((168 - hours_passed) // 24)|int }}d
-    {% else %}
-        <form method="POST"
-        action="{{ url_for(
-            'curability_remove_7d',
-            curability_preparation_id=sample.curability_preparation_id
-        ) }}">
-            <button type="submit">
-                Haal 7 dagen uit
-            </button>
-        </form>
-    {% endif %}
-{% else %}
-    Klaar voor opmeten
-{% endif %}
-</td>
-            </tr>
-        {% endfor %}
+
+                        <td>
+
+                            {% set hours_passed =
+                                ((now - sample.prepared_date).total_seconds() / 3600)
+                            %}
+
+
+                            <!-- 24 HOUR SAMPLE -->
+                            {% if sample.removed_24h_at is none %}
+
+                                {% if hours_passed < 24 %}
+
+                                    <button disabled>
+                                        Haal 24h uit
+                                    </button>
+
+                                    <br>
+
+                                    Uithalen in:
+
+                                    {{ ((24 - hours_passed) // 1)|int }}h
+
+                                {% else %}
+
+                                    <form
+                                        method="POST"
+                                        action="{{ url_for(
+                                            'curability.curability_remove_24h',
+                                            curability_preparation_id=sample.curability_preparation_id
+                                        ) }}"
+                                    >
+                                        <button type="submit">
+                                            Haal 24h uit
+                                        </button>
+                                    </form>
+
+                                {% endif %}
+
+
+
+                            <!-- 7 DAY SAMPLE -->
+                            {% elif sample.removed_7d_at is none %}
+
+                                {% if hours_passed < 168 %}
+
+                                    <button disabled>
+                                        Haal 7 dagen uit
+                                    </button>
+
+                                    <br>
+
+                                    Uithalen in:
+
+                                    {{ ((168 - hours_passed) // 24)|int }}d
+
+                                {% else %}
+
+                                    <form
+                                        method="POST"
+                                        action="{{ url_for(
+                                            'curability.curability_remove_7d',
+                                            curability_preparation_id=sample.curability_preparation_id
+                                        ) }}"
+                                    >
+                                        <button type="submit">
+                                            Haal 7 dagen uit
+                                        </button>
+                                    </form>
+
+                                {% endif %}
+
+
+                            {% else %}
+
+                                Klaar voor opmeten
+
+                            {% endif %}
+
+                        </td>
+
+                    </tr>
+
+
+                {% else %}
+
+                    <tr>
+                        <td colspan="4">
+                            Geen ingezette batches gevonden.
+                        </td>
+                    </tr>
+
+                {% endfor %}
+
+            </tbody>
+
         </table>
+
     </div>
+
 </div>
+
 
 
 <script>
 
-function updateTimers(){
-    document.querySelectorAll(".countdown").forEach(function(timer){
-        let target = new Date(timer.dataset.time);
-        let now = new Date();
-        let diff = target - now;
-        if(diff <= 0){
-            timer.innerHTML = "Available now";
-            return;
+const productSelect =
+    document.getElementById("product_select");
+
+const sampleSelect =
+    document.getElementById("sample_select");
+
+const afterstorageInput =
+    document.getElementById("afterstorage_id");
+
+
+
+/*
+ * PRODUCT CHANGED
+ *
+ * Load all Curability samples that are
+ * eligible for preparation.
+ */
+productSelect.addEventListener("change", function () {
+
+    const productId = this.value;
+
+
+    /*
+     * Reset old values.
+     */
+    sampleSelect.innerHTML =
+        '<option value="">Selecteer Batch...</option>';
+
+    afterstorageInput.value = "";
+
+
+    /*
+     * No product selected.
+     */
+    if (!productId) {
+
+        sampleSelect.innerHTML =
+            '<option value="">Selecteer eerst een product...</option>';
+
+        return;
+    }
+
+
+    /*
+     * Show loading state.
+     */
+    sampleSelect.innerHTML =
+        '<option value="">Batches laden...</option>';
+
+
+    /*
+     * Get available Curability preparation samples.
+     */
+    fetch(
+        "/test/get_curability_prep_samples/" + productId
+    )
+
+    .then(response => {
+
+        if (!response.ok) {
+
+            throw new Error(
+                "HTTP error " + response.status
+            );
+
         }
-        let hours = Math.floor(diff / 1000 / 60 / 60);
-        let minutes = Math.floor(
-            (diff / 1000 / 60) % 60
+
+        return response.json();
+
+    })
+
+    .then(data => {
+
+        sampleSelect.innerHTML =
+            '<option value="">Selecteer Batch...</option>';
+
+
+        /*
+         * No eligible samples.
+         */
+        if (data.samples.length === 0) {
+
+            sampleSelect.innerHTML =
+                '<option value="">Geen beschikbare batches</option>';
+
+            return;
+
+        }
+
+
+        /*
+         * Add samples to dropdown.
+         */
+        data.samples.forEach(function (sample) {
+
+            const option =
+                document.createElement("option");
+
+
+            option.value =
+                sample.sample_id;
+
+
+            option.textContent =
+                sample.display_name;
+
+
+            /*
+             * Store afterstorage ID inside the option.
+             *
+             * If there is no afterstorage_id,
+             * use an empty string.
+             */
+            option.dataset.afterstorage =
+                sample.afterstorage_id || "";
+
+
+            sampleSelect.appendChild(option);
+
+        });
+
+    })
+
+    .catch(error => {
+
+        console.error(
+            "Error loading Curability preparation samples:",
+            error
         );
-        timer.innerHTML =
-            hours + "h " + minutes + "m";
+
+
+        sampleSelect.innerHTML =
+            '<option value="">Fout bij laden batches</option>';
+
     });
-}
-setInterval(updateTimers, 60000);
-updateTimers();
 
-document
-.getElementById("sample_select")
-.addEventListener("change", function(){
+});
 
-    let selected =
+
+
+/*
+ * SAMPLE CHANGED
+ *
+ * Copy its afterstorage_id into the hidden
+ * form field so Flask receives it when
+ * the preparation form is submitted.
+ */
+sampleSelect.addEventListener("change", function () {
+
+    const selectedOption =
         this.options[this.selectedIndex];
 
-    document.getElementById("afterstorage_id").value =
-        selected.dataset.afterstorage || "";
+
+    afterstorageInput.value =
+        selectedOption.dataset.afterstorage || "";
 
 });
 
 </script>
 
+
 {% endblock %}
+```
