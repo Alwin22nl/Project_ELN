@@ -82,18 +82,52 @@ Zettex ELN
             {% for row in results %}
             <tr>
                 {% for title, field in columns %}
-                    <td class="cell-{{ field }}">
-                        {% if row[field] is not none %}
-                            {% if field == "prod_date" %}
-                                {{ row[field].strftime('%d-%m-%Y') }}
-                            {% else %}
-                                {{ row[field] }}
-                            {% endif %}
+                    {% set is_rheology = field in [
+                        "yield_stress",
+                        "vis_at_10"
+                    ] %}
+                    <td
+                        class="cell-{{ field }}
+                        {% if is_rheology %} result-hover{% endif %}"
+
+                        {% if is_rheology %}
+                            data-sample-id="{{ row.sample_id }}"
+                            data-test-type="rheology"
+                            data-afterstorage="false"
                         {% endif %}
+                    >
+                        {% if row[field] is not none %}
+
+                            {% if field == "prod_date" %}
+
+                                {{ row[field].strftime('%d-%m-%Y') }}
+
+                            {% else %}
+
+                                {{ row[field] }}
+
+                            {% endif %}
+
+                        {% endif %}
+
                     </td>
+
                 {% endfor %}
                 {% for title, field in as_columns %}
-                    <td class="cell-{{ field }} as-cell">
+                    {% set is_rheology = field in [
+                        "yield_stress_as",
+                        "vis_at_10_as"
+                    ] %}
+                    <td
+                        class="cell-{{ field }} as-cell
+                        {% if is_rheology %} result-hover{% endif %}"
+
+                        {% if is_rheology %}
+                            data-sample-id="{{ row.sample_id }}"
+                            data-test-type="rheology"
+                            data-afterstorage="true"
+                        {% endif %}
+                    >
                         {% if row[field] is not none %}
                             {{ row[field] }}
                         {% endif %}
@@ -105,4 +139,135 @@ Zettex ELN
     </table>
     </div>
 </div>
+<div
+    id="result-tooltip"
+    class="result-tooltip"
+></div>
+
+<script>
+
+const tooltip =
+    document.getElementById(
+        "result-tooltip"
+    );
+
+const detailCache = {};
+
+document.querySelectorAll(
+    ".result-hover"
+).forEach(cell => {
+
+    cell.addEventListener(
+        "mouseenter",
+        async event => {
+            const sampleId =
+                cell.dataset.sampleId;
+            const testType =
+                cell.dataset.testType;
+            const afterstorage =
+                cell.dataset.afterstorage;
+            const cacheKey =
+                `${sampleId}-${testType}-${afterstorage}`;
+            let data;
+
+            if (detailCache[cacheKey]) {
+                data =
+                    detailCache[cacheKey];
+
+            } else {
+                const params =
+                    new URLSearchParams({
+                        sample_id: sampleId,
+                        test_type: testType,
+                        afterstorage: afterstorage
+                    });
+
+                const response = await fetch(
+                    "{{ url_for('overview.result_details') }}"
+                    + "?"
+                    + params.toString()
+                );
+
+                data = await response.json();
+                detailCache[cacheKey] = data;
+            }
+
+            let html = "";
+
+            if (data.operator) {
+                html +=
+                    `<strong>Operator:</strong>
+                    ${data.operator}<br>`;
+
+            }
+
+            if (data.test_date) {
+                html +=
+                    `<strong>Datum:</strong>
+                    ${data.test_date}<br>`;
+
+            }
+
+            if (data.remark) {
+                html +=
+                    `<strong>Opmerking:</strong>
+                    ${data.remark}<br>`;
+            }
+
+
+            if (data.environment) {
+                for (
+                    const [name, value]
+                    of Object.entries(
+                        data.environment
+                    )
+                ) {
+
+                    if (
+                        value !== null
+                        && value !== ""
+                    ) {
+
+                        html +=
+                            `<strong>${name}:</strong>
+                            ${value}<br>`;
+                    }
+                }
+            }
+
+            if (!html) {
+                html =
+                    "Geen aanvullende informatie.";
+            }
+
+            tooltip.innerHTML = html;
+            tooltip.style.display =
+                "block";
+            tooltip.style.left =
+                `${event.clientX + 15}px`;
+            tooltip.style.top =
+                `${event.clientY + 15}px`;
+        }
+    );
+
+    cell.addEventListener(
+        "mousemove",
+        event => {
+            tooltip.style.left =
+                `${event.clientX + 15}px`;
+
+            tooltip.style.top =
+                `${event.clientY + 15}px`;
+        }
+    );
+
+    cell.addEventListener(
+        "mouseleave",
+        () => {
+            tooltip.style.display =
+                "none";
+        }
+    );
+});
+</script>
 {% endblock %}

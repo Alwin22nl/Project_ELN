@@ -240,3 +240,14 @@ class OverviewService:
             "prod_date_to": prod_date_to,
             "averages": averages
         }
+
+    def get_result_details(
+            self,
+            sample_id,
+            test_type,
+            afterstorage=False
+    ):
+        if test_type == "rheology":
+            return self.repository.get_rheology_details(sample_id, afterstorage)
+
+        return {}

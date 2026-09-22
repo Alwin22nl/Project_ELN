@@ -202,3 +202,66 @@ class OverviewRepository:
         finally:
             cursor.close()
             connection.close()
+
+    def get_rheology_details(self, sample_id, afterstorage=False):
+        connection = get_connection()
+        cursor = get_dict_cursor(connection)
+
+        try:
+            if afterstorage:
+                cursor.execute(
+                    """
+                    SELECT
+                        users.name AS operator,
+                        rheology.test_date,
+                        rheology.remark,
+                        rheology.humidity
+                    FROM rheology
+                    JOIN users 
+                    ON users.user_id = rheology.operator_id
+                    WHERE rheology.sample_id = %s
+                    AND rheology.afterstorage_id IS NOT NULL
+                    """,
+                    (sample_id,)
+                )
+
+            else:
+                cursor.execute(
+                    """
+                    SELECT
+                        users.name AS operator,
+                        rheology.test_date,
+                        rheology.remark,
+                        rheology.humidity
+                    FROM rheology
+                    JOIN users
+                    ON users.user_id = rheology.operator_id
+                    WHERE rheology.sample_id = %s
+                    AND rheology.afterstorage_id IS NULL
+                    """,
+                    (sample_id,)
+                )
+
+            row = cursor.fetchone()
+
+            if not row: 
+                return {}
+
+            return{
+                "operator": row["operator"],
+                "test_date":( 
+                    row["test_date"].strftime("%d-%m-%Y %H-%M") 
+                    if row["test_date"]
+                    else "" 
+                ),
+                "remark": row["remark"] or "",
+                "environment": {
+                    "humidity": row["humidity"]
+                }
+            }
+
+        finally:
+            cursor.close()
+            connection.close()
+
+            
