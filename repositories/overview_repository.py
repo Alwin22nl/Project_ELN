@@ -543,3 +543,133 @@ class OverviewRepository:
         finally:
             cursor.close()
             connection.close()
+
+    def get_curabilityday1_details(self, sample_id, afterstorage=False):
+        connection = get_connection()
+        cursor = get_dict_cursor(connection)
+
+        try:
+            if afterstorage:
+                cursor.execute(
+                    """
+                    SELECT
+                        users.name AS operator,
+                        curability.test_date,
+                        curability.remark,
+                        curability.temp_day1,
+                        curability.rh_day1
+                    FROM curability
+                    JOIN users 
+                    ON users.user_id = curability.operator_id
+                    WHERE curability.sample_id = %s
+                    AND curability.afterstorage_id IS NOT NULL
+                    """,
+                    (sample_id,)
+                )
+
+            else:
+                cursor.execute(
+                    """
+                    SELECT
+                        users.name AS operator,
+                        curability.test_date,
+                        curability.remark,
+                        curability.temp_day1,
+                        curability.rh_day1
+                    FROM curability
+                    JOIN users 
+                    ON users.user_id = curability.operator_id
+                    WHERE curability.sample_id = %s
+                    AND curability.afterstorage_id IS NULL
+                    """,
+                    (sample_id,)
+                )
+
+            row = cursor.fetchone()
+
+            if not row: 
+                return {}
+
+            return{
+                "operator": row["operator"],
+                "test_date":( 
+                    row["test_date"].strftime("%d-%m-%Y %H:%M") 
+                    if row["test_date"]
+                    else "" 
+                ),
+                "remark": row["remark"] or "",
+                "environment": {
+                    "Temperature": row["temp_day1"],
+                    "Humidity": row["rh_day1"]
+                },
+                "details": []
+            }
+
+        finally:
+            cursor.close()
+            connection.close()
+
+    def get_curabilityday7_details(self, sample_id, afterstorage=False):
+        connection = get_connection()
+        cursor = get_dict_cursor(connection)
+
+        try:
+            if afterstorage:
+                cursor.execute(
+                    """
+                    SELECT
+                        users.name AS operator,
+                        curability.test_date,
+                        curability.remark,
+                        curability.temp_day7,
+                        curability.rh_day7
+                    FROM curability
+                    JOIN users 
+                    ON users.user_id = curability.operator_id
+                    WHERE curability.sample_id = %s
+                    AND curability.afterstorage_id IS NOT NULL
+                    """,
+                    (sample_id,)
+                )
+
+            else:
+                cursor.execute(
+                    """
+                    SELECT
+                        users.name AS operator,
+                        curability.test_date,
+                        curability.remark,
+                        curability.temp_day7,
+                        curability.rh_day7
+                    FROM curability
+                    JOIN users 
+                    ON users.user_id = curability.operator_id
+                    WHERE curability.sample_id = %s
+                    AND curability.afterstorage_id IS NULL
+                    """,
+                    (sample_id,)
+                )
+
+            row = cursor.fetchone()
+
+            if not row: 
+                return {}
+
+            return{
+                "operator": row["operator"],
+                "test_date":( 
+                    row["test_date"].strftime("%d-%m-%Y %H:%M") 
+                    if row["test_date"]
+                    else "" 
+                ),
+                "remark": row["remark"] or "",
+                "environment": {
+                    "Temperature": row["temp_day7"],
+                    "Humidity": row["rh_day7"]
+                },
+                "details": []
+            }
+
+        finally:
+            cursor.close()
+            connection.close()

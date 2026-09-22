@@ -90,12 +90,17 @@ Zettex ELN
                     {% set is_initial_tack = field == "initial_tack" %}
                     {% set is_tack_free = field == "tack_free_time" %}
                     {% set is_skinformation = field == "skinformation_time" %}
+                    {% set is_curabilityday1 = field == "day_1" %}
+                    {% set is_curabilityday7 = field == "day_7" %}
+                    
                     {% set has_hover = 
                         is_rheology 
                         or is_shore_a
                         or is_initial_tack   
                         or is_tack_free 
                         or is_skinformation
+                        or is_curabilityday1
+                        or is_curabilityday7
                     %}
                     <td
                         class="cell-{{ field }}
@@ -105,15 +110,19 @@ Zettex ELN
                             data-sample-id="{{ row.sample_id }}"
 
                             {% if is_rheology %}
-                            data-test-type="rheology"
+                                data-test-type="rheology"
                             {% elif is_shore_a %}
-                            data-test-type="shore_a"
+                                data-test-type="shore_a"
                             {% elif is_initial_tack %}
-                            data-test-type="initial_tack"
+                                data-test-type="initial_tack"
                             {% elif is_tack_free %}
-                            data-test-type="tack_free"
+                                data-test-type="tack_free"
                             {% elif is_skinformation %}
-                            data-test-type="skinformation"
+                                data-test-type="skinformation"
+                            {% elif is_curabilityday1 %}
+                                data-test-type="curabilityday1"
+                            {% elif is_curabilityday7 %}
+                                data-test-type="curabilityday7"
 
                             {% endif %}
                             data-afterstorage="false"
@@ -145,11 +154,15 @@ Zettex ELN
 
                     {% set is_tack_free = field == "tack_free_time_as" %}
                     {% set is_skinformation = field == "skinformation_time_as" %}
+                    {% set is_curabilityday1 = field == "day_1_as" %}
+                    {% set is_curabilityday7 = field == "day_7_as" %}
 
                     {% set has_hover =
                         is_rheology
                         or is_tack_free
                         or is_skinformation
+                        or is_curabilityday1
+                        or is_curabilityday7
                     %}
 
                     <td
@@ -166,6 +179,10 @@ Zettex ELN
                                 data-test-type="tack_free"
                             {% elif is_skinformation %}
                                 data-test-type="skinformation"
+                            {% elif is_curabilityday1 %}
+                                data-test-type="curabilityday1"
+                            {% elif is_curabilityday7 %}
+                                data-test-type="curabilityday7"
 
                             {% endif %}
 
