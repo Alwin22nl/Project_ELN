@@ -10,10 +10,12 @@ Zettex ELN
 
 <form method="POST">
 
-    <input 
-    type="text"
-    name="batch_nr"
-    placeholder="Enter batch number">
+    <input
+        type="text"
+        name="batch_nr"
+        placeholder="Enter batch number"
+        required
+    >
 
     <button type="submit">
         Zoeken
@@ -21,40 +23,32 @@ Zettex ELN
 
 </form>
 
-
 {% if batch %}
 
 <hr>
-
 <h2>
-Batch: {{ batch.batch_nr }}
+    Batch: {{ batch.batch_nr }}
 </h2>
-
 <p>
-Product:
-{{ batch.product_name }}
+    <strong>Product:</strong>
+    {{ batch.product_name }}
 </p>
 
+{% if batches %}
 <p>
-Productie Datum:
-{{ batch.prod_date }}
+    <strong>Samples meegenomen in berekening:</strong>
+    {% for item in batches %}
+        {{ item.batch_nr }}
+        {% if not loop.last %}, {% endif %}
+    {% endfor %}
 </p>
-
-{% if batch.remark %}
-<div class="batch-remark">
-    {{ batch.remark|replace('\n','<br>')|safe }}
-</div>
-<br>
 {% endif %}
-
-<h2>Test Results</h2>
-
+<h2>Test Resultaten</h2>
+{% if results %}
 <table>
     <thead>
         <tr>
             <th>Test</th>
-            <th>Gebruiker</th>
-            <th>Datum</th>
             <th>Resultaat</th>
         </tr>
     </thead>
@@ -65,23 +59,42 @@ Productie Datum:
                 {{ test.test_name }}
             </td>
             <td>
-                {{ test.operator }}
-            </td>
-            <td>
-                {{ test.test_date }}
-            </td>
-            <td>
                 {% for name, value in test["values"].items() %}
-                {{ name }}:
-                {{ value }}<br>
+                    <strong>{{ name }}:</strong>
+                    {% if value is not none %}
+                        {{ value }}
+                    {% else %}
+                        -
+                    {% endif %}
+                    <br>
                 {% endfor %}
             </td>
         </tr>
     {% endfor %}
     </tbody>
-
 </table>
+{% else %}
+
+<p>
+    Geen testresultaten gevonden.
+</p>
 
 {% endif %}
 
+{% if remarks %}
+<hr>
+<h2>Opmerkingen</h2>
+{% for remark in remarks %}
+    <div class="batch-remark">
+        <strong>
+            {{ remark.batch_nr }}
+        </strong>
+        <div style="white-space: pre-line;">
+            {{ remark.remark }}
+        </div>
+    </div>
+    <br>
+{% endfor %}
+{% endif %}
+{% endif %}
 {% endblock %}
