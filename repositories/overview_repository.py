@@ -264,11 +264,21 @@ class OverviewRepository:
                 "environment": {
                     "humidity": row["humidity"]
                 },
-                "details": {
-                    "Vis @ 1": row["vis_at_1"],
-                    "vis @ 5": row["vis_at_5"],
-                    "Vis @ 10": row["vis_at_10"]
-                }
+                "details": [ 
+                    {
+                        "name": "Vis @ 1",
+                        "value": row["vis_at_1"]
+                    },
+                    {
+                        "name": "Vis @ 5",
+                        "value": row["vis_at_5"]
+                    },
+                    {
+
+                    "name": "Vis @ 10",
+                    "value": row["vis_at_10"]
+                    } 
+                ]
             }
 
         finally:
@@ -321,11 +331,20 @@ class OverviewRepository:
                     "Humidity": row["humidity"]
                 },
 
-                "details": {
-                    "Shore A 1": row["shore_a_1"],
-                    "Shore A 2": row["shore_a_2"],
-                    "Shore A 3": row["shore_a_3"]
-                }
+                "details":[
+                    {
+                        "name": "Shore A 1",
+                        "value": row["shore_a_1"]
+                    },
+                    {
+                        "name": "Shore A 2",
+                        "value": row["shore_a_2"]
+                    },
+                    {
+                        "name": "Shore A 3",
+                        "value": row["shore_a_3"]
+                    }
+                ]
             }
 
         finally:

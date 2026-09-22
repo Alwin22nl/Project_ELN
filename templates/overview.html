@@ -288,10 +288,7 @@ document.querySelectorAll(
 
             if (data.details) {
                 html += "<hr><strong>Ruwe Data</strong><br>";
-                for (
-                    const [name, value]
-                    of Object.entries(data.details)
-                ) {
+                for (const detail of data.details) {
                     if (
                         value !== null
                         && value !== ""

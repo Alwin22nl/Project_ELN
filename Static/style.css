@@ -573,4 +573,6 @@ body {
     min-width: 200px;
     max-width: 320px;
     box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+    max-height: 80vh;
+    overflow-y: auto;
 }
