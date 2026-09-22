@@ -297,7 +297,7 @@ class OverviewRepository:
                 ON users.user_id = shore_a.operator_id
                 WHERE shore_a.sample_id = %s
                 """,
-                (sample_id)
+                (sample_id,)
             )
 
             row = cursor.fetchone()
@@ -306,10 +306,10 @@ class OverviewRepository:
                 return {}
 
             return {
-                "operator": row["operator_id"],
+                "operator": row["operator"],
 
                 "test_date": (
-                    row["test_date"].strftime("%d-%m-Y %H:%M")
+                    row["test_date"].strftime("%d-%m-%Y %H:%M")
                     if row["test_date"]
                     else ""
                 ),

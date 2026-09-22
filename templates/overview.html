@@ -161,6 +161,47 @@ const tooltip =
 
 const detailCache = {};
 
+function positionTooltip(event) {
+
+    const offset = 15;
+    const tooltipWidth =
+        tooltip.offsetWidth;
+    const tooltipHeight =
+        tooltip.offsetHeight;
+    let left =
+        event.clientX + offset;
+    let top =
+        event.clientY + offset;
+
+    // Not enough room on the right
+    if (
+        left + tooltipWidth
+        > window.innerWidth
+    ) {
+        left =
+            event.clientX
+            - tooltipWidth
+            - offset;
+    }
+
+    // Not enough room underneath
+    if (
+        top + tooltipHeight
+        > window.innerHeight
+    ) {
+        top =
+            event.clientY
+            - tooltipHeight
+            - offset;
+    }
+
+    tooltip.style.left =
+        `${left}px`;
+
+    tooltip.style.top =
+        `${top}px`;
+}
+
 document.querySelectorAll(
     ".result-hover"
 ).forEach(cell => {
@@ -270,21 +311,14 @@ document.querySelectorAll(
             tooltip.innerHTML = html;
             tooltip.style.display =
                 "block";
-            tooltip.style.left =
-                `${event.clientX + 15}px`;
-            tooltip.style.top =
-                `${event.clientY + 15}px`;
+            positionTooltip(event);
         }
     );
 
     cell.addEventListener(
         "mousemove",
         event => {
-            tooltip.style.left =
-                `${event.clientX + 15}px`;
-
-            tooltip.style.top =
-                `${event.clientY + 15}px`;
+           positionTooltip(event);
         }
     );
 
