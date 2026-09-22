@@ -250,7 +250,7 @@ class OverviewRepository:
             return{
                 "operator": row["operator"],
                 "test_date":( 
-                    row["test_date"].strftime("%d-%m-%Y %H-%M") 
+                    row["test_date"].strftime("%d-%m-%Y %H:%M") 
                     if row["test_date"]
                     else "" 
                 ),
@@ -264,4 +264,3 @@ class OverviewRepository:
             cursor.close()
             connection.close()
 
-            
