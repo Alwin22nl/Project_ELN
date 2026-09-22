@@ -68,11 +68,5 @@ app.register_blueprint(epdm_adhesion_bp)
 app.register_blueprint(curability_bp)
 app.register_blueprint(tensile_bp)
 
-@app.route("/users")
-@login_required
-def users():
-
-    return "Users page"
-
 if __name__ == "__main__":
     app.run(debug=True)
