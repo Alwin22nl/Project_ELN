@@ -86,13 +86,21 @@ Zettex ELN
                         "yield_stress",
                         "vis_at_10"
                     ] %}
+                    {% set is_shore_a = field == "shore_a_avg" %}
+                    {% set has_hover = is_rheology or is_shore_a %}
                     <td
                         class="cell-{{ field }}
-                        {% if is_rheology %} result-hover{% endif %}"
+                        {% if has_hover %} result-hover{% endif %}"
 
-                        {% if is_rheology %}
+                        {% if has_hover %}
                             data-sample-id="{{ row.sample_id }}"
+
+                            {% if is_rheology %}
                             data-test-type="rheology"
+                            {% elif is_shore_a %}
+                            data-test-type="shore_a"
+
+                            {% endif %}
                             data-afterstorage="false"
                         {% endif %}
                     >
@@ -195,6 +203,7 @@ document.querySelectorAll(
             let html = "";
 
             if (data.operator) {
+                html += "<hr><strong>Eigenschappen</strong><br>";
                 html +=
                     `<strong>Operator:</strong>
                     ${data.operator}<br>`;
@@ -216,6 +225,7 @@ document.querySelectorAll(
 
 
             if (data.environment) {
+                html += "<hr><strong>Omstandigheden</strong><br>";
                 for (
                     const [name, value]
                     of Object.entries(
@@ -228,6 +238,23 @@ document.querySelectorAll(
                         && value !== ""
                     ) {
 
+                        html +=
+                            `<strong>${name}:</strong>
+                            ${value}<br>`;
+                    }
+                }
+            }
+
+            if (data.details) {
+                html += "<hr><strong>Ruwe Data</strong><br>";
+                for (
+                    const [name, value]
+                    of Object.entries(data.details)
+                ) {
+                    if (
+                        value !== null
+                        && value !== ""
+                    ) {
                         html +=
                             `<strong>${name}:</strong>
                             ${value}<br>`;

@@ -215,7 +215,10 @@ class OverviewRepository:
                         users.name AS operator,
                         rheology.test_date,
                         rheology.remark,
-                        rheology.humidity
+                        rheology.humidity,
+                        rheology.vis_at_1,
+                        rheology.vis_at_5,
+                        rheology.vis_at_10
                     FROM rheology
                     JOIN users 
                     ON users.user_id = rheology.operator_id
@@ -232,7 +235,10 @@ class OverviewRepository:
                         users.name AS operator,
                         rheology.test_date,
                         rheology.remark,
-                        rheology.humidity
+                        rheology.humidity,
+                        rheology.vis_at_1,
+                        rheology.vis_at_5,
+                        rheology.vis_at_10
                     FROM rheology
                     JOIN users
                     ON users.user_id = rheology.operator_id
@@ -257,6 +263,11 @@ class OverviewRepository:
                 "remark": row["remark"] or "",
                 "environment": {
                     "humidity": row["humidity"]
+                },
+                "details": {
+                    "Vis @ 1": row["vis_at_1"],
+                    "vis @ 5": row["vis_at_5"],
+                    "Vis @ 10": row["vis_at_10"]
                 }
             }
 
@@ -264,3 +275,59 @@ class OverviewRepository:
             cursor.close()
             connection.close()
 
+
+    def get_shore_a_details(self, sample_id):
+        connection = get_connection()
+        cursor = get_dict_cursor(connection)
+
+        try:
+            cursor.execute(
+                """
+                SELECT
+                    users.name AS operator,
+                    shore_a.test_date,
+                    shore_a.humidity,
+                    shore_a.temperature,
+                    shore_a.remark,
+                    shore_a.shore_a_1,
+                    shore_a.shore_a_2,
+                    shore_a.shore_a_3
+                FROM shore_a
+                JOIN users
+                ON users.user_id = shore_a.operator_id
+                WHERE shore_a.sample_id = %s
+                """,
+                (sample_id)
+            )
+
+            row = cursor.fetchone()
+
+            if not row:
+                return {}
+
+            return {
+                "operator": row["operator_id"],
+
+                "test_date": (
+                    row["test_date"].strftime("%d-%m-Y %H:%M")
+                    if row["test_date"]
+                    else ""
+                ),
+
+                "remark": row["remark"],
+
+                "environment": {
+                    "Temperature": row["temperature"],
+                    "Humidity": row["humidity"]
+                },
+
+                "details": {
+                    "Shore A 1": row["shore_a_1"],
+                    "Shore A 2": row["shore_a_2"],
+                    "Shore A 3": row["shore_a_3"]
+                }
+            }
+
+        finally:
+            cursor.close()
+            connection.close()
