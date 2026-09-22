@@ -24,7 +24,7 @@
                 <a href="{{ url_for('tests.tests')}}">Testen</a>
                 <a href="{{ url_for('product.products')}}">Producten</a>
                 <a href="{{ url_for('overview.overview_page') }}">Resultaten</a>
-                <a href="{{ url_for('batch_search') }}">Batch Zoeken</a>
+                <a href="{{ url_for('batch_search.batch_search') }}">Batch Zoeken</a>
                 {% endif %}
                 {% if session.role == "admin" %}
                 <a href="{{ url_for('admin.audit_logs_admin') }}">Correction Logs</a>
