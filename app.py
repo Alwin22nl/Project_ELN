@@ -27,6 +27,7 @@ from routes.epdm_adhesion import epdm_adhesion_bp
 from routes.curability import curability_bp
 from routes.tensile import tensile_bp
 
+# app specific logic
 load_dotenv()
 app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY")
@@ -55,4 +56,4 @@ app.register_blueprint(curability_bp)
 app.register_blueprint(tensile_bp)
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=False)
