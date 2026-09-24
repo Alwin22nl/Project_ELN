@@ -23,6 +23,7 @@
                 <a href="{{ url_for('sample.sample') }}">Batches</a>
                 <a href="{{ url_for('tests.tests')}}">Testen</a>
                 <a href="{{ url_for('product.products')}}">Producten</a>
+                {% endif %}
                 {% if session.role in ["R&D", "QC", "admin", "MANAGEMENT"]%}
                 <a href="{{ url_for('overview.overview_page') }}">Resultaten</a>
                 {% endif%}
@@ -58,25 +59,46 @@
 
     </body>
 
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        <div class="flash-container">
+            {% for category, message in messages %}
+                <div class="flash-message {{ category }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+{% endwith %}
+
 </html>
 <script>
-document.addEventListener('DOMContentLoaded', function () {
-    var avatar = document.getElementById('userAvatar');
-    var userBlock = avatar && avatar.closest('.sidebar-user');
-    if (!avatar || !userBlock) return;
+    document.addEventListener('DOMContentLoaded', function () {
+        var avatar = document.getElementById('userAvatar');
+        var userBlock = avatar && avatar.closest('.sidebar-user');
+        if (!avatar || !userBlock) return;
 
-    var toggleMenu = function (ev) {
-        ev.stopPropagation();
-        userBlock.classList.toggle('show-menu');
-    };
+        var toggleMenu = function (ev) {
+            ev.stopPropagation();
+            userBlock.classList.toggle('show-menu');
+        };
 
-    avatar.addEventListener('click', toggleMenu);
+        avatar.addEventListener('click', toggleMenu);
 
-    // close when clicking outside
-    document.addEventListener('click', function (ev) {
-        if (!userBlock.contains(ev.target)) {
-            userBlock.classList.remove('show-menu');
-        }
+        // close when clicking outside
+        document.addEventListener('click', function (ev) {
+            if (!userBlock.contains(ev.target)) {
+                userBlock.classList.remove('show-menu');
+            }
+        });
     });
-});
+    document.addEventListener("DOMContentLoaded", function () {
+        const flashMessages =
+            document.querySelectorAll(".flash-message");
+        flashMessages.forEach(function (message) {
+            setTimeout(function () {
+                message.remove();
+            }, 5500);
+        });
+    });
 </script>

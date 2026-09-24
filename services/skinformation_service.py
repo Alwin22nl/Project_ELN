@@ -5,6 +5,7 @@ class SkinformationService:
         self.repository = repository
 
     def submit_result(self, form, operator_id):
+            
             sample_ids = form.getlist("sample_id[]")
             afterstorage_ids = form.getlist("afterstorage_id[]")
             remarks = form.getlist("remark[]")
@@ -21,6 +22,7 @@ class SkinformationService:
                 if sample_ids[i] == "":
                     continue
 
+                sample_id = int(sample_ids[i])
                 afterstorage_id = None
 
                 if i < len(afterstorage_ids):
@@ -28,6 +30,9 @@ class SkinformationService:
 
                     if value != "":
                         afterstorage_id = value
+
+                if self.repository.skinformation_exists(sample_id, afterstorage_id):
+                    raise ValueError("Resultaten voor deze batch bestaan al!", "error")
 
                 result = SkinformationResult(
                     sample_id=sample_ids[i],

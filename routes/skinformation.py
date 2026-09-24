@@ -4,7 +4,8 @@ from flask import (
     render_template,
     request,
     url_for,
-    session
+    session,
+    flash
 )
 from helper import login_required
 
@@ -23,17 +24,26 @@ service = SkinformationService(repository)
 @skinformation_bp.route("/skinformation", methods=["GET", "POST"])
 @login_required
 def skinformation():
+    
 
     if request.method == "POST":
-        service.submit_result(
-            request.form,
-            operator_id=session["user_id"]
-        )
+
+        try: 
+            service.submit_result(
+                request.form,
+                operator_id=session["user_id"]
+
+            )
+
+            flash("Resultaat met succes opgeslagen!", "succes")
+
+        except ValueError as e:
+            flash(str(e), "error")
 
         return redirect(
             url_for("skinformation.skinformation")
         )
-    
+        
     samples = service.get_available_samples()
 
     return render_template(
