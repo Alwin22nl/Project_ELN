@@ -324,24 +324,24 @@ document.querySelectorAll(
             let html = "";
 
             if (data.operator) {
-                html += "<hr><strong>Eigenschappen</strong><br>";
+                html += "<hr>Eigenschappen<br>";
                 html +=
-                    `<strong>Operator:</strong>
-                    ${data.operator}<br>`;
+                    `Operator:
+                    <strong>${data.operator}</strong><br>`;
 
             }
 
             if (data.test_date) {
                 html +=
-                    `<strong>Datum:</strong>
-                    ${data.test_date}<br>`;
+                    `Datum:
+                   <strong>${data.test_date}</strong><br>`;
 
             }
 
             if (data.remark) {
                 html +=
-                    `<strong>Opmerking:</strong>
-                    ${data.remark}<br>`;
+                    `Opmerking:
+                    <strong>${data.remark}<strong><br>`;
             }
 
 
@@ -349,7 +349,7 @@ document.querySelectorAll(
                 data.environment
                 && Object.keys(data.environment).length > 0
             ) {
-                html += "<hr><strong>Omstandigheden</strong><br>";
+                html += "<hr>Omstandigheden<br>";
                 for (
                     const [name, value]
                     of Object.entries(
@@ -363,8 +363,8 @@ document.querySelectorAll(
                     ) {
 
                         html +=
-                            `<strong>${name}:</strong>
-                            ${value}<br>`;
+                            `${name}:
+                            <strong>${value}</strong><br>`;
                     }
                 }
             }
@@ -373,15 +373,15 @@ document.querySelectorAll(
                 data.details 
                 && data.details.length > 0
             ) {
-                html += "<hr><strong>Ruwe Data</strong><br>";
+                html += "<hr>Ruwe Data<br>";
                 for (const detail of data.details) {
                     if (
                         detail.value !== null
                         && detail.value !== ""
                     ) {
                         html +=
-                            `<strong>${detail.name}:</strong>
-                            ${detail.value}<br>`;
+                            `${detail.name}:
+                            <strong>${detail.value}</strong><br>`;
                     }
                 }
             }
