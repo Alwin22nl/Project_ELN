@@ -240,3 +240,47 @@ class OverviewService:
             "prod_date_to": prod_date_to,
             "averages": averages
         }
+
+    def get_result_details(
+            self,
+            sample_id,
+            test_type,
+            afterstorage=False
+    ):
+        if test_type == "rheology":
+            return self.repository.get_rheology_details(sample_id, afterstorage)
+
+        if test_type == "batch":
+            return self.repository.get_batch_details(sample_id)
+
+        if test_type == "shore_a":
+            return self.repository.get_shore_a_details(sample_id)
+
+        if test_type == "initial_tack":
+            return self.repository.get_initial_tack_details(sample_id)
+
+        if test_type == "tack_free":
+            return self.repository.get_tack_free_details(sample_id, afterstorage)
+
+        if test_type == "skinformation":
+            return self.repository.get_skinformation_details(sample_id, afterstorage)
+
+        if test_type == "curabilityday1":
+            return self.repository.get_curabilityday1_details(sample_id, afterstorage)
+
+        if test_type == "curabilityday7":
+            return self.repository.get_curabilityday7_details(sample_id, afterstorage)
+
+        if test_type == "density":
+            return self.repository.get_density_details(sample_id)
+
+        if test_type == "adhesion":
+            return self.repository.get_adhesion_details(sample_id)
+
+        if test_type == "epdm_adhesion":
+            return self.repository.get_epdm_adhesion_details(sample_id)
+
+        if test_type == "tensile":
+            return self.repository.get_tensile_details(sample_id)
+
+        return {}

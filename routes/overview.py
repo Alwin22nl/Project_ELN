@@ -1,7 +1,8 @@
 from flask import (
     Blueprint,
     render_template,
-    request
+    request,
+    jsonify
 )
 
 from helper import login_required
@@ -43,3 +44,29 @@ def overview_page():
         "overview.html",
         **context
     )   
+
+@overview_bp.route("/overview/result_details")
+@login_required
+def result_details():
+
+    sample_id = request.args.get(
+        "sample_id",
+        type=int
+    )
+
+    test_type = request.args.get(
+        "test_type"
+    )
+
+    afterstorage = (
+        request.args.get("afterstorage")
+        == "true"
+    )
+
+    details = service.get_result_details(
+        sample_id=sample_id,
+        test_type=test_type,
+        afterstorage=afterstorage
+    )
+
+    return jsonify(details)

@@ -556,3 +556,23 @@ body {
 .tab-content.active{display:block}
 
 .left-panel #append-panel .filter-input, .left-panel #append-panel select, .left-panel #append-panel textarea{width:100%;padding:8px;border-radius:6px;border:1px solid #d1d5db}
+
+/* hover tooltip */
+.result-hover {
+    cursor: help;
+}
+
+.result-tooltip {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 10px 12px;
+    min-width: 200px;
+    max-width: 320px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+    max-height: 80vh;
+    overflow-y: auto;
+}
