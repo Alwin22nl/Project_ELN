@@ -87,6 +87,7 @@ Zettex ELN
                         "vis_at_10"
                     ] %}
                     {% set is_shore_a = field == "shore_a_avg" %}
+                    {% set is_batch = field == "batch_nr" %}
                     {% set is_initial_tack = field == "initial_tack" %}
                     {% set is_tack_free = field == "tack_free_time" %}
                     {% set is_skinformation = field == "skinformation_time" %}
@@ -98,6 +99,7 @@ Zettex ELN
                     
                     {% set has_hover = 
                         is_rheology 
+                        or is_batch
                         or is_shore_a
                         or is_initial_tack   
                         or is_tack_free 
@@ -117,6 +119,8 @@ Zettex ELN
 
                             {% if is_rheology %}
                                 data-test-type="rheology"
+                            {% elif is_batch %}
+                                data-test-type="batch"
                             {% elif is_shore_a %}
                                 data-test-type="shore_a"
                             {% elif is_initial_tack %}

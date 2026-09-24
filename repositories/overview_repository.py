@@ -953,3 +953,31 @@ class OverviewRepository:
         finally:
             cursor.close()
             connection.close()
+
+    def get_batch_details(self, sample_id):
+        connection = get_connection()
+        cursor = get_dict_cursor(connection)
+
+        try:
+            cursor.execute(
+                """
+                SELECT
+                    remark
+                FROM samples
+                WHERE sample_id = %s
+                """,
+                (sample_id,)
+            )
+
+            row = cursor.fetchone()
+
+            if not row:
+                return {}
+
+            return {
+                "remark": row["remark"],
+            }
+
+        finally:
+            cursor.close()
+            connection.close()

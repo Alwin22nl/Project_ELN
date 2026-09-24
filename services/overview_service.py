@@ -250,6 +250,9 @@ class OverviewService:
         if test_type == "rheology":
             return self.repository.get_rheology_details(sample_id, afterstorage)
 
+        if test_type == "batch":
+            return self.repository.get_batch_details(sample_id)
+
         if test_type == "shore_a":
             return self.repository.get_shore_a_details(sample_id)
 
