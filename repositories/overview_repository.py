@@ -992,8 +992,8 @@ class OverviewRepository:
                 SELECT 
                     users.name AS operator,
                     tensile_strength.test_date,
-                    tensile.strength.remark
-                FROM tensile_strenght
+                    tensile_strength.remark
+                FROM tensile_strength
                 JOIN users
                 ON users.user_id = tensile_strength.operator_id
                 WHERE tensile_strength.sample_id = %s
@@ -1020,7 +1020,7 @@ class OverviewRepository:
                 (sample_id,)
             )
 
-            specimens = cursor.fetchone()
+            specimens = cursor.fetchall()
 
             details = []
 
