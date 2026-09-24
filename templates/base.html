@@ -18,11 +18,12 @@
         <div class="layout">
             <nav class="sidebar">
                 <h2>Zettex ELN</h2>
-                {% if session.role in ["R&D", "QC", "MANAGEMENT", "admin"] %}
+                {% if session.role in ["R&D", "QC", "admin"] %}
                 <a href="{{ url_for('dashboard.dashboard')}}">Dashboard</a>
                 <a href="{{ url_for('sample.sample') }}">Batches</a>
                 <a href="{{ url_for('tests.tests')}}">Testen</a>
                 <a href="{{ url_for('product.products')}}">Producten</a>
+                {% if session.role in ["R&D", "QC", "admin", "MANAGEMENT"]%}
                 <a href="{{ url_for('overview.overview_page') }}">Resultaten</a>
                 {% endif%}
                 {% if session.role in ["R&D", "QC", "admin", "SALES", "MANAGEMENT"]%}
