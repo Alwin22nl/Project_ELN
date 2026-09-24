@@ -728,3 +728,108 @@ class OverviewRepository:
         finally:
             cursor.close()
             connection.close()
+
+    def get_adhesion_details(self, sample_id):
+        connection = get_connection()
+        cursor = get_dict_cursor(connection)
+
+        try:
+            cursor.execute(
+                """
+                SELECT
+                    users.name AS operator,
+                    adhesion.test_date,
+                    adhesion.remark,
+                    adhesion.rubber,
+                    adhesion.copper,
+                    adhesion.wood,
+                    adhesion.aluminium,
+                    adhesion.aluminium_anod,
+                    adhesion.rvs,
+                    adhesion.lead,
+                    adhesion.concrete,
+                    adhesion.glass,
+                    adhesion.pvc,
+                    adhesion.pmma,
+                    adhesion.pc
+                FROM adhesion
+                JOIN users
+                ON users.user_id = adhesion.operator_id
+                WHERE sample_id = %s
+                """,
+                (sample_id,)
+            )
+
+            row = cursor.fetchone()
+
+            if not row:
+                return {}
+
+            return {
+                "operator": row["operator"],
+
+                "test_date": (
+                    row["test_date"].strftime("%d-%m-%Y %H:%M")
+                    if row["test_date"]
+                    else ""
+                ),
+
+                "remark": row["remark"],
+
+                "environment": {},
+
+                "details":[
+                    {
+                        "name": "Rubber",
+                        "value": row["rubber"]
+                    },
+                    {
+                        "name": "Koper",
+                        "value": row["copper"]
+                    },
+                    {
+                        "name": "Hout",
+                        "value": row["wood"]
+                    },
+                    {
+                        "name": "Aluminium",
+                        "value": row["aluminium"]
+                    },
+                    {
+                        "name": "Aluminium Anod",
+                        "value": row["aluminium_anod"]
+                    },
+                    {
+                        "name": "Lood",
+                        "value": row["lead"]
+                    },
+                    {
+                        "name": "RVS",
+                        "value": row["rvs"]
+                    },
+                    {
+                        "name": "Beton",
+                        "value": row["concrete"]
+                    },
+                    {
+                        "name": "Glas",
+                        "value": row["glass"]
+                    },
+                    {
+                        "name": "PVC",
+                        "value": row["pvc"]
+                    },
+                    {
+                        "name": "PMMA",
+                        "value": row["pmma"]
+                    },
+                    {
+                        "name": "PC",
+                        "Value": row["pc"]
+                    }
+                ]
+            }
+
+        finally:
+            cursor.close()
+            connection.close()

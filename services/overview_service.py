@@ -271,4 +271,7 @@ class OverviewService:
         if test_type == "density":
             return self.repository.get_density_details(sample_id)
 
+        if test_type == "adhesion":
+            return self.repository.get_adhesion_details(sample_id)
+
         return {}
