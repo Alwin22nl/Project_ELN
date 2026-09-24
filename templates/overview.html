@@ -96,6 +96,10 @@ Zettex ELN
                     {% set is_density = field == "density_product" %}
                     {% set is_adhesion = field == "adhesion" %}
                     {% set is_epdm_adhesion = field == "epdm_adhesion" %}
+                    {% set is_tensile = field in [
+                        "t_max",
+                        "e_max"
+                        ] %}
                     
                     {% set has_hover = 
                         is_rheology 
@@ -109,6 +113,7 @@ Zettex ELN
                         or is_density
                         or is_adhesion
                         or is_epdm_adhesion
+                        or is_tensile
                     %}
                     <td
                         class="cell-{{ field }}
@@ -139,6 +144,8 @@ Zettex ELN
                                 data-test-type="adhesion"
                             {% elif is_epdm_adhesion %}
                                 data-test-type="epdm_adhesion"
+                            {% elif is_tensile %}
+                                data-test-type="tensile"
 
                             {% endif %}
                             data-afterstorage="false"

@@ -981,3 +981,87 @@ class OverviewRepository:
         finally:
             cursor.close()
             connection.close()
+
+    def get_tensile_details(self, sample_id):
+        connection = get_connection()
+        cursor = get_dict_cursor(connection)
+
+        try:
+            cursor.execute(
+                """
+                SELECT 
+                    users.name AS operator,
+                    tensile_strength.test_date,
+                    tensile.strength.remark
+                FROM tensile_strenght
+                JOIN users
+                ON users.user_id = tensile_strength.operator_id
+                WHERE tensile_strength.sample_id = %s
+                """,
+                (sample_id,)
+            )
+
+            test = cursor.fetchone()
+
+            if not test:
+                return {}
+
+            cursor.execute(
+                """
+                SELECT
+                    t_50,
+                    t_100,
+                    t_max,
+                    e_max,
+                    remark
+                FROM tensile_specimen
+                WHERE tensile_specimen.sample_id = %s
+                """,
+                (sample_id,)
+            )
+
+            specimens = cursor.fetchone()
+
+            details = []
+
+            for index, specimen in enumerate(specimens, start=1):
+                details.append({
+                    "name": f"Dumbel {index} - T_50",
+                    "value": specimen["t_50"]
+                })
+
+                details.append({
+                    "name": f"Dumbel {index} - T_100",
+                    "value": specimen["t_100"]
+                })
+
+                details.append({
+                    "name": f"Dumbel {index} - T_max",
+                    "value": specimen["t_max"]
+                })
+
+                details.append({
+                    "name": f"Dumbel {index} - E_max",
+                    "value": specimen["e_max"]
+                })
+
+                details.append({
+                    "name": f"Dumbel {index} - Opmerking",
+                    "value": specimen["remark"]
+                })
+
+            return {
+                "operator": test["operator"],
+
+                "test_date": (
+                    test["test_date"].strftime("%d-%m-%Y %H:%M")
+                ),
+
+                "details": details
+            }
+
+        finally:
+            cursor.close()
+            connection.close()
+
+               

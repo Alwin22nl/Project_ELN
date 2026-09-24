@@ -280,4 +280,7 @@ class OverviewService:
         if test_type == "epdm_adhesion":
             return self.repository.get_epdm_adhesion_details(sample_id)
 
+        if test_type == "tensile":
+            return self.repository.get_tensile_details(sample_id)
+
         return {}
