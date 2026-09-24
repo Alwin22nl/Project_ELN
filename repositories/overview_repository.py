@@ -825,8 +825,8 @@ class OverviewRepository:
                     },
                     {
                         "name": "PC",
-                        "Value": row["pc"]
-                    }
+                        "value": row["pc"]
+                    },
                 ]
             }
 
