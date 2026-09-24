@@ -274,4 +274,7 @@ class OverviewService:
         if test_type == "adhesion":
             return self.repository.get_adhesion_details(sample_id)
 
+        if test_type == "epdm_adhesion":
+            return self.repository.get_epdm_adhesion_details(sample_id)
+
         return {}

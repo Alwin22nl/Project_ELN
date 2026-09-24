@@ -833,3 +833,123 @@ class OverviewRepository:
         finally:
             cursor.close()
             connection.close()
+
+    def get_epdm_adhesion_details(self, sample_id):
+        connection = get_connection()
+        cursor = get_dict_cursor(connection)
+
+        try:
+            cursor.execute(
+                """
+                SELECT
+                    users.name AS operator,
+                    epdm_adhesion.test_date,
+                    epdm_adhesion.remark,
+                    epdm_adhesion.europees,
+                    epdm_adhesion.trc,
+                    epdm_adhesion.carlisle,
+                    epdm_adhesion.rubber,
+                    epdm_adhesion.copper,
+                    epdm_adhesion.wood,
+                    epdm_adhesion.aluminium,
+                    epdm_adhesion.aluminium_anod,
+                    epdm_adhesion.rvs,
+                    epdm_adhesion.lead,
+                    epdm_adhesion.concrete,
+                    epdm_adhesion.glass,
+                    epdm_adhesion.pvc,
+                    epdm_adhesion.pmma,
+                    epdm_adhesion.pc
+                FROM epdm_adhesion
+                JOIN users
+                ON users.user_id = epdm_adhesion.operator_id
+                WHERE sample_id = %s
+                """,
+                (sample_id,)
+            )
+
+            row = cursor.fetchone()
+
+            if not row:
+                return {}
+
+            return {
+                "operator": row["operator"],
+
+                "test_date": (
+                    row["test_date"].strftime("%d-%m-%Y %H:%M")
+                    if row["test_date"]
+                    else ""
+                ),
+
+                "remark": row["remark"],
+
+                "environment": {},
+
+                "details":[
+                    {
+                        "name": "EPDM-Europees",
+                        "value": row["europees"]
+                    },
+                    {
+                        "name": "EPDM-TRC",
+                        "value": row["trc"]
+                    },
+                    {
+                        "name": "EPDM-Carlisle",
+                        "value": row["carlisle"]
+                    },
+                    {
+                        "name": "Rubber",
+                        "value": row["rubber"]
+                    },
+                    {
+                        "name": "Koper",
+                        "value": row["copper"]
+                    },
+                    {
+                        "name": "Hout",
+                        "value": row["wood"]
+                    },
+                    {
+                        "name": "Aluminium",
+                        "value": row["aluminium"]
+                    },
+                    {
+                        "name": "Aluminium Anod",
+                        "value": row["aluminium_anod"]
+                    },
+                    {
+                        "name": "Lood",
+                        "value": row["lead"]
+                    },
+                    {
+                        "name": "RVS",
+                        "value": row["rvs"]
+                    },
+                    {
+                        "name": "Beton",
+                        "value": row["concrete"]
+                    },
+                    {
+                        "name": "Glas",
+                        "value": row["glass"]
+                    },
+                    {
+                        "name": "PVC",
+                        "value": row["pvc"]
+                    },
+                    {
+                        "name": "PMMA",
+                        "value": row["pmma"]
+                    },
+                    {
+                        "name": "PC",
+                        "value": row["pc"]
+                    },
+                ]
+            }
+
+        finally:
+            cursor.close()
+            connection.close()

@@ -94,6 +94,7 @@ Zettex ELN
                     {% set is_curabilityday7 = field == "day_7" %}
                     {% set is_density = field == "density_product" %}
                     {% set is_adhesion = field == "adhesion" %}
+                    {% set is_epdm_adhesion = field == "epdm_adhesion" %}
                     
                     {% set has_hover = 
                         is_rheology 
@@ -105,6 +106,7 @@ Zettex ELN
                         or is_curabilityday7
                         or is_density
                         or is_adhesion
+                        or is_epdm_adhesion
                     %}
                     <td
                         class="cell-{{ field }}
@@ -131,6 +133,8 @@ Zettex ELN
                                 data-test-type="density"
                             {% elif is_adhesion %}
                                 data-test-type="adhesion"
+                            {% elif is_epdm_adhesion %}
+                                data-test-type="epdm_adhesion"
 
                             {% endif %}
                             data-afterstorage="false"
