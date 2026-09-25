@@ -233,3 +233,45 @@ class ShoreARepository:
         finally:
             cursor.close()
             connection.close()
+
+    def shore_a_prep_exists(self, sample_id):
+        connection = get_connection()
+        cursor = get_dict_cursor(connection)
+
+        try:
+            cursor.execute(
+                """
+                SELECT 1
+                FROM shore_a_preparation
+                WHERE sample_id = %s
+                LIMIT 1
+                """,
+                (sample_id,)
+            )
+
+            return cursor.fetchone() is not None
+
+        finally:
+            cursor.close()
+            connection.close()
+
+    def shore_a_exists(self, sample_id):
+        connection = get_connection()
+        cursor = get_dict_cursor(connection)
+
+        try:
+            cursor.execute(
+                """
+                SELECT 1 
+                FROM shore_a
+                WHERE sample_id = %s
+                LIMIT 1
+                """,
+                (sample_id,)
+            )
+
+            return cursor.fetchone() is not None
+
+        finally:
+            cursor.close()
+            connection.close()
