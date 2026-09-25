@@ -5,9 +5,20 @@ class RheologyService:
         self.repository = repository
 
     def submit_result(self, form, operator_id):
+        sample_id = int(form["sample_id"])
+        afterstorage_id = form.get("afterstorage_id")
+        if afterstorage_id:
+            afterstorage_id = int(afterstorage_id)
+
+        else: 
+            afterstorage_id = None
+
+        if self.repository.rheology_exists(sample_id, afterstorage_id):
+            raise ValueError("Resultaat bestaat al voor deze batch!")
+
         result = RheologyResult(
-            sample_id=form["sample_id"],
-            afterstorage_id=form.get("afterstorage_id") or None,
+            sample_id=sample_id,
+            afterstorage_id=afterstorage_id,
             operator_id=operator_id,
             remark=form["remark"],
             yield_stress=form["yield_stress"],

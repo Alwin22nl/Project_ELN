@@ -5,8 +5,13 @@ class ShoreAService:
         self.repository = repository
 
     def submit_test_result(self, form, operator_id):
+        sample_id = int(form["sample_id"])
+
+        if self.repository.shore_a_exists(sample_id):
+            raise ValueError("Resultaat voor deze batch bestaat al!")
+
         result = ShoreATestResult(
-            sample_id=form["sample_id"],
+            sample_id=sample_id,
             operator_id=operator_id,
             remark=form["remark"],
             shore_a_1=float(form["shore_a_1"]),
@@ -19,8 +24,13 @@ class ShoreAService:
         self.repository.submit_test_result(result, shore_a_avg)
 
     def submit_prep_result(self, form, operator_id):
+        sample_id = int(form["sample_id"])
+
+        if self.repository.shore_a_prep_exists(sample_id):
+            raise ValueError("Deze batch is al geregistreerd!")
+
         result = ShoreAPrepResult(
-            sample_id=form["sample_id"],
+            sample_id=sample_id,
             operator_id=operator_id,
             remark=form["remark"],
         )

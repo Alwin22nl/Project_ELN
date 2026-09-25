@@ -5,10 +5,22 @@ class CurabilityService:
         self.repository = repository
 
     def submit_prep_result(self, form, operator_id):
+        sample_id = int(form["sample_id"])
+        afterstorage_id = form.get("afterstorage_id")
+
+        if afterstorage_id:
+            afterstorage_id = int(afterstorage_id)
+
+        else:
+            afterstorage_id = None
+
+        if self.repository.curability_prep_exists(sample_id, afterstorage_id):
+            raise ValueError("Deze batch is al ingezet!")
+
         result = CurabilityPrep(
-            sample_id=form["sample_id"],
+            sample_id=sample_id,
             operator_id=operator_id,
-            afterstorage_id=form.get("afterstorage_id") or None,
+            afterstorage_id=afterstorage_id,
             remark=form["remark"],
         )
         self.repository.add_curability_prep(result)
@@ -35,11 +47,13 @@ class CurabilityService:
         rh_day7s = form.getlist("rh_day7[]")
 
         results = []
+        seen_results = set()
 
         for i in range(len(sample_ids)):
             if sample_ids[i] == "":
                 continue
 
+            sample_id = int(sample_ids[i])
             afterstorage_id = None
 
             if i < len(afterstorage_ids):
@@ -47,6 +61,15 @@ class CurabilityService:
 
                 if value != "":
                     afterstorage_id = value
+
+            result_key = (sample_id, afterstorage_id)
+            if result_key in seen_results:
+                raise ValueError("Dezelfde batch is meerdere keren geselecteerd!")
+
+            seen_results.add(result_key)
+
+            if self.repository.curability_exists(sample_id, afterstorage_id):
+                raise ValueError("Resultaten voor (1 of meerdere) batch bestaat al!")
 
             result = CurabilityTest(
                 sample_id=sample_ids[i],

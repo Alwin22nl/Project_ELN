@@ -1,4 +1,5 @@
 from database import get_connection, get_dict_cursor
+from psycopg2.errors import UniqueViolation
 
 class SkinformationRepository:
     def add_results(self, results):
@@ -39,7 +40,11 @@ class SkinformationRepository:
                     ),
                 )
 
-                connection.commit()
+            connection.commit()
+
+        except UniqueViolation:
+            connection.rollback()
+            raise ValueError("Batch is meerdere keren ingevoerd")
 
         except Exception: 
             connection.rollback()
@@ -99,3 +104,38 @@ class SkinformationRepository:
         finally:
             cursor.close()
             connection.close()
+
+    def skinformation_exists(self, sample_id, afterstorage_id=None):
+        connection = get_connection()
+        cursor = get_dict_cursor(connection)
+
+        try:
+            if afterstorage_id is None:
+                cursor.execute(
+                    """
+                    SELECT 1
+                    FROM skinformation
+                    WHERE sample_id = %s
+                    AND afterstorage_id IS NULL
+                    LIMIT 1
+                    """,
+                    (sample_id,)
+                )
+
+            else:
+                cursor.execute(
+                    """
+                    SELECT 1
+                    FROM skinformation
+                    WHERE sample_id = %s
+                    AND afterstorage_id = %s
+                    LIMIT 1
+                    """,
+                    (sample_id, afterstorage_id)
+                )
+
+            return cursor.fetchone() is not None
+        
+        finally:
+             cursor.close()
+             connection.close()

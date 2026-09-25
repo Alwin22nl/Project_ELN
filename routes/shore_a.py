@@ -4,7 +4,8 @@ from flask import(
     render_template,
     request,
     url_for,
-    session
+    session,
+    flash
 )
 
 from datetime import date
@@ -32,10 +33,15 @@ def shore_a():
 @login_required
 def shore_a_prep():
     if request.method == "POST":
-        service.submit_prep_result(
-            request.form,
-            operator_id=session["user_id"]
-        )
+        try:
+            service.submit_prep_result(
+                request.form,
+                operator_id=session["user_id"]
+            )
+            flash("Batch met succes geregistreerd!", "success")
+
+        except ValueError as e:
+            flash(str(e), "error")
 
         return redirect(
             url_for("shore_a.shore_a_prep")
@@ -54,10 +60,15 @@ def shore_a_prep():
 @login_required
 def shore_a_test():
     if request.method == "POST":
-        service.submit_test_result(
-            request.form,
-            operator_id=session["user_id"]
-        )
+        try:
+            service.submit_test_result(
+                request.form,
+                operator_id=session["user_id"]
+            )
+            flash("Resultaat met succes opgeslagen!", "success")
+
+        except ValueError as e:
+            flash(str(e), "error")
 
         return redirect(
             url_for("shore_a.shore_a_test")

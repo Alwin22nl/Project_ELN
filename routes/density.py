@@ -4,7 +4,8 @@ from flask import(
     render_template,
     request,
     url_for,
-    session
+    session,
+    flash
 )
 
 from helper import login_required
@@ -25,14 +26,22 @@ service = DensityService(repository)
 @login_required
 def density():
     if request.method == "POST":
-        service.submit_result(
-            request.form,
-            operator_id=session["user_id"]
-        )
+
+        try: 
+            service.submit_result(
+                request.form,
+                operator_id=session["user_id"]
+            )
+
+            flash("Resultaat met succes opgeslagen!", "success")
+
+        except ValueError as e:
+            flash(str(e), "error")
 
         return redirect(
             url_for("density.density")
         )
+    
     products, results = service.get_overview()
 
     return render_template(

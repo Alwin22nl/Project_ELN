@@ -5,16 +5,26 @@ class AdhesionService:
         self.repository = repository
 
     def submit_prep_result(self, form, operator_id):
+        sample_id = int(form["sample_id"])
+
+        if self.repository.adhesion_prep_exists(sample_id):
+            raise ValueError("Deze batch is al ingezet!")
+        
         result = AdhesionPrep(
-            sample_id=form["sample_id"],
+            sample_id=sample_id,
             operator_id=operator_id,
             remark=form["remark"],
         )
         self.repository.add_adhesion_prep(result)
 
     def submit_test_result(self, form, operator_id):
+        sample_id = int(form["sample_id"])
+
+        if self.repository.adhesion_exists(sample_id):
+            raise ValueError("Resultaat voor deze batch bestaat al!")
+
         result = AdhesionTest(
-            sample_id=form["sample_id"],
+            sample_id=sample_id,
             operator_id=operator_id,
             remark=form["remark"],
             rubber=form["rubber"],

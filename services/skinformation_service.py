@@ -5,6 +5,7 @@ class SkinformationService:
         self.repository = repository
 
     def submit_result(self, form, operator_id):
+            
             sample_ids = form.getlist("sample_id[]")
             afterstorage_ids = form.getlist("afterstorage_id[]")
             remarks = form.getlist("remark[]")
@@ -16,11 +17,13 @@ class SkinformationService:
             tack_rhs = form.getlist("rh_tack_free_time[]")
 
             results = []
+            seen_results = set()
 
             for i in range(len(sample_ids)):
                 if sample_ids[i] == "":
                     continue
 
+                sample_id = int(sample_ids[i])
                 afterstorage_id = None
 
                 if i < len(afterstorage_ids):
@@ -28,6 +31,15 @@ class SkinformationService:
 
                     if value != "":
                         afterstorage_id = value
+
+                result_key = (sample_id, afterstorage_id)
+                if result_key in seen_results:
+                    raise ValueError("Dezelfde batch is meerdere keren geselecteerd")
+
+                seen_results.add(result_key)
+
+                if self.repository.skinformation_exists(sample_id, afterstorage_id):
+                    raise ValueError("Resultaten voor (1 of meerdere ) batch bestaan al!")
 
                 result = SkinformationResult(
                     sample_id=sample_ids[i],
