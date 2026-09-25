@@ -35,7 +35,7 @@ def skinformation():
 
             )
 
-            flash("Resultaat met succes opgeslagen!", "succes")
+            flash("Resultaat met succes opgeslagen!", "success")
 
         except ValueError as e:
             flash(str(e), "error")
