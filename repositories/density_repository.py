@@ -134,3 +134,25 @@ class DensityRepository:
         finally:
             cursor.close()
             connection.close()
+
+    def density_exists(self, sample_id):
+        connection = get_connection()
+        cursor = get_dict_cursor(connection)
+
+        try:
+            cursor.execute(
+                """
+                SELECT 1 
+                FROM density
+                WHERE sample_id = %s
+                LIMIT 1
+                """,
+                (sample_id,)
+            )
+
+            return cursor.fetchone()
+
+        finally:
+            cursor.close()
+            connection.close()
+            

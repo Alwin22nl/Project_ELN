@@ -5,6 +5,11 @@ class DensityService:
         self.repository = repository
 
     def submit_result(self, form, operator_id):
+        sample_id = int(form["sample_id"])
+
+        if self.repository.density_exists(sample_id):
+            raise ValueError("Dichtheid voor deze batch is al geregistreed")
+
         result = DensityResult(
             sample_id=form["sample_id"],
             operator_id=operator_id,
