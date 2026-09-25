@@ -655,4 +655,45 @@ class DashboardRepository:
             cursor.close()
             connection.close()
 
-        
+    def afterstorage_place_exists(self, sample_id):
+        connection = get_connection()
+        cursor = get_dict_cursor(connection)
+
+        try:
+            cursor.execute(
+                """
+                SELECT 1
+                FROM after_storage
+                WHERE sample_id = %s
+                LIMIT 1
+                """,
+                (sample_id,)
+            )
+
+            return cursor.fetchone() is not None
+
+        finally:
+            cursor.close()
+            connection.close()
+
+    def afterstorage_remove_exists(self, sample_id):
+        connection = get_connection()
+        cursor = get_dict_cursor(connection)
+
+        try:
+            cursor.execute(
+                """
+                SELECT 1
+                FROM after_storage
+                WHERE sample_id = %s
+                AND removed_from_oven IS NOT NULL
+                LIMIT 1
+                """,
+                (sample_id,)
+            )
+
+            return cursor.fetchone() is not None
+
+        finally: 
+            cursor.close()
+            connection.close()        

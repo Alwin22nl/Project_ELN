@@ -4,7 +4,8 @@ from flask import (
     session,
     redirect,
     render_template,
-    url_for
+    url_for,
+    flash
 )
 
 from helper import login_required
@@ -33,10 +34,15 @@ def dashboard():
 @dashboard_bp.route("/afterstorage/place", methods=["POST"])
 @login_required
 def place_afterstorage():
-    service.place_afterstorage(
-        sample_id=request.form["sample_id"],
-        oven_location=request.form["oven_location"]
-    )
+    try:
+        service.place_afterstorage(
+            sample_id=request.form["sample_id"],
+            oven_location=request.form["oven_location"]
+        )
+        flash("Batch met succes in de oven gezet!", "success")
+
+    except ValueError as e:
+        flash(str(e), "error")
 
     return redirect(
         url_for(".dashboard")
@@ -45,10 +51,15 @@ def place_afterstorage():
 @dashboard_bp.route("/afterstorage/remove", methods=["POST"])
 @login_required
 def remove_afterstorage():
-    service.remove_afterstorage(
-        afterstorage_id=request.form["afterstorage_id"]
-    )
+    try:
+        service.remove_afterstorage(
+            afterstorage_id=request.form["afterstorage_id"]
+        )
+        flash("Batch met succes uit de oven gehaald!", "success")
 
+    except ValueError as e:
+        flash(str(e), "error")
+        
     return redirect(
         url_for(".dashboard")
     )
