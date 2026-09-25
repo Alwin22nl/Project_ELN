@@ -118,7 +118,7 @@ class SkinformationRepository:
                 )
 
             else:
-                                cursor.execute(
+                cursor.execute(
                     """
                     SELECT 1
                     FROM skinformation

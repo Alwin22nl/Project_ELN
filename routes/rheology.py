@@ -4,7 +4,8 @@ from flask import (
     render_template,
     request,
     url_for,
-    session
+    session,
+    flash
 )
 from helper import login_required
 
@@ -25,10 +26,16 @@ service = RheologyService(repository)
 def rheology():
 
     if request.method == "POST":
-        service.submit_result(
-            request.form,
-            operator_id=session["user_id"]
-        )
+        try:
+            service.submit_result(
+                request.form,
+                operator_id=session["user_id"]
+            )
+
+            flash("Resultaat met succes opgeslagen!", "success")
+
+        except ValueError as e:
+            flash(str(e), "error")
 
         return redirect(
             url_for("rheology.rheology")

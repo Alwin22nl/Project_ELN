@@ -148,7 +148,7 @@ class InitialTackRepository:
                 (sample_id,)
             )
 
-            cursor.fetchone()
+            cursor.fetchone() is not None
 
         finally:
             cursor.close()

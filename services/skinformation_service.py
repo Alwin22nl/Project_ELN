@@ -32,7 +32,7 @@ class SkinformationService:
                         afterstorage_id = value
 
                 if self.repository.skinformation_exists(sample_id, afterstorage_id):
-                    raise ValueError("Resultaten voor deze batch bestaan al!")
+                    raise ValueError("Resultaten voor (1 of meerdere ) batch bestaan al!")
 
                 result = SkinformationResult(
                     sample_id=sample_ids[i],

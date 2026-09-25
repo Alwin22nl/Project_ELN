@@ -150,7 +150,7 @@ class DensityRepository:
                 (sample_id,)
             )
 
-            return cursor.fetchone()
+            return cursor.fetchone() is not None
 
         finally:
             cursor.close()
