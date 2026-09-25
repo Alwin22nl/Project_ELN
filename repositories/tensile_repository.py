@@ -342,3 +342,66 @@ class TensileRepository:
         finally: 
             cursor.close()
             connection.close()
+
+    def tensile_prep_exists(self, sample_id):
+        connection = get_connection()
+        cursor = get_dict_cursor(connection)
+
+        try:
+            cursor.execute(
+                """
+                SELECT 1 
+                FROM tensile_strength_preparation
+                WHERE sample_id = %s
+                LIMIT 1
+                """,
+                (sample_id,)
+            )
+
+            return cursor.fetchone() is not None
+
+        finally:
+            cursor.close()
+            connection.close()
+
+    def tensile_measure_exists(self, sample_id):
+        connection = get_connection()
+        cursor = get_dict_cursor(connection)
+
+        try:
+            cursor.execute(
+                """
+                SELECT 1
+                FROM tensile_specimen
+                WHERE sample_id = %s
+                LIMIT 1
+                """,
+                (sample_id,)
+            )
+
+            return cursor.fetchone() is not None
+
+        finally:
+            cursor.close()
+            connection.close()
+
+    def tensile_test_exists(self, sample_id):
+        connection = get_connection()
+        cursor = get_dict_cursor(connection)
+
+        try:
+            cursor.execute(
+                """
+                SELECT 1 
+                FROM tensile_strength
+                WHERE sample_id = %s
+                LIMIT 1
+                """,
+                (sample_id,)
+            )
+
+            return cursor.fetchone() is not None
+
+        finally:
+            cursor.close()
+            connection.close()

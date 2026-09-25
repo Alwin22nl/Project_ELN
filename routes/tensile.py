@@ -4,7 +4,8 @@ from flask import(
     render_template,
     url_for,
     request,
-    session
+    session,
+    flash
 )
 
 from datetime import date
@@ -32,10 +33,16 @@ def tensile():
 @login_required
 def tensile_prep():
     if request.method == "POST":
-        service.submit_prep_result(
-            request.form,
-            operator_id=session["user_id"]
-        )
+        try:
+            service.submit_prep_result(
+                request.form,
+                operator_id=session["user_id"]
+            )
+            flash("Batch met succes geregistreed!", "success")
+
+        except ValueError as e:
+            flash(str(e), "error")
+
         return redirect(
             url_for("tensile.tensile_prep")
         )
@@ -52,9 +59,15 @@ def tensile_prep():
 @login_required
 def tensile_measure():
     if request.method == "POST":
-        service.submit_measurements(
-            request.form
-        )
+        try:
+            service.submit_measurements(
+                request.form
+            )
+            flash("Metingen met succes opgeslagen!", "success")
+
+        except ValueError as e:
+            flash(str(e), "error")
+
         return redirect (
             url_for("tensile.tensile_measure")
         )
@@ -68,10 +81,16 @@ def tensile_measure():
 @login_required
 def tensile_test():
     if request.method == "POST":
-        service.submit_test_result(
-            request.form,
-            operator_id=session["user_id"]
-        )
+        try:
+            service.submit_test_result(
+                request.form,
+                operator_id=session["user_id"]
+            )
+            flash("Resultaat met succes opgeslagen", "success")
+
+        except ValueError as e:
+            flash(str(e), "error")
+            
         return redirect(
             url_for("tensile.tensile_test")
         )

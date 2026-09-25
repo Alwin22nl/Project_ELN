@@ -5,9 +5,13 @@ class TensileService:
         self.repository = repository
 
     def submit_prep_result(self, form, operator_id):
+        sample_id = int(form["sample_id"])
+
+        if self.repository.tensile_prep_exists(sample_id):
+            raise ValueError("Deze Batch is al geregistreerd!")
 
         result = TensilePrep(
-            sample_id=form["sample_id"],
+            sample_id=sample_id,
             operator_id=operator_id,
             remark=form["remark"]
         )
@@ -26,9 +30,13 @@ class TensileService:
         thickness_2 = form.getlist("thickness_2[]")
         thickness_3 = form.getlist("thickness_3[]")
 
+        if self.repository.tensile_measure_exists(sample_id):
+            raise ValueError("Deze batch is al gemeten!")
+
         specimens = []
 
         for i in range(len(specimen_numbers)):
+            
             specimen = TensileMeasure(
                 sample_id=sample_id,
                 specimen_no=int(specimen_numbers[i]),
@@ -56,6 +64,9 @@ class TensileService:
         t_100s = form.getlist("t_100[]")
         t_maxs = form.getlist("t_max[]")
         e_maxs = form.getlist("e_max[]")
+
+        if self.repository.tensile_test_exists(sample_id):
+            raise ValueError("Resultaat voor deze batch bestaat al!")
 
         results = []
 
