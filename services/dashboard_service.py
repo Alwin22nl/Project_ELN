@@ -19,8 +19,8 @@ class DashboardService:
 
         self.repository.place_afterstorage(sample_id, oven_location)
 
-    def remove_afterstorage(self, sample_id, afterstorage_id):
-        if self.repository.afterstorage_remove_exists(sample_id):
+    def remove_afterstorage(self, afterstorage_id):
+        if self.repository.afterstorage_remove_exists(afterstorage_id):
             raise ValueError("Deze Batch is al uit de oven gehaald!")
             
         self.repository.remove_afterstorage(afterstorage_id)

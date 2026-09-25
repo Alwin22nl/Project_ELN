@@ -676,7 +676,7 @@ class DashboardRepository:
             cursor.close()
             connection.close()
 
-    def afterstorage_remove_exists(self, sample_id):
+    def afterstorage_remove_exists(self, afterstorage_id):
         connection = get_connection()
         cursor = get_dict_cursor(connection)
 
@@ -685,11 +685,11 @@ class DashboardRepository:
                 """
                 SELECT 1
                 FROM after_storage
-                WHERE sample_id = %s
+                WHERE afterstorage_id = %s
                 AND removed_from_oven IS NOT NULL
                 LIMIT 1
                 """,
-                (sample_id,)
+                (afterstorage_id,)
             )
 
             return cursor.fetchone() is not None
