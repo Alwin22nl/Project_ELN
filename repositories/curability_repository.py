@@ -337,3 +337,73 @@ class CurabilityRepository:
         finally:
             cursor.close()
             connection.close()
+
+    def curability_prep_exists(self, sample_id, afterstorage_id):
+        connection = get_connection()
+        cursor = get_dict_cursor(connection)
+
+        try:
+            if afterstorage_id is None:
+                cursor.execute(
+                    """
+                    SELECT 1
+                    FROM curability_preparation
+                    WHERE sample_id = %s
+                    AND afterstorage_id IS NULL
+                    LIMIT 1
+                    """,
+                    (sample_id,)
+                )
+
+            else:
+                cursor.execute(
+                    """
+                    SELECT 1 
+                    FROM curability_preparation
+                    WHERE sample_id = %s
+                    AND afterstorage_id = %s
+                    LIMIT 1
+                    """,
+                    (sample_id, afterstorage_id)
+                )
+
+            return cursor.fetchone() is not None
+
+        finally:
+            cursor.close()
+            connection.close()
+
+    def curability_exists(self, sample_id, afterstorage_id):
+        connection = get_connection()
+        cursor = get_dict_cursor(connection)
+
+        try:
+            if afterstorage_id is None:
+                cursor.execute(
+                    """
+                    SELECT 1 
+                    FROM curability
+                    WHERE sample_id = %s
+                    AND afterstorage_id IS NULL
+                    LIMIT 1
+                    """,
+                    (sample_id,)
+                )
+
+            else:
+                cursor.execute(
+                    """
+                    SELECT 1
+                    FROM curability
+                    WHERE sample_id = %s
+                    AND afterstorage_id = %s
+                    LIMIT 1
+                    """,
+                    (sample_id, afterstorage_id)
+                )
+
+            return cursor.fetchone() is not None
+
+        finally:
+            cursor.close()
+            connection.close()

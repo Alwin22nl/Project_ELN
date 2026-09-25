@@ -4,7 +4,8 @@ from flask import(
     render_template,
     request,
     url_for,
-    session
+    session,
+    flash
 )
 
 from datetime import datetime
@@ -32,10 +33,17 @@ def curability():
 @login_required
 def curability_prep():
     if request.method == "POST":
-        service.submit_prep_result(
-            request.form,
-            operator_id=session["user_id"]
-        )
+        try:
+            service.submit_prep_result(
+                request.form,
+                operator_id=session["user_id"]
+            )
+
+            flash("Batch met succes geregistreed!", "success")
+
+        except ValueError as e:
+            flash(str(e), "error")
+
         return redirect(
             url_for("curability.curability_prep")
         )
@@ -73,10 +81,17 @@ def curability_remove_7d(curability_preparation_id):
 @login_required
 def curability_test():
     if request.method == "POST":
-        service.submit_test_result(
-            request.form,
-            operator_id=session["user_id"]
-        )
+        try:
+            service.submit_test_result(
+                request.form,
+                operator_id=session["user_id"]
+            )
+
+            flash("Resultaten met succes opgeslagen!", "success")
+
+        except ValueError as e:
+            flash(str(e), "error")
+
         return redirect(
             url_for("curability.curability_test")
         )
