@@ -5,7 +5,8 @@ from flask import(
     request,
     url_for,
     session,
-    jsonify
+    jsonify,
+    flash
 )
 
 from helper import login_required
@@ -25,25 +26,22 @@ service = SamplesService(repository)
 @login_required
 def sample():
 
-    error = None
-
     if request.method == "POST":
-        error = service.register_sample(
-            request.form
-        )
 
-        if error is None:
-            return redirect(
-                url_for(".sample")
-            )
+        error = service.register_sample(request.form)
+        if error:
+            flash(error, "error")
+
+        else:
+            flash("Batch met succes aangemaakt!", "success")
+            return redirect(url_for(".sample"))
 
     products, samples = service.get_overview()
 
     return render_template(
         "sample.html",
         products=products,
-        samples=samples,
-        error=error
+        samples=samples
     )
 
 @sample_bp.route("/sample/append_remark", methods=["POST"])
