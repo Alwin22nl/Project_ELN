@@ -1,4 +1,5 @@
 from database import get_connection, get_dict_cursor
+from psycopg2.errors import UniqueViolation
 
 class SkinformationRepository:
     def add_results(self, results):
@@ -40,6 +41,10 @@ class SkinformationRepository:
                 )
 
                 connection.commit()
+
+        except UniqueViolation:
+            connection.rollback()
+            raise ValueError("Batch is meerdere keren ingevoerd")
 
         except Exception: 
             connection.rollback()

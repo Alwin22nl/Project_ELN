@@ -1,5 +1,6 @@
 from models.curability import CurabilityPrep, CurabilityTest
 from database import get_connection, get_dict_cursor
+from psycopg2.errors import UniqueViolation
 
 class CurabilityRepository:
     def add_curability_prep(self, result: CurabilityPrep):
@@ -77,6 +78,10 @@ class CurabilityRepository:
 
             connection.commit()
 
+        except UniqueViolation:
+            connection.rollback()
+            raise ValueError("Batch is meerdere keren ingevoerd!")
+        
         except Exception:
             connection.rollback()
             raise

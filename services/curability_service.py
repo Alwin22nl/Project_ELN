@@ -47,7 +47,6 @@ class CurabilityService:
         rh_day7s = form.getlist("rh_day7[]")
 
         results = []
-
         seen_results = set()
 
         for i in range(len(sample_ids)):
