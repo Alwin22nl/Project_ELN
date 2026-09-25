@@ -17,6 +17,7 @@ class SkinformationService:
             tack_rhs = form.getlist("rh_tack_free_time[]")
 
             results = []
+            seen_results = set()
 
             for i in range(len(sample_ids)):
                 if sample_ids[i] == "":
@@ -30,6 +31,10 @@ class SkinformationService:
 
                     if value != "":
                         afterstorage_id = value
+
+                result_key = (sample_id, afterstorage_id)
+                if result_key in seen_results:
+                    raise ValueError("Dezelfde batch is meerdere keren geselecteerd")
 
                 if self.repository.skinformation_exists(sample_id, afterstorage_id):
                     raise ValueError("Resultaten voor (1 of meerdere ) batch bestaan al!")

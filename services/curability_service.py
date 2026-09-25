@@ -48,6 +48,8 @@ class CurabilityService:
 
         results = []
 
+        seen_results = set()
+
         for i in range(len(sample_ids)):
             if sample_ids[i] == "":
                 continue
@@ -60,6 +62,10 @@ class CurabilityService:
 
                 if value != "":
                     afterstorage_id = value
+
+            result_key = (sample_id, afterstorage_id)
+            if result_key in seen_results:
+                raise ValueError("Dezelfde batch is meerdere keren geselecteerd!")
 
             if self.repository.curability_exists(sample_id, afterstorage_id):
                 raise ValueError("Resultaten voor (1 of meerdere) batch bestaat al!")
