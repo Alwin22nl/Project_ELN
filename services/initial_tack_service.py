@@ -5,6 +5,11 @@ class InitialTackService:
         self.repository = repository
 
     def submit_result(self, form, operator_id):
+        sample_id = int(form["sample_id"])
+
+        if self.repository.initial_tack_exists(sample_id):
+            raise ValueError("Initial Tack bestaat al voor deze batch!")
+
         result = InitialTackResult(
             sample_id=form["sample_id"],
             operator_id=operator_id,
