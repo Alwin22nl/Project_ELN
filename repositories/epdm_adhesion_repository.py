@@ -248,3 +248,46 @@ class EpdmAdhesionRepository:
         finally:
             cursor.close()
             connection.close()
+
+    def epdm_adhesion_prep_exists(self, sample_id):
+        connection = get_connection()
+        cursor = get_dict_cursor(connection)
+
+        try:
+            cursor.execute(
+                """
+                SELECT 1
+                FROM epdm_adhesion_preparation
+                WHERE sample_id = %s
+                LIMIT 1
+                """,
+                (sample_id,)
+            )
+
+            return cursor.fetchone() is not None
+
+        finally:
+            cursor.close()
+            connection.close()
+
+    def epdm_adhesion_exists(self, sample_id):
+        connection = get_connection()
+        cursor = get_dict_cursor(connection)
+
+        try:
+            cursor.execute(
+                """
+                SELECT 1
+                FROM epdm_adhesion
+                WHERE sample_id = %s
+                LIMIT 1
+                """,
+                (sample_id,)
+            )
+
+            return cursor.fetchone() is not None
+
+        finally:
+            cursor.close()
+            connection.close()
+            

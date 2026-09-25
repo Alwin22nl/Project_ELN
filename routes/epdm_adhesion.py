@@ -4,7 +4,8 @@ from flask import(
     render_template,
     request,
     url_for,
-    session
+    session,
+    flash
 )
 
 from datetime import date
@@ -32,10 +33,16 @@ def epdm_adhesion():
 @login_required
 def epdm_adhesion_prep():
     if request.method == "POST":
-        service.submit_prep_result(
-            request.form,
-            operator_id=session["user_id"]
-        )
+        try:
+            service.submit_prep_result(
+                request.form,
+                operator_id=session["user_id"]
+            )
+            flash("Batch met succes geregistreerd!", "success") 
+
+        except ValueError as e:
+            flash(str(e), "error")
+
         return redirect(
             url_for("epdm_adhesion.epdm_adhesion_prep")
         )
@@ -52,11 +59,16 @@ def epdm_adhesion_prep():
 @login_required
 def epdm_adhesion_test():
     if request.method == "POST":
-        service.submit_test_result(
-            request.form,
-            operator_id=session["user_id"]
-        )
+        try:
+            service.submit_test_result(
+                request.form,
+                operator_id=session["user_id"]
+            )
+            flash("Resultaat met succes geregistreerd!", "success")
 
+        except ValueError as e:
+            flash(str(e), "error")
+        
         return redirect(
             url_for("epdm_adhesion.epdm_adhesion_test")
         )
