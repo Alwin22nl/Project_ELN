@@ -4,7 +4,8 @@ from flask import(
     render_template,
     request,
     url_for,
-    session
+    session,
+    flash
 )
 
 from datetime import date
@@ -32,10 +33,17 @@ def adhesion():
 @login_required
 def adhesion_prep():
     if request.method == "POST":
-        service.submit_prep_result(
-            request.form,
-            operator_id=session["user_id"]
-        )
+        try:
+            service.submit_prep_result(
+                request.form,
+                operator_id=session["user_id"]
+            )
+
+            flash("Batch met succes geregistreed!", "success")
+
+        except ValueError as e:
+            flash(str(e), "error")
+              
         return redirect(
             url_for("adhesion.adhesion_prep")
         )
@@ -52,10 +60,15 @@ def adhesion_prep():
 @login_required
 def adhesion_test():
     if request.method == "POST":
-        service.submit_test_result(
-            request.form,
-            operator_id=session["user_id"]
-        )
+        try:
+            service.submit_test_result(
+                request.form,
+                operator_id=session["user_id"]
+            )
+            flash("Resultaat met succes opgeslagen!")
+
+        except ValueError as e:
+            flash(str(e), "error")
 
         return redirect(
             url_for("adhesion.adhesion_test")
