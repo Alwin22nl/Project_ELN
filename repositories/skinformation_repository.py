@@ -40,7 +40,7 @@ class SkinformationRepository:
                     ),
                 )
 
-                connection.commit()
+            connection.commit()
 
         except UniqueViolation:
             connection.rollback()

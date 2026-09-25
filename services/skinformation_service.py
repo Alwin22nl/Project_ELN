@@ -36,6 +36,8 @@ class SkinformationService:
                 if result_key in seen_results:
                     raise ValueError("Dezelfde batch is meerdere keren geselecteerd")
 
+                seen_results.add(result_key)
+
                 if self.repository.skinformation_exists(sample_id, afterstorage_id):
                     raise ValueError("Resultaten voor (1 of meerdere ) batch bestaan al!")
 
