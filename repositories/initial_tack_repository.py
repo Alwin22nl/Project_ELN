@@ -133,7 +133,7 @@ class InitialTackRepository:
             cursor.close()
             connection.close()
 
-    def initial_tack_exists(sample_id):
+    def initial_tack_exists(self, sample_id):
         connection = get_connection()
         cursor = get_dict_cursor(connection)
 
