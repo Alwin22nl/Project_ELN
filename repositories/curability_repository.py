@@ -180,9 +180,10 @@ class CurabilityRepository:
                 ON curability_prep.afterstorage_id = after_storage.afterstorage_id
                 WHERE after_storage.removed_from_oven IS NOT NULL
                 AND curability_prep.afterstorage_id IS NULL
+                AND samples.product_id = %s
                 ORDER BY sample_id
                 """,
-                (product_id,)
+                (product_id, product_id)
             )
 
             return cursor.fetchall()
