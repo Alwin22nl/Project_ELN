@@ -23,7 +23,7 @@
                 <a href="{{ url_for('sample.sample') }}">Batches</a>
                 <a href="{{ url_for('tests.tests')}}">Testen</a>
                 <a href="{{ url_for('product.products')}}">Producten</a>
-                <a href="{{ url_for('change_request')}}"
+                <a href="{{ url_for('change_request.create_request')}}">Veranderingen</a>
                 {% endif %}
                 {% if session.role in ["R&D", "QC", "admin", "MANAGEMENT"]%}
                 <a href="{{ url_for('overview.overview_page') }}">Resultaten</a>

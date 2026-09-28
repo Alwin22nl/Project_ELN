@@ -1,5 +1,6 @@
 from models.change_request import ChangeRequest
 from database import get_connection, get_dict_cursor
+from psycopg2 import sql
 
 class ChangeRequestRepository:
     def create_request(self, change_request):
@@ -9,7 +10,7 @@ class ChangeRequestRepository:
         try:
             cursor.execute(
                 """
-                INSERT INTO change_request
+                INSERT INTO change_requests
                 (
                     requested_by,
                     table_name,
@@ -42,3 +43,166 @@ class ChangeRequestRepository:
         finally:
             cursor.close()
             connection.close()
+
+    def get_products(self):
+        connection = get_connection()
+        cursor = get_dict_cursor(connection)
+
+        try:
+            cursor.execute(
+                """
+                SELECT
+                    product_id,
+                    product_name
+                FROM products
+                ORDER BY product_name
+                """
+            )
+
+            return cursor.fetchall()
+
+        finally:
+            cursor.close()
+            connection.close()
+
+    def get_batches(self, product_id):
+        connection = get_connection()
+        cursor = get_dict_cursor(connection)
+
+        try:
+            cursor.execute(
+                """
+                SELECT
+                    sample_id,
+                    batch_nr
+                FROM samples
+                WHERE product_id = %s
+                ORDER BY sample_id DESC
+                """,
+                (product_id,)
+            )
+
+            return cursor.fetchall()
+
+        finally:
+            cursor.close()
+            connection.close()
+
+    def get_test_records(
+        self,
+        table_name,
+        id_column,
+        sample_id
+    ):
+        connection = get_connection()
+        cursor = get_dict_cursor(connection)
+
+        try:
+            query = sql.SQL(
+                """
+                SELECT
+                    {id_column} AS record_id,
+                    afterstorage_id
+                FROM {table_name}
+                WHERE sample_id = %s
+                ORDER BY {id_column}
+                """
+            ).format(
+                id_column=sql.Identifier(id_column),
+                table_name=sql.Identifier(table_name)
+            )
+
+            cursor.execute(
+                query,
+                (sample_id,)
+            )
+
+            return cursor.fetchall()
+
+        finally:
+            cursor.close()
+            connection.close()
+
+    def get_test_fields(
+        self,
+        table_name,
+        id_column,
+        record_id,
+        field_names
+    ):
+        connection = get_connection()
+        cursor = get_dict_cursor(connection)
+
+        try:
+            columns = sql.SQL(", ").join(
+                sql.Identifier(field)
+                for field in field_names
+            )
+
+            query = sql.SQL(
+                """
+                SELECT {columns}
+                FROM {table_name}
+                WHERE {id_column} = %s
+                """
+            ).format(
+                columns=columns,
+                table_name=sql.Identifier(table_name),
+                id_column=sql.Identifier(id_column)
+            )
+
+            cursor.execute(
+                query,
+                (record_id,)
+            )
+
+            return cursor.fetchone()
+
+        finally:
+            cursor.close()
+            connection.close()
+
+    def get_current_value(
+        self,
+        table_name,
+        id_column,
+        record_id,
+        sample_id,
+        field_name
+    ):
+        connection = get_connection()
+        cursor = get_dict_cursor(connection)
+
+        try:
+            query = sql.SQL(
+                """
+                SELECT {field_name} AS current_value
+                FROM {table_name}
+                WHERE {id_column} = %s
+                AND sample_id = %s
+                """
+            ).format(
+                field_name=sql.Identifier(field_name),
+                table_name=sql.Identifier(table_name),
+                id_column=sql.Identifier(id_column)
+            )
+
+            cursor.execute(
+                query,
+                (
+                    record_id,
+                    sample_id
+                )
+            )
+
+            result = cursor.fetchone()
+
+            if result is None:
+                return None
+
+            return result["current_value"]
+
+        finally:
+            cursor.close()
+            connection.close()
+        

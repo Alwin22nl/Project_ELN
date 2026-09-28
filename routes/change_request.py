@@ -5,7 +5,8 @@ from flask import(
     request,
     url_for,
     session,
-    flash
+    flash,
+    jsonify
 )
 
 from datetime import date
@@ -25,19 +26,18 @@ service = ChangeRequestService(repository)
 @change_request_bp.route("/change_request/create", methods=["GET", "POST"])
 @login_required
 def create_request():
+
     if request.method == "POST":
         try:
             service.create_request(
-                requested_by=session["user_id"],
-                table_name=request.form["table_name"],
-                record_id=int(request.form["record_id"]),
-                field_name=request.form["field_name"],
-                old_value=request.form["old_value"],
-                new_value=request.form["new_value"],
-                reason=request.form["reason"]
+                request.form,
+                requested_by=session["user_id"]
             )
 
-            flash("wijzigingsaanvraag is ingediend!", "success")
+            flash(
+                "Wijzigingsaanvraag is ingediend!",
+                "success"
+            )
 
             return redirect(
                 url_for(".create_request")
@@ -46,6 +46,34 @@ def create_request():
         except ValueError as e:
             flash(str(e), "error")
 
+    products = service.get_products()
+
     return render_template(
-        "change_requests/create/html"
+        "change_request/create.html",
+        products=products
     )
+
+@change_request_bp.route("/change_request/batches")
+@login_required
+def get_batches():
+    product_id = request.args.get("product_id", type=int)
+    batches = service.get_batches(product_id)
+
+    return jsonify(batches)
+
+@change_request_bp.route("/change_request/tests")
+@login_required
+def get_tests():
+    sample_id = request.args.get("sample_id", type=int)
+    tests = service.get_available_tests(sample_id)
+
+    return jsonify(tests)
+
+@change_request_bp.route("/change_request/fields")
+@login_required
+def get_fields():
+    test_key = request.args.get("test_key")
+    record_id = request.args.get("record_id", type=int) 
+
+    fields = service.get_changeable_fields(test_key, record_id)
+    return jsonify(fields)
