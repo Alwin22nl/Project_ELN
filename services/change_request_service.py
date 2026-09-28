@@ -32,29 +32,41 @@ TEST_CONFIG = {
         }
     },
     "skinformation" : {
-        "label": "Skinformation",
+        "label": "Huidvorming",
         "table": "skinformation",
         "id_column": "skinformation_id",
         "fields": {
-            "skinformation_time": "Skinformation time",
-            "temp_skinformation_time": "Temp skinformation",
-            "rh_skinformation_time": "%RH skinformation",
-            "tack_free_time": "Tack Free Time",
+            "skinformation_time": "Huidvorming tijd",
+            "temp_skinformation_time": "Temp Huidvorming",
+            "rh_skinformation_time": "%RH Huidvorming",
+            "tack_free_time": "Tack Free Tijd",
             "temp_tack_free_time": "Temp Tack Free",
             "rh_tack_free_time": "%RH Tack Free"
         }
     },
     "curability" : {
-        "label": "curability",
+        "label": "Uitharding",
         "table": "curability",
         "id_column": "cureability_id",
         "fields": {
-            "day_1": "1 Day",
-            "temp_day1": "Temp day 1",
-            "rh_day1": "%RH day 1",
-            "day_7": "7 Days",
-            "temp_day7": "Temp 7 days",
-            "rh_day7": "%RH 7 days"
+            "day_1": "1 Dag",
+            "temp_day1": "Temp 1 dag",
+            "rh_day1": "%RH 1 dag",
+            "day_7": "7 Dagen",
+            "temp_day7": "Temp 7 dagen",
+            "rh_day7": "%RH 7 dagen"
+        }
+    },
+    "shore_a": {
+        "label": "Shore A",
+        "table": "shore_a",
+        "id_column": "shore_a_id",
+        "fields": {
+            "shore_a_1": "Shore A 1",
+            "shore_a_2": "Shore A 2",
+            "shore_a_3": "Shore A 3",
+            "temperature": "Temperatuur",
+            "humidity": "Luchtvochtigheid"
         }
     }
 }
