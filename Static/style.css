@@ -649,3 +649,52 @@ body {
         opacity: 0;
     }
 }
+
+/* change request pages */
+
+.change-request-container {
+    max-width: 700px;
+    margin: 40px auto;
+}
+
+.change-request-container h1 {
+    margin-bottom: 10px;
+}
+
+.change-request-container p {
+    margin-bottom: 30px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    font-weight: 600;
+    margin-bottom: 6px;
+}
+
+.form-group input,
+.form-group textarea {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+.form-group textarea {
+    resize: vertical;
+}
+
+.form-actions {
+    margin-top: 25px;
+}
+
+.form-actions button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
