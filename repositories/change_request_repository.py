@@ -225,7 +225,7 @@ class ChangeRequestRepository:
                     requested_at,
                     reviewed_at,
                     review_comment
-                FROM change_request
+                FROM change_requests
                 WHERE requested_by = %s
                 ORDER BY requested_at DESC, change_request_id DESC
                 """,

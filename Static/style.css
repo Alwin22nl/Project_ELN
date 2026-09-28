@@ -650,89 +650,113 @@ body {
     }
 }
 
-/* change request pages */
+/* =========================
+   CHANGE REQUEST PAGES
+   ========================= */
 
 .change-request-container {
-    max-width: 700px;
-    margin: 40px auto;
+    width: 100%;
+    max-width: none;
+    margin: 30px 0;
+    box-sizing: border-box;
 }
 
 .change-request-container h1 {
-    margin-bottom: 10px;
+    margin: 0;
 }
 
 .change-request-container p {
     margin-bottom: 30px;
 }
 
-.form-group {
-    display: flex;
-    flex-direction: column;
-    margin-bottom: 20px;
-}
 
-.form-group label {
-    font-weight: 600;
-    margin-bottom: 6px;
-}
-
-.form-group input,
-.form-group textarea {
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    font-size: 14px;
-}
-
-.form-group textarea {
-    resize: vertical;
-}
-
-.form-actions {
-    margin-top: 25px;
-}
-
-.form-actions button {
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-}
-
+/* Page header */
 .page-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 20px;
     margin-bottom: 25px;
 }
 
+
+/* My requests table */
 .request-table-wrapper {
+    width: 100%;
     overflow-x: auto;
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
 }
 
 .request-table {
     width: 100%;
+    min-width: 900px;
     border-collapse: collapse;
 }
 
 .request-table th,
 .request-table td {
-    padding: 12px 15px;
+    padding: 12px 16px;
     text-align: left;
-    border-bottom: 1px solid #ddd;
+    border-bottom: 1px solid #e5e7eb;
+    vertical-align: middle;
 }
 
 .request-table th {
+    background-color: #f3f4f6;
     font-weight: 600;
+    white-space: nowrap;
 }
+
+.request-table tbody tr:hover {
+    background-color: #f9fafb;
+}
+
+/* Give sensible space to the columns */
+.request-table th:nth-child(1),
+.request-table td:nth-child(1) {
+    width: 15%;
+    white-space: nowrap;
+}
+
+.request-table th:nth-child(2),
+.request-table td:nth-child(2) {
+    width: 14%;
+}
+
+.request-table th:nth-child(3),
+.request-table td:nth-child(3) {
+    width: 18%;
+}
+
+.request-table th:nth-child(4),
+.request-table td:nth-child(4) {
+    width: 18%;
+}
+
+.request-table th:nth-child(5),
+.request-table td:nth-child(5) {
+    width: 25%;
+}
+
+.request-table th:nth-child(6),
+.request-table td:nth-child(6) {
+    width: 10%;
+    white-space: nowrap;
+}
+
 
 .old-value {
     text-decoration: line-through;
+    color: #6b7280;
 }
 
 .new-value {
     font-weight: 600;
 }
+
 
 .status {
     display: inline-block;
@@ -757,55 +781,77 @@ body {
     color: #721c24;
 }
 
+
+/* Link/button at top of page */
 .button-link {
     display: inline-block;
-    padding: 10px 16px;
+    padding: 9px 14px;
+    background-color: #1f2937;
+    color: white;
     text-decoration: none;
-    border-radius: 5px;
+    border-radius: 6px;
+    white-space: nowrap;
 }
 
-.empty-state {
-    padding: 30px;
-    text-align: center;
+.button-link:hover {
+    background-color: #374151;
 }
 
-.empty-state p {
-    margin-bottom: 20px;
-}
+
+/* =========================
+   SIDEBAR DROPDOWN
+   ========================= */
+
 .nav-dropdown {
     position: relative;
-    display: inline-block;
+    width: 100%;
 }
 
+
+/* Make it look exactly like the other sidebar links */
 .nav-dropdown-button {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
     background: none;
     border: none;
+    color: white;
     font: inherit;
+    text-align: left;
+    padding: 12px;
+    margin: 0 0 5px 0;
+    border-radius: 5px;
     cursor: pointer;
-    padding: 10px 15px;
+}
+
+.nav-dropdown-button:hover {
+    background-color: #374151;
 }
 
 .nav-dropdown-arrow {
-    margin-left: 5px;
+    margin-left: 8px;
     font-size: 10px;
+    color: white;
+    display: inline-block;
+    transition: transform 0.2s ease;
 }
 
+.nav-dropdown-button.open .nav-dropdown-arrow {
+    transform: rotate(180deg);
+}
+
+/* Dropdown itself */
 .nav-dropdown-menu {
     display: none;
-
-    position: absolute;
-    top: 100%;
-    left: 0;
-
-    min-width: 220px;
-
-    background-color: white;
-
-    border: 1px solid #ddd;
+    width: max-content;
+    min-width: 100%;
+    box-sizing: border-box;
+    background-color: #111827;
     border-radius: 5px;
-
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
-
+    margin-bottom: 5px;
+    overflow: visible;
+    position: relative;
     z-index: 1000;
 }
 
@@ -815,15 +861,15 @@ body {
 
 .nav-dropdown-menu a {
     display: block;
-
-    padding: 10px 15px;
-
+    color: #e5e7eb;
     text-decoration: none;
-    color: inherit;
-
+    padding: 10px 16px;
+    margin: 0;
+    border-radius: 0;
     white-space: nowrap;
 }
 
 .nav-dropdown-menu a:hover {
-    background-color: #f2f2f2;
+    background-color: #374151;
+    color: white;
 }
