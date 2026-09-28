@@ -77,37 +77,38 @@
                             <!-- STATUS -->
                             <td>
 
-                                {% if change.status == "pending" %}
-
-                                    <span class="status status-pending">
-                                        In afwachting
-                                    </span>
-
-                                {% elif change.status == "approved" %}
-
-                                    <span class="status status-approved">
-                                        Goedgekeurd
-                                    </span>
-
-                                {% elif change.status == "rejected" %}
-
-                                    <span class="status status-rejected">
-                                        Afgewezen
-                                    </span>
-
-                                {% else %}
-
-                                    <span class="status">
-                                        {{ change.status }}
-                                    </span>
-
+                            {% if change.status == "pending" %}
+                                <span class="status status-pending">
+                                    In afwachting
+                                </span>
+                            {% elif change.status == "approved" %}
+                                <span class="status status-approved">
+                                    Goedgekeurd
+                                </span>
+                            {% elif change.status == "rejected" %}
+                                <span class="status status-rejected">
+                                    Afgewezen
+                                </span>
+                                {% if change.review_comment %}
+                                    <div class="review-comment-display">
+                                        <strong>Reden:</strong>
+                                        {{ change.review_comment }}
+                                    </div>
                                 {% endif %}
+                            {% else %}
+                                <span class="status">
+                                    {{ change.status }}
+                                </span>
+                            {% endif %}
                             </td>
                         </tr>
                     {% endfor %}
                 </tbody>
             </table>
         </div>
+        <td>
+
+</td>
 
     {% else %}
         <div class="empty-state">

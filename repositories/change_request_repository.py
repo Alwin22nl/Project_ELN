@@ -256,7 +256,7 @@ class ChangeRequestRepository:
                     reason,
                     status,
                     requested_at
-                FROM change_request
+                FROM change_requests
                 WHERE status = 'pending'
                 AND requested_by <> %s
                 ORDER BY requested_at ASC
@@ -283,7 +283,7 @@ class ChangeRequestRepository:
         try:
             cursor.execute(
                 """
-                UPDATE change_request
+                UPDATE change_requests
                 SET
                     status = %s,
                     reviewed_by = %s,

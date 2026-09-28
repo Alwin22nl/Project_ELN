@@ -924,3 +924,11 @@ body {
 .reject-button:hover {
     background-color: #f5c6cb;
 }
+
+.review-comment-display {
+    margin-top: 6px;
+    font-size: 13px;
+    color: #721c24;
+    max-width: 250px;
+    white-space: normal;
+}

@@ -103,3 +103,62 @@ def approvals():
         "change_request/approvals.html",
         pending_requests=pending_requests
     )
+
+@change_request_bp.route(
+    "/change_request/<int:change_request_id>/approve",
+    methods=["POST"]
+)
+@login_required
+def approve_request(change_request_id):
+
+    try:
+        service.approve_request(
+            change_request_id=change_request_id,
+            reviewer_id=session["user_id"],
+            review_comment=request.form.get(
+                "review_comment",
+                ""
+            )
+        )
+
+        flash(
+            "Wijzigingsaanvraag is goedgekeurd!",
+            "success"
+        )
+
+    except ValueError as e:
+        flash(str(e), "error")
+
+    return redirect(
+        url_for(".approvals")
+    )
+
+
+@change_request_bp.route(
+    "/change_request/<int:change_request_id>/reject",
+    methods=["POST"]
+)
+@login_required
+def reject_request(change_request_id):
+
+    try:
+        service.reject_request(
+            change_request_id=change_request_id,
+            reviewer_id=session["user_id"],
+            review_comment=request.form.get(
+                "review_comment",
+                ""
+            )
+        )
+
+        flash(
+            "Wijzigingsaanvraag is afgewezen.",
+            "success"
+        )
+
+    except ValueError as e:
+        flash(str(e), "error")
+
+    return redirect(
+        url_for(".approvals")
+    )
