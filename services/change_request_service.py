@@ -28,8 +28,33 @@ TEST_CONFIG = {
             "vis_at_1": "Viscositeit @ 1",
             "vis_at_5": "Viscositeit @ 5",
             "vis_at_10": "Viscositeit @ 10",
-            "humidity": "Luchtvochtigheid",
-            "remark": "Opmerking"
+            "humidity": "Luchtvochtigheid"
+        }
+    },
+    "skinformation" : {
+        "label": "Skinformation",
+        "table": "skinformation",
+        "id_column": "skinformation_id",
+        "fields": {
+            "skinformation_time": "Skinformation time",
+            "temp_skinformation_time": "Temp skinformation",
+            "rh_skinformation_time": "%RH skinformation",
+            "tack_free_time": "Tack Free Time",
+            "temp_tack_free_time": "Temp Tack Free",
+            "rh_tack_free_time": "%RH Tack Free"
+        }
+    },
+    "curability" : {
+        "label": "curability",
+        "table": "curability",
+        "id_column": "cureability_id",
+        "fields": {
+            "day_1": "1 Day",
+            "temp_day1": "Temp day 1",
+            "rh_day1": "%RH day 1",
+            "day_7": "7 Days",
+            "temp_day7": "Temp 7 days",
+            "rh_day7": "%RH 7 days"
         }
     }
 }
@@ -297,8 +322,6 @@ class ChangeRequestService:
                 "Je kunt je eigen wijzigingsaanvraag niet goedkeuren."
             )
 
-
-        # Find matching safe configuration
         config = None
 
         for test_key, test_config in TEST_CONFIG.items():
@@ -311,13 +334,10 @@ class ChangeRequestService:
                 "Deze test mag niet automatisch worden gewijzigd."
             )
 
-
-        # Check that requested field is explicitly allowed
         if change["field_name"] not in config["fields"]:
             raise ValueError(
                 "Dit veld mag niet worden gewijzigd."
             )
-
 
         self.repository.approve_and_apply_change(
             change_request_id=change_request_id,
