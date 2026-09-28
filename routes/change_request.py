@@ -90,3 +90,16 @@ def my_requests():
         "change_request/my_requests.html",
         change_requests=change_requests
     )
+
+@change_request_bp.route("/change_request/approvals")
+@login_required
+def approvals():
+
+    pending_requests = service.get_pending_requests(
+        session["user_id"]
+    )
+
+    return render_template(
+        "change_request/approvals.html",
+        pending_requests=pending_requests
+    )

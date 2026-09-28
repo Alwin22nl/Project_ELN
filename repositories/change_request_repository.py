@@ -237,4 +237,86 @@ class ChangeRequestRepository:
         finally:
             cursor.close()
             connection.close()
-            
+
+    def get_pending_requests(self, reviewer_id):
+        connection = get_connection()
+        cursor = get_dict_cursor(connection)
+
+        try:
+            cursor.execute(
+                """
+                SELECT
+                    change_request_id,
+                    requested_by,
+                    table_name,
+                    record_id,
+                    field_name,
+                    old_value,
+                    new_value,
+                    reason,
+                    status,
+                    requested_at
+                FROM change_request
+                WHERE status = 'pending'
+                AND requested_by <> %s
+                ORDER BY requested_at ASC
+                """,
+                (reviewer_id,)
+            )
+
+            return cursor.fetchall()
+
+        finally:
+            cursor.close()
+            connection.close()
+
+    def review_request(
+        self,
+        change_request_id,
+        status,
+        reviewed_by,
+        review_comment
+    ):
+        connection = get_connection()
+        cursor = connection.cursor()
+
+        try:
+            cursor.execute(
+                """
+                UPDATE change_request
+                SET
+                    status = %s,
+                    reviewed_by = %s,
+                    reviewed_at = CURRENT_TIMESTAMP,
+                    review_comment = %s
+                WHERE change_request_id = %s
+                AND status = 'pending'
+                AND requested_by <> %s
+                RETURNING change_request_id
+                """,
+                (
+                    status,
+                    reviewed_by,
+                    review_comment,
+                    change_request_id,
+                    reviewed_by
+                )
+            )
+
+            updated = cursor.fetchone()
+
+            if updated is None:
+                connection.rollback()
+                return False
+
+            connection.commit()
+
+            return True
+
+        except Exception:
+            connection.rollback()
+            raise
+
+        finally:
+            cursor.close()
+            connection.close()

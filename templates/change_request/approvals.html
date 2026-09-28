@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="change-request-container">
+
+    <div class="page-header">
+        <h1>Openstaande goedkeuringen</h1>
+    </div>
+
+    {% if pending_requests %}
+        <div class="request-table-wrapper">
+            <table class="request-table approval-table">
+                <thead>
+                    <tr>
+                        <th>Datum</th>
+                        <th>Aangevraagd door</th>
+                        <th>Test</th>
+                        <th>Veld</th>
+                        <th>Wijziging</th>
+                        <th>Reden</th>
+                        <th>Actie</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for change in pending_requests %}
+
+                        <tr>
+                            <td>
+                                {{ change.requested_at.strftime("%d-%m-%Y %H:%M") }}
+                            </td>
+                            <td>
+                                {{ change.requested_by }}
+                            </td>
+                            <td>
+                                {{ change.test_label }}
+                            </td>
+                            <td>
+                                {{ change.field_label }}
+                            </td>
+                            <td>
+                                <span class="old-value">
+                                    {{ change.old_value }}
+                                </span>
+                                →
+                                <span class="new-value">
+                                    {{ change.new_value }}
+                                </span>
+                            </td>
+                            <td>
+                                {{ change.reason }}
+                            </td>
+                            <td class="approval-actions">
+
+                                <!-- APPROVE -->
+                                <form
+                                    method="POST"
+                                    action="{{ url_for(
+                                        'change_request.approve_request',
+                                        change_request_id=change.change_request_id
+                                    ) }}"
+                                >
+                                    <input
+                                        type="text"
+                                        name="review_comment"
+                                        placeholder="Opmerking (optioneel)"
+                                        class="review-comment"
+                                    >
+
+                                    <button
+                                        type="submit"
+                                        class="approve-button"
+                                    >
+                                        Goedkeuren
+                                    </button>
+
+                                </form>
+
+                                <!-- REJECT -->
+                                <form
+                                    method="POST"
+                                    action="{{ url_for(
+                                        'change_request.reject_request',
+                                        change_request_id=change.change_request_id
+                                    ) }}"
+                                >
+
+                                    <input
+                                        type="text"
+                                        name="review_comment"
+                                        placeholder="Reden voor afwijzing"
+                                        class="review-comment"
+                                        required
+                                    >
+
+                                    <button
+                                        type="submit"
+                                        class="reject-button"
+                                    >
+                                        Afwijzen
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+    {% else %}
+        <div class="empty-state">
+            <p>
+                Er zijn geen wijzigingsaanvragen die op jouw beoordeling wachten.
+            </p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

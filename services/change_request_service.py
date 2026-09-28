@@ -202,3 +202,72 @@ class ChangeRequestService:
 
             requests.append(item)
         return requests
+
+    def get_pending_requests(self, reviewer_id):
+        rows = self.repository.get_pending_requests(
+            reviewer_id
+        )
+
+        requests = []
+
+        for row in rows:
+            item = dict(row)
+            item["test_label"] = item["table_name"]
+            item["field_label"] = item["field_name"]
+            for test_key, config in TEST_CONFIG.items():
+                if config["table"] == item["table_name"]:
+                    item["test_label"] = config["label"]
+                    item["field_label"] = config["fields"].get(
+                        item["field_name"],
+                        item["field_name"]
+                    )
+
+                    break
+
+            requests.append(item)
+        return requests
+
+    def approve_request(
+        self,
+        change_request_id,
+        reviewer_id,
+        review_comment=""
+    ):
+
+        success = self.repository.review_request(
+            change_request_id=change_request_id,
+            status="approved",
+            reviewed_by=reviewer_id,
+            review_comment=review_comment
+        )
+
+        if not success:
+            raise ValueError(
+                "Deze aanvraag kan niet worden goedgekeurd. "
+                "Mogelijk is deze al behandeld of is het je eigen aanvraag."
+            )
+        
+    def reject_request(
+        self,
+        change_request_id,
+        reviewer_id,
+        review_comment
+    ):
+
+        if not review_comment.strip():
+            raise ValueError(
+                "Geef een reden voor het afwijzen van de aanvraag."
+            )
+
+        success = self.repository.review_request(
+            change_request_id=change_request_id,
+            status="rejected",
+            reviewed_by=reviewer_id,
+            review_comment=review_comment.strip()
+        )
+
+        if not success:
+            raise ValueError(
+                "Deze aanvraag kan niet worden afgewezen. "
+                "Mogelijk is deze al behandeld of is het je eigen aanvraag."
+            )
