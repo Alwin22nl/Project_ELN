@@ -23,7 +23,27 @@
                 <a href="{{ url_for('sample.sample') }}">Batches</a>
                 <a href="{{ url_for('tests.tests')}}">Testen</a>
                 <a href="{{ url_for('product.products')}}">Producten</a>
-                <a href="{{ url_for('change_request.create_request')}}">Veranderingen</a>
+                <div class="nav-dropdown">
+                    <button
+                        type="button"
+                        class="nav-dropdown-button"
+                        id="changeRequestMenuButton"
+                    >
+                        Wijzigingen
+                        <span class="nav-dropdown-arrow">▼</span>
+                    </button>
+                    <div
+                        class="nav-dropdown-menu"
+                        id="changeRequestMenu"
+                    >
+                        <a href="{{ url_for('change_request.create_request') }}">
+                            Wijziging aanvragen
+                        </a>
+                        <a href="{{ url_for('change_request.my_requests') }}">
+                            Mijn wijzigingsaanvragen
+                        </a>
+                    </div>
+                </div>
                 {% endif %}
                 {% if session.role in ["R&D", "QC", "admin", "MANAGEMENT"]%}
                 <a href="{{ url_for('overview.overview_page') }}">Resultaten</a>
@@ -101,5 +121,24 @@
                 message.remove();
             }, 5500);
         });
+    });
+
+    const changeRequestMenuButton =
+        document.getElementById("changeRequestMenuButton");
+
+    const changeRequestMenu =
+        document.getElementById("changeRequestMenu");
+
+    changeRequestMenuButton.addEventListener("click", function (event) {
+        event.stopPropagation();
+        changeRequestMenu.classList.toggle("show");
+    });
+
+    document.addEventListener("click", function () {
+        changeRequestMenu.classList.remove("show");
+    });
+
+    changeRequestMenu.addEventListener("click", function (event) {
+        event.stopPropagation();
     });
 </script>

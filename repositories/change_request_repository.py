@@ -205,4 +205,36 @@ class ChangeRequestRepository:
         finally:
             cursor.close()
             connection.close()
-        
+
+    def get_requests_by_user(self, user_id):
+        connection = get_connection()
+        cursor = get_dict_cursor(connection)
+
+        try:
+            cursor.execute(
+                """
+                SELECT
+                    change_request_id,
+                    table_name,
+                    record_id,
+                    field_name,
+                    old_value,
+                    new_value,
+                    reason,
+                    status,
+                    requested_at,
+                    reviewed_at,
+                    review_comment
+                FROM change_request
+                WHERE requested_by = %s
+                ORDER BY requested_at DESC, change_request_id DESC
+                """,
+                (user_id,)
+            )
+
+            return cursor.fetchall()
+
+        finally:
+            cursor.close()
+            connection.close()
+            

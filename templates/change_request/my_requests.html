@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="change-request-container">
+
+    <div class="page-header">
+        <h1>Mijn wijzigingsaanvragen</h1>
+
+        <a
+            href="{{ url_for('change_request.create_request') }}"
+            class="button-link"
+        >
+            Nieuwe wijziging aanvragen
+        </a>
+    </div>
+
+    {% if change_requests %}
+
+        <div class="request-table-wrapper">
+
+            <table class="request-table">
+
+                <thead>
+                    <tr>
+                        <th>Datum</th>
+                        <th>Test</th>
+                        <th>Veld</th>
+                        <th>Wijziging</th>
+                        <th>Reden</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    {% for change in change_requests %}
+
+                        <tr>
+
+                            <!-- DATE -->
+                            <td>
+                                {{ change.requested_at.strftime("%d-%m-%Y %H:%M") }}
+                            </td>
+
+
+                            <!-- TEST -->
+                            <td>
+                                {{ change.test_label }}
+                            </td>
+
+
+                            <!-- FIELD -->
+                            <td>
+                                {{ change.field_label }}
+                            </td>
+
+
+                            <!-- CHANGE -->
+                            <td>
+                                <span class="old-value">
+                                    {{ change.old_value }}
+                                </span>
+
+                                →
+
+                                <span class="new-value">
+                                    {{ change.new_value }}
+                                </span>
+                            </td>
+
+                            <!-- REASON -->
+                            <td>
+                                {{ change.reason }}
+                            </td>
+
+                            <!-- STATUS -->
+                            <td>
+
+                                {% if change.status == "pending" %}
+
+                                    <span class="status status-pending">
+                                        In afwachting
+                                    </span>
+
+                                {% elif change.status == "approved" %}
+
+                                    <span class="status status-approved">
+                                        Goedgekeurd
+                                    </span>
+
+                                {% elif change.status == "rejected" %}
+
+                                    <span class="status status-rejected">
+                                        Afgewezen
+                                    </span>
+
+                                {% else %}
+
+                                    <span class="status">
+                                        {{ change.status }}
+                                    </span>
+
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+    {% else %}
+        <div class="empty-state">
+            <p>
+                Je hebt nog geen wijzigingsaanvragen ingediend.
+            </p>
+            <a
+                href="{{ url_for('change_request.create_request') }}"
+                class="button-link"
+            >
+                Eerste wijziging aanvragen
+            </a>
+        </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}

@@ -180,3 +180,25 @@ class ChangeRequestService:
             )
 
         return value
+
+    def get_requests_by_user(self, user_id):
+        rows = self.repository.get_requests_by_user(user_id)
+
+        requests = []
+
+        for row in rows:
+            item = dict(row)
+            item["test_label"] = item["table_name"]
+            item["field_label"] = item["field_name"]
+
+            for test_key, config in TEST_CONFIG.items():
+                if config["table"] == item["table_name"]:
+                    item["test_label"] = config["label"]
+                    item["field_label"] = config["fields"].get(
+                        item["field_name"],
+                        item["field_name"]
+                    )
+                    break
+
+            requests.append(item)
+        return requests

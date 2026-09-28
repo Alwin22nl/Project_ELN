@@ -77,3 +77,16 @@ def get_fields():
 
     fields = service.get_changeable_fields(test_key, record_id)
     return jsonify(fields)
+
+@change_request_bp.route("/change_request/my_requests")
+@login_required
+def my_requests():
+
+    change_requests = service.get_requests_by_user(
+        session["user_id"]
+    )
+
+    return render_template(
+        "change_request/my_requests.html",
+        change_requests=change_requests
+    )
