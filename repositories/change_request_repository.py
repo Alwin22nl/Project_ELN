@@ -1,6 +1,7 @@
 from models.change_request import ChangeRequest
 from database import get_connection, get_dict_cursor
 from psycopg2 import sql
+from psycopg2.extras import Json
 
 class ChangeRequestRepository:
     def create_request(self, change_request):
@@ -312,6 +313,227 @@ class ChangeRequestRepository:
             connection.commit()
 
             return True
+
+        except Exception:
+            connection.rollback()
+            raise
+
+        finally:
+            cursor.close()
+            connection.close()
+
+    def get_request(self, change_request_id):
+        connection = get_connection()
+        cursor = get_dict_cursor(connection)
+
+        try:
+            cursor.execute(
+                """
+                SELECT
+                    change_request_id,
+                    requested_by,
+                    table_name,
+                    record_id,
+                    field_name,
+                    old_value,
+                    new_value,
+                    reason,
+                    status
+                FROM change_requests
+                WHERE change_request_id = %s
+                """,
+                (change_request_id,)
+            )
+
+            return cursor.fetchone()
+
+        finally:
+            cursor.close()
+            connection.close()
+
+    def approve_and_apply_change(
+        self,
+        change_request_id,
+        reviewer_id,
+        table_name,
+        id_column,
+        field_name,
+        review_comment
+    ):
+        connection = get_connection()
+        cursor = get_dict_cursor(connection)
+
+        try:
+            cursor.execute(
+                """
+                SELECT
+                    change_request_id,
+                    requested_by,
+                    table_name,
+                    record_id,
+                    field_name,
+                    old_value,
+                    new_value,
+                    reason,
+                    status
+                FROM change_requests
+                WHERE change_request_id = %s
+                FOR UPDATE
+                """,
+                (change_request_id,)
+            )
+
+            change = cursor.fetchone()
+
+            if change is None:
+                raise ValueError(
+                    "Wijzigingsaanvraag bestaat niet."
+                )
+
+            if change["status"] != "pending":
+                raise ValueError(
+                    "Deze wijzigingsaanvraag is al behandeld."
+                )
+
+            if change["requested_by"] == reviewer_id:
+                raise ValueError(
+                    "Je kunt je eigen wijzigingsaanvraag niet goedkeuren."
+                )
+
+            if change["table_name"] != table_name:
+                raise ValueError(
+                    "Ongeldige tabel voor deze wijziging."
+                )
+
+            if change["field_name"] != field_name:
+                raise ValueError(
+                    "Ongeldig veld voor deze wijziging."
+                )
+
+            query = sql.SQL(
+                """
+                SELECT {field}
+                FROM {table}
+                WHERE {id_column} = %s
+                FOR UPDATE
+                """
+            ).format(
+                field=sql.Identifier(field_name),
+                table=sql.Identifier(table_name),
+                id_column=sql.Identifier(id_column)
+            )
+
+            cursor.execute(
+                query,
+                (change["record_id"],)
+            )
+
+            current_record = cursor.fetchone()
+
+            if current_record is None:
+                raise ValueError(
+                    "Het oorspronkelijke testresultaat bestaat niet meer."
+                )
+
+            current_value = current_record[field_name]
+
+            current_text = (
+                None
+                if current_value is None
+                else str(current_value)
+            )
+
+            stored_old_text = (
+                None
+                if change["old_value"] is None
+                else str(change["old_value"])
+            )
+
+            if current_text != stored_old_text:
+                raise ValueError(
+                    "De oorspronkelijke waarde is inmiddels gewijzigd. "
+                    "De aanvraag kan daarom niet automatisch worden uitgevoerd."
+                )
+
+            update_query = sql.SQL(
+                """
+                UPDATE {table}
+                SET {field} = %s
+                WHERE {id_column} = %s
+                """
+            ).format(
+                table=sql.Identifier(table_name),
+                field=sql.Identifier(field_name),
+                id_column=sql.Identifier(id_column)
+            )
+
+            cursor.execute(
+                update_query,
+                (
+                    change["new_value"],
+                    change["record_id"]
+                )
+            )
+
+            cursor.execute(
+                """
+                INSERT INTO audit_log
+                (
+                    table_name,
+                    record_id,
+                    changed_by,
+                    changed_at,
+                    old_values,
+                    new_values,
+                    reason
+                )
+                VALUES
+                (
+                    %s,
+                    %s,
+                    %s,
+                    CURRENT_TIMESTAMP,
+                    %s,
+                    %s,
+                    %s
+                )
+                """,
+                (
+                    table_name,
+                    change["record_id"],
+                    reviewer_id,
+
+                    Json({
+                        field_name: current_text
+                    }),
+
+                    Json({
+                        field_name: change["new_value"]
+                    }),
+
+                    change["reason"]
+                )
+            )
+
+            cursor.execute(
+                """
+                UPDATE change_requests
+                SET
+                    status = 'approved',
+                    reviewed_by = %s,
+                    reviewed_at = CURRENT_TIMESTAMP,
+                    review_comment = %s
+                WHERE change_request_id = %s
+                """,
+                (
+                    reviewer_id,
+                    review_comment,
+                    change_request_id
+                )
+            )
+
+            connection.commit()
+
 
         except Exception:
             connection.rollback()

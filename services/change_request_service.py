@@ -271,3 +271,59 @@ class ChangeRequestService:
                 "Deze aanvraag kan niet worden afgewezen. "
                 "Mogelijk is deze al behandeld of is het je eigen aanvraag."
             )
+
+    def approve_request(
+        self,
+        change_request_id,
+        reviewer_id,
+        review_comment=""
+    ):
+        change = self.repository.get_request(
+            change_request_id
+        )
+
+        if change is None:
+            raise ValueError(
+                "Wijzigingsaanvraag bestaat niet."
+            )
+
+        if change["status"] != "pending":
+            raise ValueError(
+                "Deze wijzigingsaanvraag is al behandeld."
+            )
+
+        if change["requested_by"] == reviewer_id:
+            raise ValueError(
+                "Je kunt je eigen wijzigingsaanvraag niet goedkeuren."
+            )
+
+
+        # Find matching safe configuration
+        config = None
+
+        for test_key, test_config in TEST_CONFIG.items():
+            if test_config["table"] == change["table_name"]:
+                config = test_config
+                break
+
+        if config is None:
+            raise ValueError(
+                "Deze test mag niet automatisch worden gewijzigd."
+            )
+
+
+        # Check that requested field is explicitly allowed
+        if change["field_name"] not in config["fields"]:
+            raise ValueError(
+                "Dit veld mag niet worden gewijzigd."
+            )
+
+
+        self.repository.approve_and_apply_change(
+            change_request_id=change_request_id,
+            reviewer_id=reviewer_id,
+            table_name=config["table"],
+            id_column=config["id_column"],
+            field_name=change["field_name"],
+            review_comment=review_comment
+        )

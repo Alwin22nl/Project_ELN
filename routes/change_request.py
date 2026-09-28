@@ -122,7 +122,7 @@ def approve_request(change_request_id):
         )
 
         flash(
-            "Wijzigingsaanvraag is goedgekeurd!",
+            "Wijzigingsaanvraag is goedgekeurd en uitgevoerd!",
             "success"
         )
 
