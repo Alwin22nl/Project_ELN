@@ -1,3 +1,6 @@
+/* =========================
+    BASE PAGE AND SHARED LAYOUT
+    ========================= */
 body {
     font-family: Arial, sans-serif;
     margin: 30px;
@@ -112,6 +115,9 @@ body {
     margin-top: auto;
 }
 
+/* =========================
+    LOGIN PAGE
+    ========================= */
 .login-container {
     width: 350px;
     margin: 80px auto;
@@ -150,6 +156,9 @@ body {
     margin-bottom: 15px;
 }
 
+/* =========================
+    MAIN CONTENT AND TEST PAGES
+    ========================= */
 /* Main page */
 .content {
     flex: 1;
@@ -161,6 +170,9 @@ body {
     max-width: 500px;
 }
 
+/* =========================
+    SKINFORMATION BATCH ENTRY
+    ========================= */
 /* Skinformation */
 #batch-table {
     width: 100%;
@@ -209,6 +221,9 @@ body {
     margin-right: 10px;
 }
 
+/* =========================
+    TIMER
+    ========================= */
 .timer-box{
     position:absolute;
     bottom:30px;
@@ -237,6 +252,9 @@ body {
     width:30%;
 }
 
+/* =========================
+    PRODUCT TEST OPTIONS
+    ========================= */
 /* products */
 .test-option {
     display:flex;
@@ -249,6 +267,9 @@ body {
     width:70px;
 }
 
+/* =========================
+    TEST CATALOG
+    ========================= */
 /* Tests-page */
 .test-grid {
     display: grid;
@@ -276,6 +297,9 @@ body {
     color: #2563eb;
 }
 
+/* =========================
+    ADHESION TABLE
+    ========================= */
 /* Adhesion Table */
 .compact-table {
     width: 100%;
@@ -305,6 +329,9 @@ body {
     width: 18%;
 }
 
+/* =========================
+    PAGE NAVIGATION
+    ========================= */
 /* navigation button */
 .page-navigation {
     margin-bottom: 20px;
@@ -325,6 +352,9 @@ body {
     background-color: #ddd;
 }
 
+/* =========================
+    OVERVIEW TABLES AND FILTERS
+    ========================= */
 /* overview table */
 .overview table {
     width: 100%;
@@ -357,6 +387,9 @@ body {
 .btn{padding:8px 12px;border-radius:6px;border:1px solid #cbd5e1;background:#111827;color:white;text-decoration:none;cursor:pointer}
 .btn-secondary{background:#f3f4f6;color:#111827;border:1px solid #e5e7eb}
 
+/* =========================
+    SEARCH TABLES AND REMARKS
+    ========================= */
 /* Table improvements for readability */
 .table-wrapper{overflow:auto;border-radius:8px;border:1px solid #e6edf3;background:white;box-shadow:0 1px 4px rgba(16,24,40,0.03)}
 .nice-table{width:100%;border-collapse:collapse;min-width:800px}
@@ -428,6 +461,9 @@ body {
 }
 .remark-input:focus{outline:2px solid #c7e0ff}
 
+/* =========================
+    DASHBOARD
+    ========================= */
 /* dashboard */ 
 .dashboard-grid{
     display:grid;
@@ -471,6 +507,9 @@ body {
     cursor: pointer;
 }
 
+/* =========================
+    SIDEBAR USER MENU
+    ========================= */
 /* Sidebar user avatar and menu */
 .sidebar-user {
     display: flex;
@@ -518,6 +557,9 @@ body {
     display: flex;
 }
 
+/* =========================
+    FORM CONTROLS
+    ========================= */
 .checkbox-label {
     display: flex !important;
     align-items: center !important;
@@ -531,6 +573,9 @@ body {
     margin: 0 !important;
 }
 
+/* =========================
+    DASHBOARD CARD DETAILS
+    ========================= */
 /* Card header */
 .dashboard-card h2{display:flex;align-items:center;gap:10px;margin:0 0 12px 0;font-size:18px}
 .dashboard-card h2 .card-icon{width:38px;height:38px;border-radius:8px;background:linear-gradient(135deg,var(--accent),var(--accent-600));display:inline-flex;align-items:center;justify-content:center;color:white;font-weight:700}
@@ -548,6 +593,9 @@ body {
 /* Subtle card titles for home page */
 .dashboard-card a h2{margin:0}
 
+/* =========================
+    SAMPLE PAGE TABS
+    ========================= */
 /* Tabs for sample page */
 .tabs{display:flex;gap:8px;margin-bottom:12px}
 .tab-btn{padding:8px 12px;border-radius:8px;border:1px solid #e6eef6;background:#f8fafc;cursor:pointer}
@@ -557,6 +605,9 @@ body {
 
 .left-panel #append-panel .filter-input, .left-panel #append-panel select, .left-panel #append-panel textarea{width:100%;padding:8px;border-radius:6px;border:1px solid #d1d5db}
 
+/* =========================
+    RESULT TOOLTIP
+    ========================= */
 /* hover tooltip */
 .result-hover {
     cursor: help;
@@ -577,6 +628,9 @@ body {
     overflow-y: auto;
 }
 
+/* =========================
+    FLASH MESSAGES
+    ========================= */
 /* error flashcards */
 .flash-container {
     position: fixed;
@@ -875,6 +929,9 @@ body {
     color: white;
 }
 
+/* =========================
+    CHANGE REQUEST REVIEW ACTIONS
+    ========================= */
 .approval-actions {
     min-width: 220px;
 }
