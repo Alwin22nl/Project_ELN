@@ -180,4 +180,50 @@ TEST_CONFIG = {
                     ]
                 }
     },
+    "adhesion": {
+        "label": "Hechting",
+        "table": "adhesion",
+        "id_column": "adhesion_id",
+        "has_afterstorage": False,
+
+        "fields": {
+            "rubber": "Rubber",
+            "copper": "Koper",
+            "wood": "Hout",
+            "aluminium": "Aluminium",
+            "aluminium_anod": "Aluminium Anod.",
+            "lead": "Lood",
+            "rvs": "RVS",
+            "concrete": "Beton",
+            "glass": "Glas",
+            "pvc": "PVC",
+            "pmma": "PMMA",
+            "pc": "PC"
+        }
+    },
+    "epdm_adhesion": {
+        "label": "EPDM Hechting",
+        "table": "epdm_adhesion",
+        "id_column": "epdm_adhesion_id",
+        "has_afterstorage": False,
+
+        "fields": {
+            "europees": "EPDM-EU",
+            "trc": "EPDM-TRC",
+            "carlisle": "EPDM-Carlisle",
+            "rubber": "Rubber",
+            "copper": "Koper",
+            "wood": "Hout",
+            "aluminium": "Aluminium",
+            "aluminium_anod": "Aluminium Anod.",
+            "lead": "Lood",
+            "rvs": "RVS",
+            "concrete": "Beton",
+            "glass": "Glas",
+            "pvc": "PVC",
+            "pmma": "PMMA",
+            "pc": "PC"
+        }
+    },
+
 }
