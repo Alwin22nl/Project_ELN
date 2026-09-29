@@ -91,6 +91,29 @@ class ChangeRequestRepository:
             cursor.close()
             connection.close()
 
+    def get_tensile_specimens(self, sample_id):
+        connection = get_connection()
+        cursor = get_dict_cursor(connection)
+
+        try:
+            cursor.execute(
+                """
+                SELECT
+                    tensile_specimen_id,
+                    specimen_no
+                FROM tensile_specimen
+                WHERE sample_id = %s
+                ORDER BY specimen_no
+                """,
+                (sample_id,)
+            )
+
+            return cursor.fetchall()
+
+        finally:
+            cursor.close()
+            connection.close()
+
     def get_test_records(
         self,
         table_name,
