@@ -242,7 +242,7 @@ TEST_CONFIG = {
         "special_type": "specimens",
 
         "table": "tensile_specimen",
-        "id_column": "tensile_specimen_id",
+        "id_column": "specimen_id",
         "specimen_column": "specimen_no",
         "has_afterstorage": False,
 

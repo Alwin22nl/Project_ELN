@@ -89,7 +89,7 @@ class ChangeRequestService:
                     available_tests.append({
                         "test_key": test_key,
                         "record_id": specimen[
-                            "tensile_specimen_id"
+                            "specimen_id"
                         ],
                         "label": (
                             f'{config["label"]} - '

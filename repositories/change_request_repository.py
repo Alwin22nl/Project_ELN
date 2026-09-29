@@ -99,7 +99,7 @@ class ChangeRequestRepository:
             cursor.execute(
                 """
                 SELECT
-                    tensile_specimen_id,
+                    specimen_id,
                     specimen_no
                 FROM tensile_specimen
                 WHERE sample_id = %s
