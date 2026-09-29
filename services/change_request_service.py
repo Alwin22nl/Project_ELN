@@ -302,5 +302,6 @@ class ChangeRequestService:
             table_name=config["table"],
             id_column=config["id_column"],
             field_name=change["field_name"],
-            review_comment=review_comment
+            review_comment=review_comment,
+            recalculate=config.get("recalculate")
         )

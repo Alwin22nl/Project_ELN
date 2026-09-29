@@ -129,7 +129,7 @@ class ChangeRequestRepository:
                     id_column=sql.Identifier(id_column),
                     table_name=sql.Identifier(table_name)
                 )
-                
+
             cursor.execute(
                 query,
                 (sample_id,)
@@ -369,13 +369,14 @@ class ChangeRequestRepository:
             connection.close()
 
     def approve_and_apply_change(
-        self,
-        change_request_id,
-        reviewer_id,
-        table_name,
-        id_column,
-        field_name,
-        review_comment
+    self,
+    change_request_id,
+    reviewer_id,
+    table_name,
+    id_column,
+    field_name,
+    review_comment,
+    recalculate=None
     ):
         connection = get_connection()
         cursor = get_dict_cursor(connection)
@@ -472,6 +473,45 @@ class ChangeRequestRepository:
                     "De aanvraag kan daarom niet automatisch worden uitgevoerd."
                 )
 
+            old_values = {
+                field_name: current_text
+            }
+
+            new_values = {
+                field_name: change["new_value"]
+            }
+
+            if recalculate:
+
+                average_field = recalculate["field"]
+
+                average_query = sql.SQL(
+                    """
+                    SELECT {average_field}
+                    FROM {table}
+                    WHERE {id_column} = %s
+                    """
+                ).format(
+                    average_field=sql.Identifier(average_field),
+                    table=sql.Identifier(table_name),
+                    id_column=sql.Identifier(id_column)
+                )
+
+                cursor.execute(
+                    average_query,
+                    (change["record_id"],)
+                )
+
+                average_record = cursor.fetchone()
+
+                old_average = average_record[average_field]
+
+                old_values[average_field] = (
+                    None
+                    if old_average is None
+                    else str(old_average)
+                )
+
             update_query = sql.SQL(
                 """
                 UPDATE {table}
@@ -491,6 +531,67 @@ class ChangeRequestRepository:
                     change["record_id"]
                 )
             )
+
+            if recalculate:
+
+                source_fields = recalculate["source_fields"]
+                average_field = recalculate["field"]
+
+                columns = sql.SQL(", ").join(
+                    sql.Identifier(field)
+                    for field in source_fields
+                )
+
+                query = sql.SQL(
+                    """
+                    SELECT {columns}
+                    FROM {table}
+                    WHERE {id_column} = %s
+                    """
+                ).format(
+                    columns=columns,
+                    table=sql.Identifier(table_name),
+                    id_column=sql.Identifier(id_column)
+                )
+
+                cursor.execute(
+                    query,
+                    (change["record_id"],)
+                )
+
+                result = cursor.fetchone()
+
+                values = [
+                    float(result[field])
+                    for field in source_fields
+                ]
+
+                new_average = round(
+                    sum(values) / len(values),
+                    1
+                )
+
+                average_update = sql.SQL(
+                    """
+                    UPDATE {table}
+                    SET {average_field} = %s
+                    WHERE {id_column} = %s
+                    """
+                ).format(
+                    table=sql.Identifier(table_name),
+                    average_field=sql.Identifier(average_field),
+                    id_column=sql.Identifier(id_column)
+                )
+
+                cursor.execute(
+                    average_update,
+                    (
+                        new_average,
+                        change["record_id"]
+                    )
+                )
+
+                new_values[average_field] = str(new_average)
 
             cursor.execute(
                 """
@@ -519,15 +620,8 @@ class ChangeRequestRepository:
                     table_name,
                     change["record_id"],
                     reviewer_id,
-
-                    Json({
-                        field_name: current_text
-                    }),
-
-                    Json({
-                        field_name: change["new_value"]
-                    }),
-
+                    Json(old_values),
+                    Json(new_values),
                     change["reason"]
                 )
             )
@@ -550,7 +644,6 @@ class ChangeRequestRepository:
             )
 
             connection.commit()
-
 
         except Exception:
             connection.rollback()

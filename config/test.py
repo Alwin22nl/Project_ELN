@@ -131,6 +131,14 @@ TEST_CONFIG = {
             "shore_a_3": "Shore A 3",
             "temperature": "Temperatuur",
             "humidity": "Luchtvochtigheid"
+        },
+        "recalculate": {
+            "field": "shore_a_avg",
+            "source_fields": [
+                "shore_a_1",
+                "shore_a_2",
+                "shore_a_3"
+            ]
         }
     }
 }
