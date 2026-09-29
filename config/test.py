@@ -140,5 +140,44 @@ TEST_CONFIG = {
                 "shore_a_3"
             ]
         }
-    }
+    },
+    "density": {
+        "label": "Dichtheid",
+        "table": "density",
+        "id_column": "density_id",
+        "has_afterstorage": False,
+        "fields": {
+            "vessel_empty": "Gewicht Leeg",
+            "vessel_full": "Gewicht Vol",
+            "vessel_volume": "Volume"
+        },
+        "recalculate": {
+                    "field": "density_product",
+                    "source_fields": [
+                        "vessel_empty",
+                        "vessel_full",
+                        "vessel_volume"
+                    ]
+                }
+    },
+    "initial_tack": {
+        "label": "Initial Tack",
+        "table": "initial_tack",
+        "id_column": "initial_tack_id",
+        "has_afterstorage": False,
+        "fields": {
+            "area": "Oppervlak",
+            "area_weight": "Gewicht Opp.",
+            "added_weight": "Toegevoegt Gewicht",
+            "humidity": "Luchtvochtigheid"
+        },
+        "recalculate": {
+                    "field": "initial_tack",
+                    "source_fields": [
+                        "area",
+                        "area_weight",
+                        "added_weight"
+                    ]
+                }
+    },
 }

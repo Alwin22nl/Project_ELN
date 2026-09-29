@@ -560,16 +560,37 @@ class ChangeRequestRepository:
                 )
 
                 result = cursor.fetchone()
+                
+                if table_name == "shore_a":
+                    values = [
+                        float(result[field])
+                        for field in source_fields
+                    ]
+                    
+                    new_average = round(
+                        sum(values) / len(values),
+                        0
+                    )
 
-                values = [
-                    float(result[field])
-                    for field in source_fields
-                ]
+                elif table_name == "density":
+                    vessel_full = float(result["vessel_full"])
+                    vessel_empty = float(result["vessel_empty"])
+                    vessel_volume = float(result["vessel_volume"])
 
-                new_average = round(
-                    sum(values) / len(values),
-                    1
-                )
+                    new_average = round(
+                        (vessel_full - vessel_empty) / vessel_volume,
+                        2
+                    )
+
+                elif table_name == "initial_tack":
+                    area = float(result["area"])
+                    area_weight = float(result["area_weight"])
+                    added_weight = float(result["added_weight"])
+
+                    new_average = round(
+                        (area_weight + added_weight) / area,
+                        2
+                    )
 
                 average_update = sql.SQL(
                     """
