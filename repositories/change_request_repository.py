@@ -1,7 +1,8 @@
-from models.change_request import ChangeRequest
 from database import get_connection, get_dict_cursor
+
 from psycopg2 import sql
 from psycopg2.extras import Json
+
 
 class ChangeRequestRepository:
     def create_request(self, change_request):
@@ -66,6 +67,7 @@ class ChangeRequestRepository:
             cursor.close()
             connection.close()
 
+
     def get_batches(self, product_id):
         connection = get_connection()
         cursor = get_dict_cursor(connection)
@@ -105,7 +107,7 @@ class ChangeRequestRepository:
                     """
                     SELECT
                         {id_column} AS record_id,
-                        afterstorage_id 
+                        afterstorage_id
                     FROM {table_name}
                     WHERE sample_id = %s
                     ORDER BY {id_column}
@@ -116,6 +118,7 @@ class ChangeRequestRepository:
                 )
 
             else:
+
                 query = sql.SQL(
                     """
                     SELECT
@@ -180,6 +183,7 @@ class ChangeRequestRepository:
             cursor.close()
             connection.close()
 
+
     def get_current_value(
         self,
         table_name,
@@ -197,7 +201,7 @@ class ChangeRequestRepository:
                 SELECT {field_name} AS current_value
                 FROM {table_name}
                 WHERE {id_column} = %s
-                AND sample_id = %s
+                  AND sample_id = %s
                 """
             ).format(
                 field_name=sql.Identifier(field_name),
@@ -276,7 +280,7 @@ class ChangeRequestRepository:
                     requested_at
                 FROM change_requests
                 WHERE status = 'pending'
-                AND requested_by <> %s
+                  AND requested_by <> %s
                 ORDER BY requested_at ASC
                 """,
                 (reviewer_id,)
@@ -308,8 +312,8 @@ class ChangeRequestRepository:
                     reviewed_at = CURRENT_TIMESTAMP,
                     review_comment = %s
                 WHERE change_request_id = %s
-                AND status = 'pending'
-                AND requested_by <> %s
+                  AND status = 'pending'
+                  AND requested_by <> %s
                 RETURNING change_request_id
                 """,
                 (
@@ -369,14 +373,14 @@ class ChangeRequestRepository:
             connection.close()
 
     def approve_and_apply_change(
-    self,
-    change_request_id,
-    reviewer_id,
-    table_name,
-    id_column,
-    field_name,
-    review_comment,
-    recalculate=None
+        self,
+        change_request_id,
+        reviewer_id,
+        table_name,
+        id_column,
+        field_name,
+        review_comment,
+        recalculate=None
     ):
         connection = get_connection()
         cursor = get_dict_cursor(connection)
@@ -481,35 +485,74 @@ class ChangeRequestRepository:
                 field_name: change["new_value"]
             }
 
+            calculated_field = None
+            source_fields = None
+            calculation_group = None
+
             if recalculate:
+                if (
+                    "field" in recalculate
+                    and "source_fields" in recalculate
+                ):
 
-                average_field = recalculate["field"]
+                    if field_name in recalculate["source_fields"]:
 
-                average_query = sql.SQL(
+                        calculated_field = recalculate["field"]
+                        source_fields = recalculate["source_fields"]
+
+                else:
+
+                    for group_name, rule in recalculate.items():
+
+                        trigger_fields = rule.get(
+                            "trigger_fields",
+                            []
+                        )
+
+                        if field_name in trigger_fields:
+
+                            calculated_field = rule["result_field"]
+                            source_fields = trigger_fields
+                            calculation_group = group_name
+
+                            break
+
+            if calculated_field is not None:
+
+                calculated_query = sql.SQL(
                     """
-                    SELECT {average_field}
+                    SELECT {calculated_field}
                     FROM {table}
                     WHERE {id_column} = %s
                     """
                 ).format(
-                    average_field=sql.Identifier(average_field),
+                    calculated_field=sql.Identifier(
+                        calculated_field
+                    ),
                     table=sql.Identifier(table_name),
                     id_column=sql.Identifier(id_column)
                 )
 
                 cursor.execute(
-                    average_query,
+                    calculated_query,
                     (change["record_id"],)
                 )
 
-                average_record = cursor.fetchone()
+                calculated_record = cursor.fetchone()
 
-                old_average = average_record[average_field]
+                if calculated_record is None:
+                    raise ValueError(
+                        "De berekende waarde kon niet worden gevonden."
+                    )
 
-                old_values[average_field] = (
+                old_calculated_value = calculated_record[
+                    calculated_field
+                ]
+
+                old_values[calculated_field] = (
                     None
-                    if old_average is None
-                    else str(old_average)
+                    if old_calculated_value is None
+                    else str(old_calculated_value)
                 )
 
             update_query = sql.SQL(
@@ -532,17 +575,14 @@ class ChangeRequestRepository:
                 )
             )
 
-            if recalculate:
-
-                source_fields = recalculate["source_fields"]
-                average_field = recalculate["field"]
+            if calculated_field is not None:
 
                 columns = sql.SQL(", ").join(
                     sql.Identifier(field)
                     for field in source_fields
                 )
 
-                query = sql.SQL(
+                source_query = sql.SQL(
                     """
                     SELECT {columns}
                     FROM {table}
@@ -555,64 +595,138 @@ class ChangeRequestRepository:
                 )
 
                 cursor.execute(
-                    query,
+                    source_query,
                     (change["record_id"],)
                 )
 
                 result = cursor.fetchone()
-                
+
+                if result is None:
+                    raise ValueError(
+                        "De waarden voor herberekening "
+                        "konden niet worden gevonden."
+                    )
+
                 if table_name == "shore_a":
+
                     values = [
                         float(result[field])
                         for field in source_fields
                     ]
-                    
-                    new_average = round(
+
+                    new_calculated_value = round(
                         sum(values) / len(values),
                         0
                     )
 
                 elif table_name == "density":
-                    vessel_full = float(result["vessel_full"])
-                    vessel_empty = float(result["vessel_empty"])
-                    vessel_volume = float(result["vessel_volume"])
 
-                    new_average = round(
-                        (vessel_full - vessel_empty) / vessel_volume,
+                    vessel_full = float(
+                        result["vessel_full"]
+                    )
+
+                    vessel_empty = float(
+                        result["vessel_empty"]
+                    )
+
+                    vessel_volume = float(
+                        result["vessel_volume"]
+                    )
+
+                    if vessel_volume == 0:
+                        raise ValueError(
+                            "Vessel volume kan niet 0 zijn."
+                        )
+
+                    new_calculated_value = round(
+                        (
+                            vessel_full
+                            - vessel_empty
+                        )
+                        / vessel_volume,
                         2
                     )
 
                 elif table_name == "initial_tack":
-                    area = float(result["area"])
-                    area_weight = float(result["area_weight"])
-                    added_weight = float(result["added_weight"])
 
-                    new_average = round(
-                        (area_weight + added_weight) / area,
+                    area = float(
+                        result["area"]
+                    )
+
+                    area_weight = float(
+                        result["area_weight"]
+                    )
+
+                    added_weight = float(
+                        result["added_weight"]
+                    )
+
+                    if area == 0:
+                        raise ValueError(
+                            "Oppervlakte kan niet 0 zijn."
+                        )
+
+                    new_calculated_value = round(
+                        (
+                            area_weight
+                            + added_weight
+                        )
+                        / area,
                         2
                     )
 
-                average_update = sql.SQL(
+                elif table_name == "tensile_specimen":
+
+                    values = [
+                        float(result[field])
+                        for field in source_fields
+                    ]
+
+                    tensile_rule = recalculate[
+                        calculation_group
+                    ]
+
+                    decimal_places = tensile_rule.get(
+                        "round",
+                        2
+                    )
+
+                    new_calculated_value = round(
+                        sum(values) / len(values),
+                        decimal_places
+                    )
+
+                else:
+                    raise ValueError(
+                        f"Geen herberekening ingesteld voor "
+                        f"tabel '{table_name}'."
+                    )
+
+                calculated_update = sql.SQL(
                     """
                     UPDATE {table}
-                    SET {average_field} = %s
+                    SET {calculated_field} = %s
                     WHERE {id_column} = %s
                     """
                 ).format(
                     table=sql.Identifier(table_name),
-                    average_field=sql.Identifier(average_field),
+                    calculated_field=sql.Identifier(
+                        calculated_field
+                    ),
                     id_column=sql.Identifier(id_column)
                 )
 
                 cursor.execute(
-                    average_update,
+                    calculated_update,
                     (
-                        new_average,
+                        new_calculated_value,
                         change["record_id"]
                     )
                 )
 
-                new_values[average_field] = str(new_average)
+                new_values[calculated_field] = str(
+                    new_calculated_value
+                )
 
             cursor.execute(
                 """
@@ -665,6 +779,7 @@ class ChangeRequestRepository:
             )
 
             connection.commit()
+
 
         except Exception:
             connection.rollback()

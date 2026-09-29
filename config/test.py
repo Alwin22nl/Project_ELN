@@ -78,6 +78,18 @@ OVERVIEW_TESTS = {
 }
 
 TEST_CONFIG = {
+    "samples": {
+        "label": "Sample",
+        "table": "samples",
+        "id_column": "sample_id",
+        "has_afterstorage": False,
+
+        "fields": {
+            "batch_nr": "Batch Nummer",
+            "prod_date": "Productie datum",
+            "after_storage_required": "Afterstorage"
+        } 
+    },
     "rheology": {
         "label": "Rheology",
         "table": "rheology",
@@ -225,5 +237,62 @@ TEST_CONFIG = {
             "pc": "PC"
         }
     },
+    "tensile": {
+        "label": "Tensile",
+        "special_type": "specimens",
 
+        "table": "tensile_specimen",
+        "id_column": "tensile_specimen_id",
+        "specimen_column": "specimen_no",
+        "has_afterstorage": False,
+
+        "fields": {
+            "width_1": "Breedte 1",
+            "width_2": "Breedte 2",
+            "width_3": "Breedte 3",
+
+            "thickness_1": "Dikte 1",
+            "thickness_2": "Dikte 2",
+            "thickness_3": "Dikte 3",
+
+            "t_50": "T 50",
+            "t_100": "T 100",
+            "t_max": "T MAX",
+            "e_max": "E MAX"
+        },
+
+        "recalculate": {
+            "width": {
+                "trigger_fields": [
+                    "width_1",
+                    "width_2",
+                    "width_3"
+                ],
+                "result_field": "width_avg",
+                "round": 2
+            },
+
+            "thickness": {
+                "trigger_fields": [
+                    "thickness_1",
+                    "thickness_2",
+                    "thickness_3"
+                ],
+                "result_field": "thickness_avg",
+                "round": 2
+            }
+        }
+    }
+}
+
+TEST_TABLES = {
+    "rheology": "rheology",
+    "skinformation": "skinformation",
+    "curability": "curability",
+    "density": "density",
+    "initial_tack": "initial_tack",
+    "shore_a": "shore_a",
+    "tensile_strength": "tensile_strength",
+    "adhesion": "adhesion",
+    "epdm_adhesion": "epdm_adhesion"
 }

@@ -162,3 +162,18 @@ def reject_request(change_request_id):
     return redirect(
         url_for(".approvals")
     )
+
+@change_request_bp.route("/change_request/specimens")
+@login_required
+def get_specimens():
+
+    sample_id = request.args.get(
+        "sample_id",
+        type=int
+    )
+
+    specimens = service.get_tensile_specimens(
+        sample_id
+    )
+
+    return jsonify(specimens)
