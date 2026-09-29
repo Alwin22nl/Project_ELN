@@ -93,26 +93,43 @@ class ChangeRequestRepository:
         self,
         table_name,
         id_column,
-        sample_id
+        sample_id,
+        has_afterstorage
     ):
         connection = get_connection()
         cursor = get_dict_cursor(connection)
 
         try:
-            query = sql.SQL(
-                """
-                SELECT
-                    {id_column} AS record_id,
-                    afterstorage_id
-                FROM {table_name}
-                WHERE sample_id = %s
-                ORDER BY {id_column}
-                """
-            ).format(
-                id_column=sql.Identifier(id_column),
-                table_name=sql.Identifier(table_name)
-            )
+            if has_afterstorage:
+                query = sql.SQL(
+                    """
+                    SELECT
+                        {id_column} AS record_id,
+                        afterstorage_id 
+                    FROM {table_name}
+                    WHERE sample_id = %s
+                    ORDER BY {id_column}
+                    """
+                ).format(
+                    id_column=sql.Identifier(id_column),
+                    table_name=sql.Identifier(table_name)
+                )
 
+            else:
+                query = sql.SQL(
+                    """
+                    SELECT
+                        {id_column} AS record_id,
+                        NULL::INTEGER AS afterstorage_id
+                    FROM {table_name}
+                    WHERE sample_id = %s
+                    ORDER BY {id_column}
+                    """
+                ).format(
+                    id_column=sql.Identifier(id_column),
+                    table_name=sql.Identifier(table_name)
+                )
+                
             cursor.execute(
                 query,
                 (sample_id,)
