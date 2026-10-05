@@ -177,3 +177,12 @@ def get_specimens():
     )
 
     return jsonify(specimens)
+
+@change_request_bp.route("/change_request/notification_status")
+@login_required
+def notification_status():
+    show_bell = service.has_open_requests_for_user(session["user_id"])
+
+    return jsonify({
+        "show_bell": show_bell
+    })

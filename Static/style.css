@@ -610,6 +610,10 @@ body {
     transition: transform 0.15s ease;
 }
 
+.notification-hidden {
+    display: none;
+}
+
 .avatar-notification svg {
     width: 13px;
     height: 13px;

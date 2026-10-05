@@ -76,10 +76,11 @@
 
                                     {% endif %}
                                 </div>
-                                {% if show_change_request_bell %}
                                     <a
+                                        id="changeRequestBell"
                                         href="{{ url_for('change_request.approvals') }}"
-                                        class="avatar-notification"
+                                        class="avatar-notification
+                                            {% if not show_change_request_bell %}notification-hidden{% endif %}"
                                         title="Open wijzigingsaanvragen"
                                     >
                                         <svg
@@ -97,7 +98,6 @@
                                             />
                                         </svg>
                                     </a>
-                                {% endif %}
                             </div>
                             <div
                                 id="userMenu"
@@ -191,4 +191,53 @@
     changeRequestMenu.addEventListener("click", function (event) {
         event.stopPropagation();
     });
+
+    document.addEventListener("DOMContentLoaded", function () {
+
+        const notificationBell =
+            document.getElementById("changeRequestBell");
+
+        if (!notificationBell) {
+            return;
+        }
+
+        async function refreshNotificationBell() {
+
+            try {
+                const response = await fetch(
+                    "{{ url_for('change_request.notification_status') }}",
+                    {
+                        cache: "no-store"
+                    }
+                );
+
+                if (!response.ok) {
+                    return;
+                }
+
+                const data = await response.json();
+                notificationBell.classList.toggle(
+                    "notification-hidden",
+                    !data.show_bell
+                );
+
+            } catch (error) {
+                console.error(
+                    "Notification status kon niet worden opgehaald:",
+                    error
+                );
+            }
+        }
+
+        // Check immediately
+        refreshNotificationBell();
+
+        // Then check every 15 seconds
+        setInterval(
+            refreshNotificationBell,
+            15000
+        );
+
+    });
+
 </script>
