@@ -382,3 +382,7 @@ class ChangeRequestService:
                 "recalculate"
             )
         )
+
+    def has_open_requests_for_user(self, user_id):
+        return self.repository.has_open_requests_for_user(user_id)
+    

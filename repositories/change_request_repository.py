@@ -811,3 +811,26 @@ class ChangeRequestRepository:
         finally:
             cursor.close()
             connection.close()
+
+    def has_open_requests_for_user(self, user_id):
+        connection = get_connection()
+        cursor = connection.cursor()
+
+        try:
+            cursor.execute(
+                """
+                SELECT EXISTS (
+                    SELECT 1
+                    FROM change_requests
+                    WHERE status = 'pending'
+                    AND requested_by <> %s
+                )
+                """,
+                (user_id,)
+            )
+
+            return cursor.fetchone()[0]
+
+        finally:
+            cursor.close()
+            connection.close()
