@@ -24,6 +24,7 @@
                 <thead>
                     <tr>
                         <th>Datum</th>
+                        <th>Batch</th>
                         <th>Test</th>
                         <th>Veld</th>
                         <th>Wijziging</th>
@@ -42,7 +43,11 @@
                             <td>
                                 {{ change.requested_at.strftime("%d-%m-%Y %H:%M") }}
                             </td>
-
+                            
+                            <!-- Batch -->
+                            <td>
+                                {{ change.batch_nr or "-" }}
+                            </td>
 
                             <!-- TEST -->
                             <td>

@@ -15,6 +15,7 @@
                     <tr>
                         <th>Datum</th>
                         <th>Aangevraagd door</th>
+                        <th>Batch</th>
                         <th>Test</th>
                         <th>Veld</th>
                         <th>Wijziging</th>
@@ -30,7 +31,10 @@
                                 {{ change.requested_at.strftime("%d-%m-%Y %H:%M") }}
                             </td>
                             <td>
-                                {{ change.requested_by }}
+                                {{ change.requested_by_name }}
+                            </td>
+                            <td>
+                                {{ change.batch_nr or "-" }}
                             </td>
                             <td>
                                 {{ change.test_label }}

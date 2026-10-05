@@ -50,6 +50,7 @@ class ChangeRequestService:
 
         change_request = ChangeRequest(
             requested_by=requested_by,
+            sample_id=sample_id,
             table_name=table_name,
             record_id=record_id,
             field_name=field_name,

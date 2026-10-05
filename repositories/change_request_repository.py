@@ -15,6 +15,7 @@ class ChangeRequestRepository:
                 INSERT INTO change_requests
                 (
                     requested_by,
+                    sample_id,
                     table_name,
                     record_id,
                     field_name,
@@ -27,6 +28,7 @@ class ChangeRequestRepository:
                 """,
                 (
                     change_request.requested_by,
+                    change_request.sample_id,
                     change_request.table_name,
                     change_request.record_id,
                     change_request.field_name,
@@ -259,20 +261,24 @@ class ChangeRequestRepository:
             cursor.execute(
                 """
                 SELECT
-                    change_request_id,
-                    table_name,
-                    record_id,
-                    field_name,
-                    old_value,
-                    new_value,
-                    reason,
-                    status,
-                    requested_at,
-                    reviewed_at,
-                    review_comment
-                FROM change_requests
-                WHERE requested_by = %s
-                ORDER BY requested_at DESC, change_request_id DESC
+                    cr.change_request_id,
+                    cr.table_name,
+                    cr.sample_id,
+                    s.batch_nr
+                    cr.record_id,
+                    cr.field_name,
+                    cr.old_value,
+                    cr.new_value,
+                    cr.reason,
+                    cr.status,
+                    cr.requested_at,
+                    cr.reviewed_at,
+                    cr.review_comment
+                FROM change_requests AS cr
+                LEFT JOIN samples AS s
+                ON s.sample_id = cr.sample_id
+                WHERE cr.requested_by = %s
+                ORDER BY cr.requested_at DESC, cr.change_request_id DESC
                 """,
                 (user_id,)
             )
@@ -291,20 +297,27 @@ class ChangeRequestRepository:
             cursor.execute(
                 """
                 SELECT
-                    change_request_id,
-                    requested_by,
-                    table_name,
-                    record_id,
-                    field_name,
-                    old_value,
-                    new_value,
-                    reason,
-                    status,
-                    requested_at
-                FROM change_requests
-                WHERE status = 'pending'
-                  AND requested_by <> %s
-                ORDER BY requested_at ASC
+                    cr.change_request_id,
+                    cr.sample_id,
+                    s.batch_nr,
+                    cr.requested_by,
+                    u.name AS requested_by_name,
+                    cr.table_name,
+                    cr.record_id,
+                    cr.field_name,
+                    cr.old_value,
+                    cr.new_value,
+                    cr.reason,
+                    cr.status,
+                    cr.requested_at
+                FROM change_requests AS cr
+                JOIN users AS u
+                LEFT JOIN samples AS s
+                ON s.sample_id = cr.sample_id
+                ON u.user_id = cr.requested_by
+                WHERE cr.status = 'pending'
+                  AND cr.requested_by <> %s
+                ORDER BY cr.requested_at ASC
                 """,
                 (reviewer_id,)
             )
