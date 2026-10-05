@@ -264,7 +264,7 @@ class ChangeRequestRepository:
                     cr.change_request_id,
                     cr.table_name,
                     cr.sample_id,
-                    s.batch_nr
+                    s.batch_nr,
                     cr.record_id,
                     cr.field_name,
                     cr.old_value,
@@ -312,9 +312,9 @@ class ChangeRequestRepository:
                     cr.requested_at
                 FROM change_requests AS cr
                 JOIN users AS u
+                ON u.user_id = cr.requested_by
                 LEFT JOIN samples AS s
                 ON s.sample_id = cr.sample_id
-                ON u.user_id = cr.requested_by
                 WHERE cr.status = 'pending'
                   AND cr.requested_by <> %s
                 ORDER BY cr.requested_at ASC
