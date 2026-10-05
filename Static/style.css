@@ -610,7 +610,7 @@ body {
     transition: transform 0.15s ease;
 }
 
-.notification-hidden {
+.sidebar .avatar-notification.notification-hidden {
     display: none;
 }
 
