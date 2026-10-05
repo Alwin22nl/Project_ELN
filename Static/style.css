@@ -1,3 +1,6 @@
+/* =========================
+    BASE PAGE AND SHARED LAYOUT
+    ========================= */
 body {
     font-family: Arial, sans-serif;
     margin: 30px;
@@ -112,6 +115,9 @@ body {
     margin-top: auto;
 }
 
+/* =========================
+    LOGIN PAGE
+    ========================= */
 .login-container {
     width: 350px;
     margin: 80px auto;
@@ -150,6 +156,9 @@ body {
     margin-bottom: 15px;
 }
 
+/* =========================
+    MAIN CONTENT AND TEST PAGES
+    ========================= */
 /* Main page */
 .content {
     flex: 1;
@@ -161,6 +170,9 @@ body {
     max-width: 500px;
 }
 
+/* =========================
+    SKINFORMATION BATCH ENTRY
+    ========================= */
 /* Skinformation */
 #batch-table {
     width: 100%;
@@ -209,6 +221,9 @@ body {
     margin-right: 10px;
 }
 
+/* =========================
+    TIMER
+    ========================= */
 .timer-box{
     position:absolute;
     bottom:30px;
@@ -237,6 +252,9 @@ body {
     width:30%;
 }
 
+/* =========================
+    PRODUCT TEST OPTIONS
+    ========================= */
 /* products */
 .test-option {
     display:flex;
@@ -249,6 +267,9 @@ body {
     width:70px;
 }
 
+/* =========================
+    TEST CATALOG
+    ========================= */
 /* Tests-page */
 .test-grid {
     display: grid;
@@ -276,6 +297,9 @@ body {
     color: #2563eb;
 }
 
+/* =========================
+    ADHESION TABLE
+    ========================= */
 /* Adhesion Table */
 .compact-table {
     width: 100%;
@@ -305,6 +329,9 @@ body {
     width: 18%;
 }
 
+/* =========================
+    PAGE NAVIGATION
+    ========================= */
 /* navigation button */
 .page-navigation {
     margin-bottom: 20px;
@@ -325,6 +352,9 @@ body {
     background-color: #ddd;
 }
 
+/* =========================
+    OVERVIEW TABLES AND FILTERS
+    ========================= */
 /* overview table */
 .overview table {
     width: 100%;
@@ -357,6 +387,9 @@ body {
 .btn{padding:8px 12px;border-radius:6px;border:1px solid #cbd5e1;background:#111827;color:white;text-decoration:none;cursor:pointer}
 .btn-secondary{background:#f3f4f6;color:#111827;border:1px solid #e5e7eb}
 
+/* =========================
+    SEARCH TABLES AND REMARKS
+    ========================= */
 /* Table improvements for readability */
 .table-wrapper{overflow:auto;border-radius:8px;border:1px solid #e6edf3;background:white;box-shadow:0 1px 4px rgba(16,24,40,0.03)}
 .nice-table{width:100%;border-collapse:collapse;min-width:800px}
@@ -428,6 +461,9 @@ body {
 }
 .remark-input:focus{outline:2px solid #c7e0ff}
 
+/* =========================
+    DASHBOARD
+    ========================= */
 /* dashboard */ 
 .dashboard-grid{
     display:grid;
@@ -471,6 +507,9 @@ body {
     cursor: pointer;
 }
 
+/* =========================
+    SIDEBAR USER MENU
+    ========================= */
 /* Sidebar user avatar and menu */
 .sidebar-user {
     display: flex;
@@ -517,7 +556,82 @@ body {
 .sidebar-user.show-menu .sidebar-user-menu {
     display: flex;
 }
+/* Notification bell */
+.avatar-wrapper {
+    position: relative;
+    display: inline-block;
+}
 
+.user-avatar {
+    width: 45px;
+    height: 45px;
+
+    border-radius: 50%;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: #14b8a6;
+    color: white;
+
+    font-weight: bold;
+    font-size: 18px;
+}
+
+
+/* Small notification badge attached to avatar */
+.sidebar .avatar-notification {
+    position: absolute;
+
+    top: -6px;
+    right: -8px;
+
+    width: 24px;
+    height: 24px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: #f97316;
+
+    border-radius: 50%;
+
+    border: 2px solid #1f2937;
+
+    padding: 0;
+    margin: 0;
+
+    text-decoration: none;
+
+    box-sizing: border-box;
+
+    transition: transform 0.15s ease;
+}
+
+.notification-hidden {
+    display: none;
+}
+
+.avatar-notification svg {
+    width: 13px;
+    height: 13px;
+
+    fill: none;
+    stroke: white;
+    stroke-width: 2;
+
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.avatar-notification:hover {
+    transform: scale(1.15);
+}
+/* =========================
+    FORM CONTROLS
+    ========================= */
 .checkbox-label {
     display: flex !important;
     align-items: center !important;
@@ -531,6 +645,9 @@ body {
     margin: 0 !important;
 }
 
+/* =========================
+    DASHBOARD CARD DETAILS
+    ========================= */
 /* Card header */
 .dashboard-card h2{display:flex;align-items:center;gap:10px;margin:0 0 12px 0;font-size:18px}
 .dashboard-card h2 .card-icon{width:38px;height:38px;border-radius:8px;background:linear-gradient(135deg,var(--accent),var(--accent-600));display:inline-flex;align-items:center;justify-content:center;color:white;font-weight:700}
@@ -548,6 +665,9 @@ body {
 /* Subtle card titles for home page */
 .dashboard-card a h2{margin:0}
 
+/* =========================
+    SAMPLE PAGE TABS
+    ========================= */
 /* Tabs for sample page */
 .tabs{display:flex;gap:8px;margin-bottom:12px}
 .tab-btn{padding:8px 12px;border-radius:8px;border:1px solid #e6eef6;background:#f8fafc;cursor:pointer}
@@ -557,6 +677,9 @@ body {
 
 .left-panel #append-panel .filter-input, .left-panel #append-panel select, .left-panel #append-panel textarea{width:100%;padding:8px;border-radius:6px;border:1px solid #d1d5db}
 
+/* =========================
+    RESULT TOOLTIP
+    ========================= */
 /* hover tooltip */
 .result-hover {
     cursor: help;
@@ -577,6 +700,9 @@ body {
     overflow-y: auto;
 }
 
+/* =========================
+    FLASH MESSAGES
+    ========================= */
 /* error flashcards */
 .flash-container {
     position: fixed;
@@ -648,4 +774,290 @@ body {
         transform: translateY(-100px);
         opacity: 0;
     }
+}
+
+/* =========================
+   CHANGE REQUEST PAGES
+   ========================= */
+
+.change-request-container {
+    width: 100%;
+    max-width: none;
+    margin: 30px 0;
+    box-sizing: border-box;
+}
+
+.change-request-container h1 {
+    margin: 0;
+}
+
+.change-request-container p {
+    margin-bottom: 30px;
+}
+
+
+/* Page header */
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 25px;
+}
+
+
+/* My requests table */
+.request-table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+}
+
+.request-table {
+    width: 100%;
+    min-width: 900px;
+    border-collapse: collapse;
+}
+
+.request-table th,
+.request-table td {
+    padding: 12px 16px;
+    text-align: left;
+    border-bottom: 1px solid #e5e7eb;
+    vertical-align: middle;
+}
+
+.request-table th {
+    background-color: #f3f4f6;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.request-table tbody tr:hover {
+    background-color: #f9fafb;
+}
+
+/* Give sensible space to the columns */
+.request-table th:nth-child(1),
+.request-table td:nth-child(1) {
+    width: 15%;
+    white-space: nowrap;
+}
+
+.request-table th:nth-child(2),
+.request-table td:nth-child(2) {
+    width: 14%;
+}
+
+.request-table th:nth-child(3),
+.request-table td:nth-child(3) {
+    width: 18%;
+}
+
+.request-table th:nth-child(4),
+.request-table td:nth-child(4) {
+    width: 18%;
+}
+
+.request-table th:nth-child(5),
+.request-table td:nth-child(5) {
+    width: 25%;
+}
+
+.request-table th:nth-child(6),
+.request-table td:nth-child(6) {
+    width: 10%;
+    white-space: nowrap;
+}
+
+
+.old-value {
+    text-decoration: line-through;
+    color: #6b7280;
+}
+
+.new-value {
+    font-weight: 600;
+}
+
+
+.status {
+    display: inline-block;
+    padding: 5px 10px;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.status-pending {
+    background-color: #fff3cd;
+    color: #856404;
+}
+
+.status-approved {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.status-rejected {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+
+/* Link/button at top of page */
+.button-link {
+    display: inline-block;
+    padding: 9px 14px;
+    background-color: #1f2937;
+    color: white;
+    text-decoration: none;
+    border-radius: 6px;
+    white-space: nowrap;
+}
+
+.button-link:hover {
+    background-color: #374151;
+}
+
+
+/* =========================
+   SIDEBAR DROPDOWN
+   ========================= */
+
+.nav-dropdown {
+    position: relative;
+    width: 100%;
+}
+
+
+/* Make it look exactly like the other sidebar links */
+.nav-dropdown-button {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: none;
+    border: none;
+    color: white;
+    font: inherit;
+    text-align: left;
+    padding: 12px;
+    margin: 0 0 5px 0;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.nav-dropdown-button:hover {
+    background-color: #374151;
+}
+
+.nav-dropdown-arrow {
+    margin-left: 8px;
+    font-size: 10px;
+    color: white;
+    display: inline-block;
+    transition: transform 0.2s ease;
+}
+
+.nav-dropdown-button.open .nav-dropdown-arrow {
+    transform: rotate(180deg);
+}
+
+/* Dropdown itself */
+.nav-dropdown-menu {
+    display: none;
+    width: max-content;
+    min-width: 100%;
+    box-sizing: border-box;
+    background-color: #111827;
+    border-radius: 5px;
+    margin-bottom: 5px;
+    overflow: visible;
+    position: relative;
+    z-index: 1000;
+}
+
+.nav-dropdown-menu.show {
+    display: block;
+}
+
+.nav-dropdown-menu a {
+    display: block;
+    color: #e5e7eb;
+    text-decoration: none;
+    padding: 10px 16px;
+    margin: 0;
+    border-radius: 0;
+    white-space: nowrap;
+}
+
+
+.nav-dropdown-menu a:hover {
+    background-color: #374151;
+    color: white;
+}
+
+/* =========================
+    CHANGE REQUEST REVIEW ACTIONS
+    ========================= */
+.approval-actions {
+    min-width: 220px;
+}
+
+.approval-actions form {
+    margin: 0 0 8px 0;
+}
+
+.approval-actions form:last-child {
+    margin-bottom: 0;
+}
+
+.review-comment {
+    width: 100%;
+    padding: 7px 9px;
+    margin: 0 0 6px 0;
+    box-sizing: border-box;
+    border: 1px solid #d1d5db;
+    border-radius: 5px;
+}
+
+.approve-button,
+.reject-button {
+    width: auto;
+    margin: 0;
+    padding: 7px 12px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.approve-button {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.approve-button:hover {
+    background-color: #c3e6cb;
+}
+
+.reject-button {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+.reject-button:hover {
+    background-color: #f5c6cb;
+}
+
+.review-comment-display {
+    margin-top: 6px;
+    font-size: 13px;
+    color: #721c24;
+    max-width: 250px;
+    white-space: normal;
 }

@@ -1,0 +1,226 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="change-request-container">
+
+    <h1>Wijziging aanvragen</h1>
+
+    <form method="POST" id="changeRequestForm">
+
+        <!-- PRODUCT -->
+        <div class="form-group">
+            <label for="product_id">Product</label>
+
+            <select id="product_id" name="product_id" required>
+                <option value="">Selecteer product...</option>
+
+                {% for product in products %}
+                    <option value="{{ product.product_id }}">
+                        {{ product.product_name }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <!-- BATCH -->
+        <div class="form-group">
+            <label for="sample_id">Batchnummer</label>
+
+            <select
+                id="sample_id"
+                name="sample_id"
+                disabled
+                required
+            >
+                <option value="">Selecteer eerst een product...</option>
+            </select>
+        </div>
+
+        <!-- TEST -->
+        <div class="form-group">
+            <label for="test_target">Test</label>
+
+            <select
+                id="test_target"
+                name="test_target"
+                disabled
+                required
+            >
+                <option value="">Selecteer eerst een batch...</option>
+            </select>
+        </div>
+
+        <!-- FIELD -->
+        <div class="form-group">
+            <label for="field_name">Resultaat</label>
+
+            <select
+                id="field_name"
+                name="field_name"
+                disabled
+                required
+            >
+                <option value="">Selecteer eerst een test...</option>
+            </select>
+        </div>
+
+        <!-- OLD VALUE -->
+        <div class="form-group">
+            <label for="old_value_display">Huidige waarde</label>
+
+            <input
+                type="text"
+                id="old_value_display"
+                readonly
+            >
+        </div>
+
+        <!-- NEW VALUE -->
+        <div class="form-group">
+            <label for="new_value">Nieuwe waarde</label>
+
+            <input
+                type="text"
+                id="new_value"
+                name="new_value"
+                required
+            >
+            <input
+                type="hidden"
+                id="record_id"
+                name="record_id"
+            >
+        </div>
+
+        <!-- REASON -->
+        <div class="form-group">
+            <label for="reason">Reden voor wijziging</label>
+
+            <textarea
+                id="reason"
+                name="reason"
+                rows="5"
+                required
+            ></textarea>
+        </div>
+
+        <button type="submit">
+            Wijziging aanvragen
+        </button>
+    </form>
+</div>
+
+<script>
+    const productSelect = document.getElementById("product_id");
+    const batchSelect = document.getElementById("sample_id");
+    const testSelect = document.getElementById("test_target");
+    const fieldSelect = document.getElementById("field_name");
+    const oldValueInput = document.getElementById("old_value_display");
+    const recordIdInput = document.getElementById("record_id");
+
+    productSelect.addEventListener("change", async function () {
+
+        const productId = this.value;
+        batchSelect.innerHTML =
+            '<option value="">Selecteer batch...</option>';
+        testSelect.innerHTML =
+            '<option value="">Selecteer eerst een batch...</option>';
+        fieldSelect.innerHTML =
+            '<option value="">Selecteer eerst een test...</option>';
+        oldValueInput.value = "";
+        recordIdInput.value = "";
+        batchSelect.disabled = true;
+        testSelect.disabled = true;
+        fieldSelect.disabled = true;
+
+        if (!productId) {
+            return;
+        }
+
+        const response = await fetch(
+            `/change_request/batches?product_id=${productId}`
+        );
+
+        const batches = await response.json();
+        batches.forEach(batch => {
+            const option = document.createElement("option");
+            option.value = batch.sample_id;
+            option.textContent = batch.batch_nr;
+            batchSelect.appendChild(option);
+        });
+
+        batchSelect.disabled = false;
+    });
+
+    batchSelect.addEventListener("change", async function () {
+        const sampleId = this.value;
+        testSelect.innerHTML =
+            '<option value="">Selecteer test...</option>';
+        fieldSelect.innerHTML =
+            '<option value="">Selecteer eerst een test...</option>';
+        oldValueInput.value = "";
+        recordIdInput.value = "";
+        testSelect.disabled = true;
+        fieldSelect.disabled = true;
+
+        if (!sampleId) {
+            return;
+        }
+
+        const response = await fetch(
+            `/change_request/tests?sample_id=${sampleId}`
+        );
+
+        const tests = await response.json();
+        tests.forEach(test => {
+            const option = document.createElement("option");
+            option.value = test.test_key;
+            option.textContent = test.label;
+            option.dataset.recordId = test.record_id;
+            testSelect.appendChild(option);
+        });
+        testSelect.disabled = false;
+    });
+
+    testSelect.addEventListener("change", async function () {
+        const selectedOption =
+            this.options[this.selectedIndex];
+        const testKey = this.value;
+        const recordId = selectedOption.dataset.recordId;
+        fieldSelect.innerHTML =
+            '<option value="">Selecteer resultaat...</option>';
+        oldValueInput.value = "";
+        recordIdInput.value = "";
+        fieldSelect.disabled = true;
+
+        if (!testKey || !recordId) {
+            return;
+        }
+
+        recordIdInput.value = recordId;
+        const response = await fetch(
+            `/change_request/fields?test_key=${testKey}&record_id=${recordId}`
+        );
+        const fields = await response.json();
+
+        fields.forEach(field => {
+            const option = document.createElement("option");
+            option.value = field.field;
+            option.textContent = field.label;
+            option.dataset.oldValue = field.value ?? "";
+            fieldSelect.appendChild(option);
+        });
+
+        fieldSelect.disabled = false;
+    });
+
+    fieldSelect.addEventListener("change", function () {
+        const selectedOption =
+            this.options[this.selectedIndex];
+        oldValueInput.value =
+            selectedOption.dataset.oldValue || "";
+    });
+</script>
+
+{% endblock %}
