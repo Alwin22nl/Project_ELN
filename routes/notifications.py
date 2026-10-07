@@ -32,3 +32,15 @@ def get_notifications():
         "has_notifications": len(notifications) > 0,
         "notifications": notifications
     })
+
+@notification_bp.route("/notifications/mark-read",methods=["POST"])
+@login_required
+def mark_notifications_read():
+
+    service.mark_notifications_read(
+        session["user_id"]
+    )
+
+    return jsonify({
+        "success": True
+    })

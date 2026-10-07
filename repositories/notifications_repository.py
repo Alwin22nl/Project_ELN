@@ -159,3 +159,29 @@ class NotificationsRepository:
             cursor.close()
             connection.close()
 
+    def mark_notifications_read(self, user_id):
+        connection = get_connection()
+        cursor = connection.cursor()
+
+        try:
+            cursor.execute(
+                """
+                UPDATE notifications
+                SET
+                    is_read = TRUE,
+                    read_at = CURRENT_TIMESTAMP
+                WHERE user_id = %s
+                AND is_read = FALSE
+                """,
+                (user_id,)
+            )
+
+            connection.commit()
+
+        except Exception:
+            connection.rollback()
+            raise
+
+        finally:
+            cursor.close()
+            connection.close()

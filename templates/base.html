@@ -194,7 +194,7 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         );
     }
-    
+
     if (
         dropdown
         && !dropdown.contains(event.target)
@@ -229,8 +229,33 @@ document.addEventListener("DOMContentLoaded", function () {
             "aria-hidden",
             isOpen ? "false" : "true"
         );
+
+        if (isOpen) {
+            markNotificationsRead();
+        };
     }
 
+    async function markNotificationsRead() {
+        try {
+
+            const response = await fetch(
+                "{{ url_for('notifications.mark_notifications_read') }}",
+                {
+                    method: "POST"
+                }
+            );
+            if (!response.ok) {
+                console.error(
+                    "Meldingen konden niet als gelezen worden gemarkeerd."
+                );
+            }
+        } catch (error) {
+            console.error(
+                "Fout bij markeren van meldingen als gelezen:",
+                error
+            );
+        }
+    }
 
     if (avatar) {
 

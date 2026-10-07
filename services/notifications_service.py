@@ -36,4 +36,6 @@ class NotificationsService:
 
     def get_other_users(self, exclude_user_id):
         return self.repository.get_other_users(exclude_user_id)
-    
+
+    def mark_notifications_read(self, user_id):
+        self.repository.mark_notifications_read(user_id)
