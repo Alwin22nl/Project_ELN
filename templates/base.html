@@ -61,9 +61,11 @@
                 <div class="sidebar-bottom">
                     {% if session.get("user_id") %}
                         <div class="sidebar-user">
+                            <!-- Popup panel -->
                             <div
                                 id="notificationPanel"
                                 class="notification-panel"
+                                aria-hidden="true"
                             >
                                 <div class="notification-panel-header">
                                     Meldingen
@@ -76,46 +78,12 @@
                                         Geen meldingen
                                     </div>
                                 </div>
-                            </div>
-                            <div class="sidebar-user-footer">
-                                <div class="avatar-wrapper">
-                                    <div
-                                        id="userAvatar"
-                                        class="sidebar-avatar"
-                                        title="{{ session['name'] }}"
-                                    >
-                                        {% set _parts = session['name'].split()
-                                        if session.get('name') else [] %}
 
-                                        {% if _parts|length >= 2 %}
-                                            {{ (_parts[0][0] + _parts[1][0])|upper }}
-                                        {% elif _parts|length == 1 %}
-                                            {{ _parts[0][0:2]|upper }}
-                                        {% endif %}
-                                    </div>
-                                    <div
-                                        id="notificationBell"
-                                        class="avatar-notification notification-hidden"
-                                    >
-                                        <svg
-                                            viewBox="0 0 24 24"
-                                            aria-hidden="true"
-                                        >
-                                            <path
-                                                d="
-                                                    M18 8a6 6 0 0 0-12 0
-                                                    c0 7-3 7-3 9h18
-                                                    c0-2-3-2-3-9
-                                                    M13.73 21
-                                                    a2 2 0 0 1-3.46 0
-                                                "
-                                            />
-                                        </svg>
-                                    </div>
-                                </div>
-                                <div class="sidebar-user-details">
+                                <!-- User section inside popup -->
+                                <div class="notification-user-section">
+
                                     <div class="sidebar-user-name">
-                                        {{ session['name'] }}
+                                        {{ session["name"] }}
                                     </div>
                                     <a
                                         class="logout-link"
@@ -123,6 +91,49 @@
                                     >
                                         Uitloggen
                                     </a>
+                                </div>
+                            </div>
+                            <!-- Avatar stays visible -->
+                            <div class="avatar-wrapper">
+                                <div
+                                    id="userAvatar"
+                                    class="sidebar-avatar"
+                                    title="{{ session['name'] }}"
+                                    role="button"
+                                    tabindex="0"
+                                >
+                                    {% set _parts = session['name'].split()
+                                    if session.get('name') else [] %}
+
+                                    {% if _parts|length >= 2 %}
+                                        {{ (_parts[0][0] + _parts[1][0])|upper }}
+
+                                    {% elif _parts|length == 1 %}
+                                        {{ _parts[0][0:2]|upper }}
+
+                                    {% endif %}
+                                </div>
+                                <div
+                                    id="changeRequestBell"
+                                    class="avatar-notification notification-hidden"
+                                    title="Meldingen"
+                                    role="button"
+                                    tabindex="0"
+                                >
+                                    <svg
+                                        viewBox="0 0 24 24"
+                                        aria-hidden="true"
+                                    >
+                                        <path
+                                            d="
+                                                M18 8a6 6 0 0 0-12 0
+                                                c0 7-3 7-3 9h18
+                                                c0-2-3-2-3-9
+                                                M13.73 21
+                                                a2 2 0 0 1-3.46 0
+                                            "
+                                        />
+                                    </svg>
                                 </div>
                             </div>
                         </div>
@@ -154,63 +165,90 @@
 
 </html>
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        var avatar = document.getElementById('userAvatar');
-        var userBlock = avatar && avatar.closest('.sidebar-user');
-        if (!avatar || !userBlock) return;
+document.addEventListener("DOMContentLoaded", function () {
 
-        var toggleMenu = function (ev) {
-            ev.stopPropagation();
-            userBlock.classList.toggle('show-menu');
-        };
+    const avatar = document.getElementById("userAvatar");
+    const bell = document.getElementById("changeRequestBell");
+    const panel = document.getElementById("notificationPanel");
 
-        avatar.addEventListener('click', toggleMenu);
+    if (!avatar || !panel) {
+        return;
+    }
 
-        // close when clicking outside
-        document.addEventListener('click', function (ev) {
-            if (!userBlock.contains(ev.target)) {
-                userBlock.classList.remove('show-menu');
-            }
-        });
-    });
-    document.addEventListener("DOMContentLoaded", function () {
-        const flashMessages =
-            document.querySelectorAll(".flash-message");
-        flashMessages.forEach(function (message) {
-            setTimeout(function () {
-                message.remove();
-            }, 5500);
-        });
-    });
-
-    const changeRequestMenuButton =
-        document.getElementById("changeRequestMenuButton");
-
-    const changeRequestMenu =
-        document.getElementById("changeRequestMenu");
-
-    changeRequestMenuButton.addEventListener("click", function (event) {
-        event.stopPropagation();
-        changeRequestMenu.classList.toggle("show");
-    });
-
-    document.addEventListener("click", function () {
-        changeRequestMenu.classList.remove("show");
-    });
-
-    changeRequestMenu.addEventListener("click", function (event) {
-        event.stopPropagation();
-    });
-
-    document.addEventListener("DOMContentLoaded", function () {
-
-        const notificationBell =
-            document.getElementById("changeRequestBell");
-
-        if (!notificationBell) {
-            return;
+    function toggleNotificationPanel(event) {
+        if (event) {
+            event.stopPropagation();
         }
 
+        const isOpen = panel.classList.toggle("open");
+        panel.setAttribute(
+            "aria-hidden",
+            isOpen ? "false" : "true"
+        );
+    }
+    avatar.addEventListener(
+        "click",
+        toggleNotificationPanel
+    );
+
+    if (bell) {
+        bell.addEventListener(
+            "click",
+            toggleNotificationPanel
+        );
+    }
+
+    // Close when clicking elsewhere
+    document.addEventListener(
+        "click",
+        function (event) {
+
+            if (
+                !panel.contains(event.target)
+                && !avatar.contains(event.target)
+                && (!bell || !bell.contains(event.target))
+            ) {
+                panel.classList.remove("open");
+
+                panel.setAttribute(
+                    "aria-hidden",
+                    "true"
+                );
+            }
+        }
+    );
+
+    // Keyboard support
+    avatar.addEventListener(
+        "keydown",
+        function (event) {
+
+            if (
+                event.key === "Enter"
+                || event.key === " "
+            ) {
+                event.preventDefault();
+                toggleNotificationPanel(event);
+            }
+        }
+    );
+
+    if (bell) {
+        bell.addEventListener(
+            "keydown",
+            function (event) {
+                if (
+                    event.key === "Enter"
+                    || event.key === " "
+                ) {
+                    event.preventDefault();
+                    toggleNotificationPanel(event);
+                }
+            }
+        );
+    }
+
+});
         async function refreshNotificationBell() {
 
             try {
@@ -248,6 +286,5 @@
             15000
         );
 
-    });
 
 </script>

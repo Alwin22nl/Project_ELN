@@ -629,6 +629,145 @@ body {
 .avatar-notification:hover {
     transform: scale(1.15);
 }
+.sidebar-user {
+    position: relative;
+}
+
+/* =========================================
+   Notification panel
+   ========================================= */
+
+.notification-panel {
+    position: absolute;
+    left: 0;
+    bottom: 60px;
+    width: 190px;
+    max-height: 360px;
+    background: #1f2937;
+    border: 1px solid #374151;
+    border-radius: 8px;
+    box-sizing: border-box;
+    overflow: hidden;
+    display: none;
+    z-index: 100;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+}
+
+.notification-panel.open {
+    display: block;
+}
+
+.notification-panel-header {
+    padding: 12px 14px;
+    color: white;
+    font-weight: 600;
+    border-bottom: 1px solid #374151;
+}
+
+.notification-list {
+    max-height: 230px;
+    overflow-y: auto;
+}
+
+
+.notification-empty {
+    padding: 18px 12px;
+    color: #9ca3af;
+    font-size: 13px;
+    text-align: center;
+}
+
+
+/* User info at bottom of opened panel */
+.notification-user-section {
+    padding: 12px 14px;
+    border-top: 1px solid #374151;
+}
+
+
+.sidebar-user-name {
+    color: white;
+    font-size: 14px;
+    margin-bottom: 8px;
+}
+
+
+.notification-user-section .logout-link {
+    display: inline-block;
+    padding: 6px 10px;
+    background: #ef4444;
+    color: white;
+    border-radius: 5px;
+    text-decoration: none;
+    font-size: 13px;
+}
+
+/* =========================================
+   Avatar
+   ========================================= */
+
+.avatar-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+.sidebar-avatar {
+    cursor: pointer;
+}
+
+/* =========================================
+   Notification bell
+   ========================================= */
+
+.sidebar .avatar-notification {
+    position: absolute;
+    top: -6px;
+    right: -8px;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f97316;
+    border-radius: 50%;
+    border: 2px solid #1f2937;
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+    cursor: pointer;
+    z-index: 10;
+}
+
+.sidebar .avatar-notification.notification-hidden {
+    display: none;
+}
+
+.avatar-notification svg {
+    width: 13px;
+    height: 13px;
+    fill: none;
+    stroke: white;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+/* =========================================
+   User area
+   ========================================= */
+
+.sidebar-user-footer {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.sidebar-user-details {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
 /* =========================
     FORM CONTROLS
     ========================= */
