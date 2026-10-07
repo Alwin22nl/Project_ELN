@@ -1,0 +1,135 @@
+from database import get_dict_cursor, get_connection
+
+class NotificationsRepository:
+    def get_active_notifications(self, user_id):
+        connection = get_connection()
+        cursor = get_dict_cursor(connection)
+
+        try:
+            cursor.execute(
+                """
+                SELECT
+                    notifications_id,
+                    notifications_type,
+                    title,
+                    message,
+                    reference_type,
+                    reference_id,
+                    link,
+                    is_read,
+                    created_at
+                FROM notifications
+                WHERE user_id = %s
+                AND is_active = TRUE
+                ORDER BY created_at DESC
+                """,
+                (user_id,)
+            )
+
+            return cursor.fetchall()
+
+        finally:
+            cursor.close()
+            connection.close()
+
+    def has_active_notifications(self, user_id):
+        connection = get_connection()
+        cursor = get_dict_cursor(connection)
+
+        try:
+            cursor.execute(
+                """
+                SELECT EXISTS (
+                    SELECT 1
+                    FROM notifications
+                    WHERE user_id = %s
+                    AND is_active = TRUE
+                )
+                """,
+                (user_id,)
+            )
+
+            return cursor.fetchone()[0]
+
+        finally:
+            cursor.close()
+            connection.close()
+
+    def create_notification(
+            self,
+            user_id,
+            notification_type,
+            title,
+            message=None,
+            reference_type=None,
+            reference_id=None,
+            link=None
+    ):
+        connection = get_connection()
+        cursor = connection.cursor()
+
+        try:
+            cursor.execute(
+                """
+                INSERT INTO notifications
+                (
+                    user_id,
+                    notification_type,
+                    title,
+                    message,
+                    reference_type,
+                    reference_id,
+                    link
+                )
+                VALUES
+                (%s,%s,%s,%s,%s,%s,%s)
+                """,
+                (
+                    user_id,
+                    notification_type,
+                    title,
+                    message,
+                    reference_type,
+                    reference_id,
+                    link
+                )
+            )
+
+            connection.commit()
+
+        except Exception:
+            connection.rollback()
+            raise
+
+        finally:
+            cursor.close()
+            connection.close()
+
+    def deactivate_notification(self, reference_type, reference_id):
+        connection = get_connection()
+        cursor = connection.cursor()
+
+        try:
+            cursor.execute(
+                """
+                UPDATE notifications
+                SET is_active = FALSE
+                WHERE reference_type = %s
+                AND reference_id = %s
+                AND is_active = TRUE
+                """,
+                (
+                    reference_type,
+                    reference_id
+                )
+            )
+
+            connection.commit()
+
+        except Exception:
+            connection.rollback()
+            raise
+
+        finally:
+            cursor.close()
+            connection.close()
