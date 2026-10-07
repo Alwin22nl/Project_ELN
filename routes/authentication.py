@@ -1,3 +1,4 @@
+import time
 from flask import(
     Blueprint,
     redirect,
@@ -39,6 +40,7 @@ def login():
         session.clear()
 
         session.permanent = True
+        session["last_activity"] = time.time()
 
         session["user_id"] = user["user_id"]
         session["username"] = user["username"]

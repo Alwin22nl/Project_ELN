@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 from flask import Flask
 from datetime import timedelta
 from Context_processors import register_context_processors
+from middleware import register_session_timeout
 
 #importing routes
 from routes.authentication import authentication_bp
@@ -35,7 +36,8 @@ load_dotenv()
 app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY")
 app.permanent_session_lifetime = timedelta(hours=1)
-app.config["SESSION_REFRESH_EACH_REQUEST"] = True
+app.config["SESSION_REFRESH_EACH_REQUEST"] = False
+register_session_timeout(app)
 register_context_processors(app)
 
 # routes
