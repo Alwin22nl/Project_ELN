@@ -1,0 +1,35 @@
+class NotificationsService:
+    def __init__(self, repository):
+        self.repository = repository
+
+    def get_active_notifications(self, user_id):
+        return self.repository.get_active_notifications(user_id)
+
+    def has_active_notifications(self, user_id):
+        return self.repository.has_avtive_notifications(user_id)
+
+    def create_notification(
+            self,
+            user_id,
+            notification_type,
+            title,
+            message=None,
+            reference_type=None,
+            reference_id=None,
+            link=None
+    ):
+        self.repository.create_notification(
+            user_id=user_id,
+            notification_type=notification_type,
+            title=title,
+            message=message,
+            reference_type=reference_type,
+            reference_id=reference_id,
+            link=link
+        )
+
+    def close_notification(self, reference_type, reference_id):
+        self.repository.deactivate_notification(
+            reference_type,
+            reference_id
+        )
