@@ -21,6 +21,9 @@ CREATE TABLE notifications (
     read_at TIMESTAMP
 );
 
+CREATE INDEX idx_notifications_user_active
+ON notifications (user_id, is_active);
+
 GRANT USAGE ON SCHEMA public TO eln_app;
 
 GRANT SELECT, INSERT, UPDATE, DELETE
