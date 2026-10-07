@@ -129,13 +129,6 @@ class NotificationsRepository:
             )
 
             updated = cursor.fetchall()
-            print(
-                "CLOSING NOTIFICATIONS:",
-                reference_type,
-                reference_id,
-                "UPDATED:",
-                updated
-            )
 
             connection.commit()
 
