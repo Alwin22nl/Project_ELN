@@ -133,3 +133,28 @@ class NotificationsRepository:
         finally:
             cursor.close()
             connection.close()
+
+    def get_other_users(self, exclude_user_id):
+        connection = get_connection()
+        cursor = get_dict_cursor(connection)
+
+        try:
+            cursor.execute(
+                """
+                SELECT
+                    user_id,
+                    name
+                FROM users
+                WHERE user_id <> %s
+                ORDER BY name
+                """,
+                (exclude_user_id,)
+            )
+
+            return cursor.fetchall()
+
+        finally:
+            cursor.close()
+            connection.close()
+
+            

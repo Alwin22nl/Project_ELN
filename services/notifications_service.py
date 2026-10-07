@@ -33,3 +33,7 @@ class NotificationsService:
             reference_type,
             reference_id
         )
+
+    def get_other_users(self, exclude_user_id):
+        return self.repository.get_other_users(exclude_user_id)
+    

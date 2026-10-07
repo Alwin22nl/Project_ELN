@@ -249,41 +249,84 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
 });
-        async function refreshNotificationBell() {
-
-            try {
-                const response = await fetch(
-                    "{{ url_for('change_request.notification_status') }}",
-                    {
-                        cache: "no-store"
-                    }
-                );
-
-                if (!response.ok) {
-                    return;
+    async function refreshNotifications() {
+        try {
+            const response = await fetch(
+                "{{ url_for('notifications.get_notifications') }}",
+                {
+                    cache: "no-store"
                 }
+            );
 
-                const data = await response.json();
-                notificationBell.classList.toggle(
-                    "notification-hidden",
-                    !data.show_bell
-                );
-
-            } catch (error) {
-                console.error(
-                    "Notification status kon niet worden opgehaald:",
-                    error
-                );
+            if (!response.ok) {
+                return;
             }
-        }
 
+            const data = await response.json();
+
+            const bell =
+                document.getElementById("changeRequestBell");
+
+            const list =
+                document.getElementById("notificationList");
+
+
+            // Bell
+            bell.classList.toggle(
+                "notification-hidden",
+                !data.has_notifications
+            );
+
+            // Notification panel
+            list.innerHTML = "";
+
+            if (data.notifications.length === 0) {
+
+                list.innerHTML = `
+                    <div class="notification-empty">
+                        Geen meldingen
+                    </div>
+                `;
+                return;
+            }
+
+            data.notifications.forEach(notification => {
+
+                const item =
+                    document.createElement("a");
+
+                item.className = "notification-item";
+
+                item.href = notification.link;
+
+                item.innerHTML = `
+                    <div class="notification-title">
+                        ${notification.title}
+                    </div>
+
+                    <div class="notification-message">
+                        ${notification.message || ""}
+                    </div>
+                `;
+
+                list.appendChild(item);
+            });
+
+        } catch (error) {
+
+            console.error(
+                "Meldingen konden niet worden opgehaald:",
+                error
+            );
+        }
+    }
         // Check immediately
         refreshNotificationBell();
 
         // Then check every 15 seconds
         setInterval(
             refreshNotificationBell,
-            15000
+            30000
         );
 
 

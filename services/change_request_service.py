@@ -4,8 +4,9 @@ from config.test import TEST_CONFIG
 
 class ChangeRequestService:
 
-    def __init__(self, repository):
+    def __init__(self, repository, notification_service=None):
         self.repository = repository
+        self.notification_service = notification_service
 
     def create_request(self, form, requested_by):
 
@@ -62,6 +63,34 @@ class ChangeRequestService:
         self.repository.create_request(
             change_request
         )
+
+        change_request_id = self.repository.create_request(change_request)
+
+        if self.notification_service:
+            users = self.notification_service.get_other_users(requested_by)
+
+            config = TEST_CONFIG[test_key]
+
+            test_label = config["label"]
+            field_label = config["fields"][field_name]
+            batch_nr = self.repository.get_batch_nr(sample_id)
+
+            for user in users:
+                self.notification_service.create_notification(
+                    user_id=user["user_id"],
+                    notification_type="change_request",
+                    title="Nieuwe Wijzigingsaanvraag",
+                    message=(
+                        f"batch {batch_nr} - "
+                        f"{test_label} - "
+                        f"{field_label}"
+                    ),
+                    reference_type="change_request",
+                    reference_id=change_request_id,
+                    link="/change_request/approvals"
+                )
+
+        return change_request_id
 
     def get_products(self):
         return self.repository.get_products()
@@ -322,6 +351,9 @@ class ChangeRequestService:
                 "je eigen aanvraag."
             )
 
+        if self.notification_service:
+            self.notification_service.close_change_request_notifications(change_request_id)
+
     def approve_request(
         self,
         change_request_id,
@@ -383,6 +415,9 @@ class ChangeRequestService:
                 "recalculate"
             )
         )
+
+        if self.notification_service:
+            self.notification_service.close_and_change_request_notifications(change_request_id)
 
     def has_open_requests_for_user(self, user_id):
         return self.repository.has_open_requests_for_user(user_id)
