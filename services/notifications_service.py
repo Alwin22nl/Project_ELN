@@ -39,3 +39,14 @@ class NotificationsService:
 
     def mark_notifications_read(self, user_id):
         self.repository.mark_notifications_read(user_id)
+
+    def has_unread_active_notifications(self, user_id):
+        return (
+            self.repository.has_unread_active_notifications(user_id)
+        )
+
+    def close_change_request_notifications(self, change_request_id):
+        self.repository.close_notifications(
+            reference_type="change_request",
+            reference_id=change_request_id
+        )

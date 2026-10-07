@@ -44,6 +44,7 @@ class NotificationsRepository:
                     FROM notifications
                     WHERE user_id = %s
                     AND is_active = TRUE
+                    AND read_at IS NULL
                 ) AS has_notifications
                 """,
                 (user_id,)
@@ -107,7 +108,7 @@ class NotificationsRepository:
             cursor.close()
             connection.close()
 
-    def deactivate_notification(self, reference_type, reference_id):
+    def close_notifications(self, reference_type, reference_id):
         connection = get_connection()
         cursor = connection.cursor()
 
@@ -119,6 +120,7 @@ class NotificationsRepository:
                 WHERE reference_type = %s
                 AND reference_id = %s
                 AND is_active = TRUE
+                RETURNING notification_id
                 """,
                 (
                     reference_type,
@@ -126,7 +128,18 @@ class NotificationsRepository:
                 )
             )
 
+            updated = cursor.fetchall()
+            print(
+                "CLOSING NOTIFICATIONS:",
+                reference_type,
+                reference_id,
+                "UPDATED:",
+                updated
+            )
+
             connection.commit()
+
+            return updated
 
         except Exception:
             connection.rollback()
@@ -181,6 +194,30 @@ class NotificationsRepository:
         except Exception:
             connection.rollback()
             raise
+
+        finally:
+            cursor.close()
+            connection.close()
+
+    def has_unread_active_notifications(self, user_id):
+        connection = get_connection()
+        cursor = connection.cursor()
+
+        try:
+            cursor.execute(
+                """
+                SELECT EXISTS (
+                    SELECT 1
+                    FROM notifications
+                    WHERE user_id = %s
+                    AND is_active = TRUE
+                    AND read_at IS NULL
+                )
+                """,
+                (user_id,)
+            )
+
+            return cursor.fetchone()[0]
 
         finally:
             cursor.close()

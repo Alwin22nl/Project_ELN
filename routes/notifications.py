@@ -15,7 +15,12 @@ service = NotificationsService(repository)
 @notification_bp.route("/notifications")
 @login_required
 def get_notifications():
-    rows = service.get_active_notifications(session["user_id"])
+
+    user_id = session["user_id"]
+
+    rows = service.get_active_notifications(
+        user_id
+    )
 
     notifications = []
 
@@ -25,18 +30,24 @@ def get_notifications():
             "type": row["notification_type"],
             "title": row["title"],
             "message": row["message"],
-            "link": row["link"]
+            "link": row["link"],
+            "is_read": row["is_read"]
         })
 
+    has_unread = (
+        service.has_unread_active_notifications(
+            user_id
+        )
+    )
+
     return jsonify({
-        "has_notifications": len(notifications) > 0,
+        "has_unread": has_unread,
         "notifications": notifications
     })
 
 @notification_bp.route("/notifications/mark-read",methods=["POST"])
 @login_required
 def mark_notifications_read():
-
     service.mark_notifications_read(
         session["user_id"]
     )

@@ -245,8 +245,12 @@ document.addEventListener("DOMContentLoaded", function () {
                 }
             );
             if (!response.ok) {
-                console.error(
-                    "Meldingen konden niet als gelezen worden gemarkeerd."
+                return;
+            }
+
+            if (bell) {
+                bell.classList.add(
+                    "notifications_hidden"
                 );
             }
         } catch (error) {
@@ -367,7 +371,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
                 notificationBell.classList.toggle(
                     "notification-hidden",
-                    !data.has_notifications
+                    !data.has_unread
                 );
             }
 
