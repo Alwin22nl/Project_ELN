@@ -24,7 +24,7 @@ class ChangeRequestRepository:
                     reason
                 )
                 VALUES
-                (%s,%s,%s,%s,%s,%s,%s)
+                (%s,%s,%s,%s,%s,%s,%s,%s)
                 RETURNING change_request_id
                 """,
                 (

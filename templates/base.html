@@ -167,46 +167,132 @@
 <script>
 document.addEventListener("DOMContentLoaded", function () {
 
-    const avatar = document.getElementById("userAvatar");
-    const bell = document.getElementById("changeRequestBell");
-    const panel = document.getElementById("notificationPanel");
+    const dropdown =
+        document.querySelector(".nav-dropdown");
 
-    if (!avatar || !panel) {
-        return;
+    const dropdownButton =
+        document.querySelector(".nav-dropdown-button");
+
+    const dropdownMenu =
+        document.querySelector(".nav-dropdown-menu");
+
+
+    if (
+        dropdown
+        && dropdownButton
+        && dropdownMenu
+    ) {
+
+        dropdownButton.addEventListener(
+            "click",
+            function (event) {
+
+                event.stopPropagation();
+
+                dropdownMenu.classList.toggle("show");
+                dropdownButton.classList.toggle("open");
+            }
+        );
+    }
+    
+    if (
+        dropdown
+        && !dropdown.contains(event.target)
+    ) {
+        dropdown.classList.remove("open");
     }
 
+    const avatar =
+        document.getElementById("userAvatar");
+
+    const bell =
+        document.getElementById("changeRequestBell");
+
+    const panel =
+        document.getElementById("notificationPanel");
+
+
     function toggleNotificationPanel(event) {
+
         if (event) {
             event.stopPropagation();
         }
 
-        const isOpen = panel.classList.toggle("open");
+        if (!panel) {
+            return;
+        }
+
+        const isOpen =
+            panel.classList.toggle("open");
+
         panel.setAttribute(
             "aria-hidden",
             isOpen ? "false" : "true"
         );
     }
-    avatar.addEventListener(
-        "click",
-        toggleNotificationPanel
-    );
+
+
+    if (avatar) {
+
+        avatar.addEventListener(
+            "click",
+            toggleNotificationPanel
+        );
+
+        avatar.addEventListener(
+            "keydown",
+            function (event) {
+
+                if (
+                    event.key === "Enter"
+                    || event.key === " "
+                ) {
+                    event.preventDefault();
+
+                    toggleNotificationPanel(
+                        event
+                    );
+                }
+            }
+        );
+    }
+
 
     if (bell) {
+
         bell.addEventListener(
             "click",
             toggleNotificationPanel
         );
-    }
 
-    // Close when clicking elsewhere
+        bell.addEventListener(
+            "keydown",
+            function (event) {
+
+                if (
+                    event.key === "Enter"
+                    || event.key === " "
+                ) {
+                    event.preventDefault();
+
+                    toggleNotificationPanel(
+                        event
+                    );
+                }
+            }
+        );
+    }
     document.addEventListener(
         "click",
         function (event) {
 
+            // Close notification panel
             if (
-                !panel.contains(event.target)
-                && !avatar.contains(event.target)
+                panel
+                && panel.classList.contains("open")
+                && (!avatar || !avatar.contains(event.target))
                 && (!bell || !bell.contains(event.target))
+                && !panel.contains(event.target)
             ) {
                 panel.classList.remove("open");
 
@@ -215,40 +301,17 @@ document.addEventListener("DOMContentLoaded", function () {
                     "true"
                 );
             }
-        }
-    );
 
-    // Keyboard support
-    avatar.addEventListener(
-        "keydown",
-        function (event) {
-
+            // Close Wijzigingen dropdown
             if (
-                event.key === "Enter"
-                || event.key === " "
+                dropdown
+                && !dropdown.contains(event.target)
             ) {
-                event.preventDefault();
-                toggleNotificationPanel(event);
+                dropdown.classList.remove("open");
             }
         }
     );
 
-    if (bell) {
-        bell.addEventListener(
-            "keydown",
-            function (event) {
-                if (
-                    event.key === "Enter"
-                    || event.key === " "
-                ) {
-                    event.preventDefault();
-                    toggleNotificationPanel(event);
-                }
-            }
-        );
-    }
-
-});
     async function refreshNotifications() {
         try {
             const response = await fetch(
@@ -262,25 +325,37 @@ document.addEventListener("DOMContentLoaded", function () {
                 return;
             }
 
-            const data = await response.json();
+            const data =
+                await response.json();
 
-            const bell =
-                document.getElementById("changeRequestBell");
+            const notificationBell =
+                document.getElementById(
+                    "changeRequestBell"
+                );
 
             const list =
-                document.getElementById("notificationList");
+                document.getElementById(
+                    "notificationList"
+                );
 
+            if (notificationBell) {
 
-            // Bell
-            bell.classList.toggle(
-                "notification-hidden",
-                !data.has_notifications
-            );
+                notificationBell.classList.toggle(
+                    "notification-hidden",
+                    !data.has_notifications
+                );
+            }
 
-            // Notification panel
+            if (!list) {
+                return;
+            }
+
             list.innerHTML = "";
 
-            if (data.notifications.length === 0) {
+            if (
+                !data.notifications
+                || data.notifications.length === 0
+            ) {
 
                 list.innerHTML = `
                     <div class="notification-empty">
@@ -290,28 +365,30 @@ document.addEventListener("DOMContentLoaded", function () {
                 return;
             }
 
-            data.notifications.forEach(notification => {
+            data.notifications.forEach(
+                notification => {
 
-                const item =
-                    document.createElement("a");
+                    const item =
+                        document.createElement("a");
 
-                item.className = "notification-item";
+                    item.className =
+                        "notification-item";
 
-                item.href = notification.link;
+                    item.href =
+                        notification.link || "#";
 
-                item.innerHTML = `
-                    <div class="notification-title">
-                        ${notification.title}
-                    </div>
+                    item.innerHTML = `
+                        <div class="notification-title">
+                            ${notification.title}
+                        </div>
 
-                    <div class="notification-message">
-                        ${notification.message || ""}
-                    </div>
-                `;
-
-                list.appendChild(item);
-            });
-
+                        <div class="notification-message">
+                            ${notification.message || ""}
+                        </div>
+                    `;
+                    list.appendChild(item);
+                }
+            );
         } catch (error) {
 
             console.error(
@@ -320,14 +397,11 @@ document.addEventListener("DOMContentLoaded", function () {
             );
         }
     }
-        // Check immediately
-        refreshNotificationBell();
 
-        // Then check every 15 seconds
-        setInterval(
-            refreshNotificationBell,
-            30000
-        );
-
-
+    refreshNotifications();
+    setInterval(
+        refreshNotifications,
+        30000
+    );
+});
 </script>

@@ -6,7 +6,7 @@ class NotificationsService:
         return self.repository.get_active_notifications(user_id)
 
     def has_active_notifications(self, user_id):
-        return self.repository.has_avtive_notifications(user_id)
+        return self.repository.has_active_notifications(user_id)
 
     def create_notification(
             self,

@@ -15,13 +15,20 @@ from helper import login_required
 from repositories.change_request_repository import ChangeRequestRepository
 from services.change_request_service import ChangeRequestService
 
+from repositories.notifications_repository import NotificationsRepository
+from services.notifications_service import NotificationsService
+
 change_request_bp = Blueprint(
     "change_request",
     __name__
 )
 
-repository = ChangeRequestRepository()
-service = ChangeRequestService(repository)
+change_request_repository = ChangeRequestRepository()
+
+notifications_repository = NotificationsRepository()
+notifications_service = NotificationsService(notifications_repository)
+
+service = ChangeRequestService(change_request_repository, notifications_service)
 
 @change_request_bp.route("/change_request/create", methods=["GET", "POST"])
 @login_required
@@ -177,12 +184,3 @@ def get_specimens():
     )
 
     return jsonify(specimens)
-
-@change_request_bp.route("/change_request/notification_status")
-@login_required
-def notification_status():
-    show_bell = service.has_open_requests_for_user(session["user_id"])
-
-    return jsonify({
-        "show_bell": show_bell
-    })

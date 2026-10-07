@@ -9,8 +9,8 @@ class NotificationsRepository:
             cursor.execute(
                 """
                 SELECT
-                    notifications_id,
-                    notifications_type,
+                    notification_id,
+                    notification_type,
                     title,
                     message,
                     reference_type,
@@ -44,12 +44,14 @@ class NotificationsRepository:
                     FROM notifications
                     WHERE user_id = %s
                     AND is_active = TRUE
-                )
+                ) AS has_notifications
                 """,
                 (user_id,)
             )
 
-            return cursor.fetchone()[0]
+            result = cursor.fetchone()
+
+            return result["has_notifications"]
 
         finally:
             cursor.close()
@@ -157,4 +159,3 @@ class NotificationsRepository:
             cursor.close()
             connection.close()
 
-            
