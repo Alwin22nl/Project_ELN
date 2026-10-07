@@ -61,27 +61,41 @@
                 <div class="sidebar-bottom">
                     {% if session.get("user_id") %}
                         <div class="sidebar-user">
-                            <div class="avatar-wrapper">
-                                <div
-                                    id="userAvatar"
-                                    class="sidebar-avatar"
-                                    title="{{ session['name'] }}"
-                                >
-                                    {% set _parts = session['name'].split() if session.get('name') else [] %}
-                                    {% if _parts|length >= 2 %}
-                                        {{ (_parts[0][0] + _parts[1][0])|upper }}
-
-                                    {% elif _parts|length == 1 %}
-                                        {{ _parts[0][0:2]|upper }}
-
-                                    {% endif %}
+                            <div
+                                id="notificationPanel"
+                                class="notification-panel"
+                            >
+                                <div class="notification-panel-header">
+                                    Meldingen
                                 </div>
-                                    <a
-                                        id="changeRequestBell"
-                                        href="{{ url_for('change_request.approvals') }}"
-                                        class="avatar-notification
-                                            {% if not show_change_request_bell %}notification-hidden{% endif %}"
-                                        title="Open wijzigingsaanvragen"
+                                <div
+                                    id="notificationList"
+                                    class="notification-list"
+                                >
+                                    <div class="notification-empty">
+                                        Geen meldingen
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="sidebar-user-footer">
+                                <div class="avatar-wrapper">
+                                    <div
+                                        id="userAvatar"
+                                        class="sidebar-avatar"
+                                        title="{{ session['name'] }}"
+                                    >
+                                        {% set _parts = session['name'].split()
+                                        if session.get('name') else [] %}
+
+                                        {% if _parts|length >= 2 %}
+                                            {{ (_parts[0][0] + _parts[1][0])|upper }}
+                                        {% elif _parts|length == 1 %}
+                                            {{ _parts[0][0:2]|upper }}
+                                        {% endif %}
+                                    </div>
+                                    <div
+                                        id="notificationBell"
+                                        class="avatar-notification notification-hidden"
                                     >
                                         <svg
                                             viewBox="0 0 24 24"
@@ -97,23 +111,19 @@
                                                 "
                                             />
                                         </svg>
-                                    </a>
-                            </div>
-                            <div
-                                id="userMenu"
-                                class="sidebar-user-menu"
-                                aria-hidden="true"
-                            >
-                                <div class="sidebar-user-name">
-                                    {{ session['name'] }}
+                                    </div>
                                 </div>
-
-                                <a
-                                    class="logout-link"
-                                    href="{{ url_for('authentication.logout') }}"
-                                >
-                                    Uitloggen
-                                </a>
+                                <div class="sidebar-user-details">
+                                    <div class="sidebar-user-name">
+                                        {{ session['name'] }}
+                                    </div>
+                                    <a
+                                        class="logout-link"
+                                        href="{{ url_for('authentication.logout') }}"
+                                    >
+                                        Uitloggen
+                                    </a>
+                                </div>
                             </div>
                         </div>
                     {% endif %}
