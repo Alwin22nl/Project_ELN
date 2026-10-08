@@ -638,59 +638,66 @@ body {
    ========================================= */
 
 .notification-panel {
+    display: none;
     position: absolute;
     left: 0;
     bottom: 60px;
-    width: 190px;
-    max-height: 360px;
+    width: 700px;
+    min-height: 240px;
+    max-height: 500px;
     background: #1f2937;
     border: 1px solid #374151;
     border-radius: 8px;
-    box-sizing: border-box;
+    z-index: 1000;
     overflow: hidden;
-    display: none;
-    z-index: 100;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
 }
 
 .notification-panel.open {
-    display: block;
+    display: flex;
+    flex-direction: column;
 }
 
+/* Header */
 .notification-panel-header {
-    padding: 12px 14px;
-    color: white;
+    padding: 12px 16px;
     font-weight: 600;
+    color: white;
     border-bottom: 1px solid #374151;
 }
 
+/* Notification area */
 .notification-list {
-    max-height: 230px;
+    flex: 1;
+    width: 100%;
+    padding: 0;
     overflow-y: auto;
 }
 
-
+/* When there are no notifications */
 .notification-empty {
-    padding: 18px 12px;
+    padding: 18px 16px;
     color: #9ca3af;
     font-size: 13px;
-    text-align: center;
+    text-align: left;
 }
 
+/* =========================================
+   User info at bottom-left
+   ========================================= */
 
-/* User info at bottom of opened panel */
 .notification-user-section {
+    margin-top: auto;
+    width: 100%;
     padding: 12px 14px;
     border-top: 1px solid #374151;
+    box-sizing: border-box;
 }
-
 
 .sidebar-user-name {
     color: white;
     font-size: 14px;
     margin-bottom: 8px;
 }
-
 
 .notification-user-section .logout-link {
     display: inline-block;

@@ -70,8 +70,8 @@ class NotificationsService:
                 "title": config["title"],
                 "message": config["message"],
                 "link": config["link"],
-                "count": config["count"],
-                "unread_count": config["unread_count"]
+                "count": row["active_count"],
+                "unread_count": row["unread_count"]
             })
 
         return notifications
