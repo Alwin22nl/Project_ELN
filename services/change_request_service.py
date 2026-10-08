@@ -62,11 +62,7 @@ class ChangeRequestService:
 
         change_request_id = self.repository.create_request(change_request)
 
-        print("CHANGE REQUEST ID:", change_request_id)
         users = self.notification_service.get_other_users(requested_by)
-        # delete later
-        print("REQUESTED BY:", requested_by)
-        print("NOTIFICATION USERS:", users)
 
         config = TEST_CONFIG[test_key]
 

@@ -16,28 +16,15 @@ service = NotificationsService(repository)
 @login_required
 def get_notifications():
 
-    user_id = session["user_id"]
-
-    rows = service.get_active_notifications(
-        user_id
+    notifications = (
+        service.get_notification_summary(
+            session["user_id"]
+        )
     )
 
-    notifications = []
-
-    for row in rows:
-        notifications.append({
-            "id": row["notification_id"],
-            "type": row["notification_type"],
-            "title": row["title"],
-            "message": row["message"],
-            "link": row["link"],
-            "is_read": row["is_read"]
-        })
-
-    has_unread = (
-        service.has_unread_active_notifications(
-            user_id
-        )
+    has_unread = any(
+        notification["unread_count"] > 0
+        for notification in notifications
     )
 
     return jsonify({

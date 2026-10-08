@@ -1,3 +1,5 @@
+from config.test import NOTIFICATION_CONFIG
+
 class NotificationsService:
     def __init__(self, repository):
         self.repository = repository
@@ -50,3 +52,26 @@ class NotificationsService:
             reference_type="change_request",
             reference_id=change_request_id
         )
+
+    def get_notification_summary(self, user_id):
+        rows = self.repository.get_notification_summary(user_id)
+
+        notifications = []
+
+        for row in rows:
+            notification_type = row["notification_type"]
+            config = NOTIFICATION_CONFIG.get(notification_type)
+
+            if config is None:
+                continue
+
+            notifications.append({
+                "type": notification_type,
+                "title": config["title"],
+                "message": config["message"],
+                "link": config["link"],
+                "count": config["count"],
+                "unread_count": config["unread_count"]
+            })
+
+        return notifications

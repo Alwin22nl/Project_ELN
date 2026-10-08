@@ -215,3 +215,32 @@ class NotificationsRepository:
         finally:
             cursor.close()
             connection.close()
+
+    def get_notification_summary(self, user_id):
+        connection = get_connection()
+        cursor = get_dict_cursor(connection)
+
+        try:
+            cursor.execute(
+                """
+                SELECT
+                    notification_type,
+                    COUNT(*) AS active_count,
+                    COUNT(*) FILTER (
+                        WHERE read_at IS NULL
+                    ) AS unread_count,
+                    MAX(created_at) AS latest_created_at
+                FROM notifications
+                WHERE user_id = %s
+                AND is_active = TRUE
+                GROUP BY notification_type
+                ORDER BY latest_created_at DESC
+                """,
+                (user_id,)
+            )
+
+            return cursor.fetchall()
+
+        finally:
+            cursor.close()
+            connection.close()
