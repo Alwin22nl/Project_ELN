@@ -1,11 +1,11 @@
-from flask import session
+from flask import session, current_app
 
-from repositories.change_request_repository import ChangeRequestRepository
-from services.change_request_service import ChangeRequestService
+from repositories.notifications_repository import NotificationsRepository
+from services.notifications_service import NotificationsService
 
 def register_notifications_context(app):
-    repository = ChangeRequestRepository()
-    service = ChangeRequestService(repository)
+    repository = NotificationsRepository()
+    service = NotificationsService(repository)
 
     @app.context_processor
     def inject_notifications():
@@ -14,10 +14,18 @@ def register_notifications_context(app):
                 "show_change_request_bell": False
             }
 
-        show_bell = service.has_open_requests_for_user(
-            session["user_id"]
-        )
+        try:
+            show_bell = service.has_active_notifications(
+                session["user_id"]
+            )
+
+        except Exception:
+            current_app.logger.exception(
+                "Could not load notifications"
+            )
+
+            show_bell = False
 
         return {
-            "show_change_request_bell": show_bell
+            "show_notifications_bell": show_bell
         }

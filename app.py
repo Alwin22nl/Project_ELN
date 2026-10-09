@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 from flask import Flask
 from datetime import timedelta
 from Context_processors import register_context_processors
+from middleware import register_session_timeout
 
 #importing routes
 from routes.authentication import authentication_bp
@@ -16,6 +17,7 @@ from routes.products import product_bp
 from routes.overview import overview_bp
 from routes.batch_search import batch_search_bp
 from routes.change_request import change_request_bp
+from routes.notifications import notification_bp
 
 # importing Test Routes
 from routes.tests import test_bp
@@ -34,7 +36,8 @@ load_dotenv()
 app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY")
 app.permanent_session_lifetime = timedelta(hours=1)
-app.config["SESSION_REFRESH_EACH_REQUEST"] = True
+app.config["SESSION_REFRESH_EACH_REQUEST"] = False
+register_session_timeout(app)
 register_context_processors(app)
 
 # routes
@@ -46,6 +49,7 @@ app.register_blueprint(product_bp)
 app.register_blueprint(overview_bp)
 app.register_blueprint(batch_search_bp)
 app.register_blueprint(change_request_bp)
+app.register_blueprint(notification_bp)
 
 # test routes
 app.register_blueprint(test_bp)
@@ -60,4 +64,4 @@ app.register_blueprint(curability_bp)
 app.register_blueprint(tensile_bp)
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=False)

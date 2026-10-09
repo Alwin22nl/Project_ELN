@@ -296,3 +296,24 @@ TEST_TABLES = {
     "adhesion": "adhesion",
     "epdm_adhesion": "epdm_adhesion"
 }
+
+NOTIFICATION_CONFIG = {
+
+    "change_request": {
+        "title": "Wijzigingsaanvragen",
+        "message": (
+            "1 of meerdere wijzigingsaanvragen "
+            "staan klaar voor beoordeling."
+        ),
+        "link": "/change_request/approvals"
+    },
+
+    "product_limit": {
+        "title": "Product-limieten",
+        "message": (
+            "1 of meerdere batches hebben een "
+            "resultaat buiten de limieten."
+        ),
+        "link": "/quality/limit-triggers"
+    }
+}

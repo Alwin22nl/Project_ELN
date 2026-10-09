@@ -24,7 +24,8 @@ class ChangeRequestRepository:
                     reason
                 )
                 VALUES
-                (%s,%s,%s,%s,%s,%s,%s)
+                (%s,%s,%s,%s,%s,%s,%s,%s)
+                RETURNING change_request_id
                 """,
                 (
                     change_request.requested_by,
@@ -38,11 +39,40 @@ class ChangeRequestRepository:
                 )
             )
 
+            change_request_id = cursor.fetchone()[0]
+
             connection.commit()
+
+            return change_request_id
 
         except Exception:
             connection.rollback()
             raise
+
+        finally:
+            cursor.close()
+            connection.close()
+
+    def get_batch_nr(self, sample_id):
+        connection = get_connection()
+        cursor = connection.cursor()
+
+        try:
+            cursor.execute(
+                """
+                SELECT batch_nr
+                FROM samples
+                WHERE sample_id = %s
+                """,
+                (sample_id,)
+            )
+
+            result = cursor.fetchone()
+
+            if result is None:
+                return None
+
+            return result[0]
 
         finally:
             cursor.close()
