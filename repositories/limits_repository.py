@@ -303,3 +303,22 @@ class LimitsRepository:
         finally:
             cursor.close()
             connection.close()
+
+    def get_products_for_limits(self):
+        connection = get_connection()
+        cursor = connection.cursor(cursor_factory=RealDictCursor)
+
+        try:
+            cursor.execute(
+                """
+                SELECT product_id
+                FROM products
+                ORDER BY product_id
+                """
+            )
+
+            return cursor.fetchall()
+
+        finally: 
+            cursor.close()
+            connection.close()
