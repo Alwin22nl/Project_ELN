@@ -1,0 +1,89 @@
+.limits-page {
+    padding: 24px;
+    max-width: 1400px;
+}
+
+.limits-page h1 {
+    margin-bottom: 8px;
+}
+
+.limits-page label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 600;
+}
+
+.limits-page input,
+.limits-page select {
+    padding: 8px 10px;
+    border: 1px solid #d1d5db;
+    border-radius: 5px;
+    box-sizing: border-box;
+}
+
+.limit-product-selector {
+    margin: 24px 0;
+}
+
+.limits-section {
+    margin-top: 28px;
+    padding: 20px;
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+}
+
+.limit-form-grid {
+    display: grid;
+    grid-template-columns: repeat(
+        auto-fit,
+        minmax(180px, 1fr)
+    );
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.limit-form-grid input,
+.limit-form-grid select {
+    width: 100%;
+}
+
+.limits-page button {
+    padding: 8px 12px;
+    border: none;
+    border-radius: 5px;
+    background: #2563eb;
+    color: white;
+    cursor: pointer;
+}
+
+.limits-table-wrapper {
+    overflow-x: auto;
+}
+
+.limits-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.limits-table th,
+.limits-table td {
+    padding: 12px;
+    border-bottom: 1px solid #e5e7eb;
+    text-align: left;
+}
+
+.limit-inline-form {
+    display: inline-flex;
+    gap: 6px;
+    align-items: center;
+    margin: 3px 4px 3px 0;
+}
+
+.limit-inline-form input {
+    width: 90px;
+}
+
+.limits-page .limit-deactivate-button {
+    background: #dc2626;
+}

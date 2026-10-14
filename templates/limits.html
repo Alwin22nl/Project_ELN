@@ -1,0 +1,254 @@
+
+{% extends "base.html" %}
+
+{% block content %}
+
+<link
+    rel="stylesheet"
+    href="{{ url_for('static', filename='css/limits.css') }}"
+>
+
+<div class="limits-page">
+
+    <h1>Productlimieten</h1>
+
+    <p>
+        Beheer de toegestane meetwaarden per product en test.
+    </p>
+
+
+    <!-- Product selection -->
+
+    <form
+        method="GET"
+        action="{{ url_for('limits.manage_limits') }}"
+        class="limit-product-selector"
+    >
+
+        <label for="product_id">Product</label>
+
+        <select
+            name="product_id"
+            id="product_id"
+            onchange="this.form.submit()"
+        >
+
+            {% for product in products %}
+
+            <option
+                value="{{ product.product_id }}"
+                {% if product.product_id == selected_product_id %}
+                    selected
+                {% endif %}
+            >
+                Product {{ product.product_id }}
+            </option>
+
+            {% endfor %}
+
+        </select>
+
+    </form>
+
+
+    {% if selected_product_id is not none %}
+
+    <!-- New limit -->
+
+    <section class="limits-section">
+
+        <h2>Nieuwe limiet toevoegen</h2>
+
+        <form
+            method="POST"
+            action="{{ url_for('limits.create_limit') }}"
+            class="limit-create-form"
+        >
+
+            <input
+                type="hidden"
+                name="product_id"
+                value="{{ selected_product_id }}"
+            >
+
+            <div class="limit-form-grid">
+
+                <div>
+                    <label for="test_key">Test</label>
+
+                    <select
+                        name="test_key"
+                        id="test_key"
+                        required
+                    >
+
+                        {% for key, config in limit_config.items() %}
+
+                        <option value="{{ key }}">
+                            {{ config.label }}
+                        </option>
+
+                        {% endfor %}
+
+                    </select>
+                </div>
+
+
+                <div>
+                    <label for="field_name">Resultaatveld</label>
+
+                    <select
+                        name="field_name"
+                        id="field_name"
+                        required
+                    ></select>
+                </div>
+
+                <div>
+                    <label for="test_stage">Meetmoment</label>
+                    <select
+                        name="test_stage"
+                        id="test_stage"
+                        required
+                    ></select>
+                </div>
+
+                <div>
+                    <label for="min_value">Minimum</label>
+                    <input
+                        type="number"
+                        step="any"
+                        name="min_value"
+                        id="min_value"
+                        placeholder="Optioneel"
+                    >
+                </div>
+
+                <div>
+                    <label for="max_value">Maximum</label>
+                    <input
+                        type="number"
+                        step="any"
+                        name="max_value"
+                        id="max_value"
+                        placeholder="Optioneel"
+                    >
+                </div>
+            </div>
+            <button type="submit">
+                Limiet toevoegen
+            </button>
+        </form>
+    </section>
+
+    <!-- Existing limits -->
+    <section class="limits-section">
+
+        <h2>Actieve limieten</h2>
+
+        {% if product_limits %}
+        <div class="limits-table-wrapper">
+            <table class="limits-table">
+                <thead>
+                    <tr>
+                        <th>Test</th>
+                        <th>Resultaat</th>
+                        <th>Meetmoment</th>
+                        <th>Huidige limiet</th>
+                        <th>Acties</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for limit in product_limits %}
+                    <tr>
+
+                        <td>{{ limit.test_key }}</td>
+                        <td>{{ limit.field_name }}</td>
+
+                        <td>
+                            {% if limit.test_stage == "after_storage" %}
+                                After storage
+                            {% else %}
+                                Normaal
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            {{ limit.min_value if limit.min_value is not none else "—" }}
+                            –
+                            {{ limit.max_value if limit.max_value is not none else "—" }}
+                        </td>
+
+                        <td>
+                            <form
+                                method="POST"
+                                action="{{ url_for(
+                                    'limits.replace_limit',
+                                    limit_id=limit.limit_id
+                                ) }}"
+                                class="limit-inline-form"
+                            >
+                                <input
+                                    type="number"
+                                    step="any"
+                                    name="min_value"
+                                    aria-label="Nieuw minimum"
+                                    placeholder="Min"
+                                    value="{{ limit.min_value if limit.min_value is not none else '' }}"
+                                >
+                                <input
+                                    type="number"
+                                    step="any"
+                                    name="max_value"
+                                    aria-label="Nieuw maximum"
+                                    placeholder="Max"
+                                    value="{{ limit.max_value if limit.max_value is not none else '' }}"
+                                >
+                                <button type="submit">
+                                    Vervangen
+                                </button>
+
+                            </form>
+
+                            <form
+                                method="POST"
+                                action="{{ url_for(
+                                    'limits.deactivate_limit',
+                                    limit_id=limit.limit_id
+                                ) }}"
+                                class="limit-inline-form"
+                            >
+                                <button
+                                    type="submit"
+                                    class="limit-deactivate-button"
+                                    onclick="return confirm('Deze limiet deactiveren?')"
+                                >
+                                    Deactiveren
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p>
+            Voor dit product zijn nog geen actieve limieten ingesteld.
+        </p>
+        {% endif %}
+    </section>
+    {% endif %}
+
+</div>
+
+<script id="limit-config" type="application/json">
+    {{ limit_config | tojson }}
+</script>
+
+<script
+    src="{{ url_for('static', filename='js/limits.js') }}"
+    defer
+></script>
+{% endblock %}
