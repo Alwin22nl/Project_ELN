@@ -86,7 +86,7 @@ class LimitsRepository:
 
             cursor.execute(query, (product_id,))
 
-            return cursor.fetchall
+            return cursor.fetchall()
 
         finally:
             cursor.close()
@@ -311,7 +311,9 @@ class LimitsRepository:
         try:
             cursor.execute(
                 """
-                SELECT product_id
+                SELECT 
+                    product_id,
+                    product_name AS display_name
                 FROM products
                 ORDER BY product_id
                 """
