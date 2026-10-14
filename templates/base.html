@@ -57,6 +57,7 @@
                 {% if session.role == "admin" %}
                 <a href="{{ url_for('admin.audit_logs_admin') }}">Correction Logs</a>
                 <a href="{{ url_for('admin.admin_page') }}">Administration</a>
+                <a href="{{ url_for('limits.manage_limits') }}">Productlimieten</a>
                 {% endif %}
                 <div class="sidebar-bottom">
                     {% if session.get("user_id") %}

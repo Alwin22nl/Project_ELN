@@ -18,6 +18,7 @@ from routes.overview import overview_bp
 from routes.batch_search import batch_search_bp
 from routes.change_request import change_request_bp
 from routes.notifications import notification_bp
+from routes.limits import limits_bp
 
 # importing Test Routes
 from routes.tests import test_bp
@@ -50,6 +51,7 @@ app.register_blueprint(overview_bp)
 app.register_blueprint(batch_search_bp)
 app.register_blueprint(change_request_bp)
 app.register_blueprint(notification_bp)
+app.register_blueprint(limits_bp)
 
 # test routes
 app.register_blueprint(test_bp)
