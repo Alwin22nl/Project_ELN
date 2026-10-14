@@ -27,8 +27,8 @@ class LimitsService:
                 "Deze test heeft geen after-storage meeting."
             )
 
-    def get_product_limits(self, product_id, include_inactivity=False):
-        return self.repository.get_product_limits(product_id, include_inactivity)
+    def get_product_limits(self, product_id, include_inactive=False):
+        return self.repository.get_product_limits(product_id, include_inactive)
 
     def get_active_limit(self, product_id, test_key, field_name, test_stage="initial"):
         self.validate_limit_target(test_key, field_name, test_stage)

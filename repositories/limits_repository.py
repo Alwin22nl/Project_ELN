@@ -47,7 +47,7 @@ class LimitsRepository:
 
         return minimum, maximum
 
-    def het_product_limits(
+    def get_product_limits(
             self, 
             product_id,
             include_inactive=False
@@ -75,14 +75,14 @@ class LimitsRepository:
             if not include_inactive:
                 query += " AND is_active = TRUE"
 
-            query = """
-            ORDER BY
-                test_key,
-                field_name,
-                test_stage,
-                created_at DESC,
-                limit_id DESC
-            """
+            query += """
+                ORDER BY 
+                    test_key,
+                    field_name,
+                    test_stage,
+                    created_at DESC,
+                    limit_id DESC
+                """
 
             cursor.execute(query, (product_id,))
 
