@@ -75,3 +75,12 @@ class NotificationsService:
             })
 
         return notifications
+
+    def get_limit_notification_recipients(self):
+        return self.repository.get_limit_notification_recipients()
+
+    def close_limit_flag_notifications(self, flag_id):
+        self.repository.close_notifications(
+            reference_type="limit_flag",
+            reference_id=flag_id
+        )

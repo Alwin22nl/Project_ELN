@@ -315,5 +315,14 @@ NOTIFICATION_CONFIG = {
             "resultaat buiten de limieten."
         ),
         "link": "/quality/limit-triggers"
+    },
+    
+    "limit_exceeded": {
+        "title": "Limietoverschrijdingen",
+        "message": (
+            "1 of meerdere batches hebben "
+            "meetresultaten die buiten de gestelde limieten vallen"
+        ),
+        "link": "/limits/exceedances"
     }
 }

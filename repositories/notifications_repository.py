@@ -1,4 +1,5 @@
 from database import get_dict_cursor, get_connection
+from psycopg2.extras import RealDictCursor
 
 class NotificationsRepository:
     def get_active_notifications(self, user_id):
@@ -244,3 +245,24 @@ class NotificationsRepository:
         finally:
             cursor.close()
             connection.close()
+
+    def get_limit_notification_recipients(self):
+        connection = get_connection()
+        cursor = connection.cursor(cursor_factory=RealDictCursor)
+
+        try:
+            cursor.execute(
+                """
+                SELECT user_id
+                FROM users
+                ORDER BY user_id
+                """
+            )
+
+            return cursor.fetchall()
+
+        finally:
+            cursor.close()
+            connection.close()
+
+            
