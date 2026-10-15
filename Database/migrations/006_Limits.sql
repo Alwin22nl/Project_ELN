@@ -85,7 +85,7 @@ CREATE TABLE limit_flags (
         CHECK (status IN ('open', 'resolved')),
 
     CONSTRAINT limit_flags_valid_stage
-        CHECK test_stage IN ('initial', 'after_storage')
+        CHECK (test_stage IN ('initial', 'after_storage'))
 );
 
 CREATE UNIQUE INDEX uq_open_limit_flags
